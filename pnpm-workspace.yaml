@@ -1,0 +1,5 @@
+packages:
+  - 'agent-core'
+  - 'agent-fe'
+  - 'tsconfig'
+  - 'utils'
