@@ -1,7 +1,17 @@
+import { Lang, parse } from '@ast-grep/napi';
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, relative, resolve, sep } from 'node:path';
 
-const workspaceRoot = import.meta.dirname;
+type DependencyCheck = {
+  allowedDependencies: Map<string, Set<string>>;
+  projectRoot: string;
+  sourceFile: string;
+  sourceLayer: string;
+  specifier: string;
+  targetLayer: string | null;
+};
+
+const workspaceRoot = resolve(import.meta.dirname, '..');
 const frontendRoot = resolve(workspaceRoot, 'agent-fe/src');
 const agentCoreRoot = resolve(workspaceRoot, 'agent-core/src');
 const sourceExtensions = new Set(['.ts', '.tsx']);
@@ -12,17 +22,17 @@ const frontendDependencies = new Map([
   ['router', new Set(['components', 'pages'])],
   ['pages', new Set(['api', 'components', 'utils'])],
   ['components', new Set(['utils'])],
-  ['api', new Set()],
-  ['utils', new Set()]
+  ['api', new Set<string>()],
+  ['utils', new Set<string>()]
 ]);
 
 const agentCoreDependencies = new Map([
   ['entry', new Set(['orchestration', 'foundation'])],
   ['orchestration', new Set(['foundation'])],
-  ['foundation', new Set()]
+  ['foundation', new Set<string>()]
 ]);
 
-const collectSourceFiles = (directory) => {
+const collectSourceFiles = (directory: string): string[] => {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = resolve(directory, entry.name);
 
@@ -34,30 +44,49 @@ const collectSourceFiles = (directory) => {
   });
 };
 
-const getModuleSpecifiers = (filePath) => {
+const getModuleSpecifiers = (filePath: string): string[] => {
   const sourceText = readFileSync(filePath, 'utf8');
-  const staticModulePattern = /(?:^|\n)\s*(?:import|export)\s+(?:type\s+)?(?:[^'\"]*?\s+from\s+)?['\"]([^'\"]+)['\"]/g;
-  const dynamicModulePattern = /\bimport\s*\(\s*['\"]([^'\"]+)['\"]\s*\)/g;
+  const language = filePath.endsWith('.tsx') ? Lang.Tsx : Lang.TypeScript;
+  const rootNode = parse(language, sourceText).root();
+  const moduleSpecifiers: string[] = [];
 
-  return [
-    ...Array.from(sourceText.matchAll(staticModulePattern), (match) => match[1]),
-    ...Array.from(sourceText.matchAll(dynamicModulePattern), (match) => match[1])
-  ];
+  rootNode
+    .findAll({
+      rule: {
+        any: [
+          { kind: 'import_statement' },
+          { kind: 'export_statement' },
+          {
+            kind: 'call_expression',
+            has: { kind: 'import', stopBy: 'neighbor' }
+          }
+        ]
+      }
+    })
+    .forEach((node) => {
+      const stringNode = node.find({ rule: { kind: 'string' } });
+
+      if (stringNode) {
+        moduleSpecifiers.push(stringNode.text().slice(1, -1));
+      }
+    });
+
+  return moduleSpecifiers;
 };
 
-const getFrontendLayer = (filePath) => {
+const getFrontendLayer = (filePath: string) => {
   const relativePath = relative(frontendRoot, filePath);
 
   if (relativePath === 'index.tsx') {
     return 'entry';
   }
 
-  return relativePath.split(sep)[0];
+  return relativePath.split(sep)[0] ?? 'unknown';
 };
 
-const getFrontendTargetLayer = (sourceFile, specifier) => {
+const getFrontendTargetLayer = (sourceFile: string, specifier: string) => {
   if (specifier.startsWith('@/')) {
-    return specifier.slice(2).split('/')[0];
+    return specifier.slice(2).split('/')[0] ?? null;
   }
 
   if (!specifier.startsWith('.')) {
@@ -71,10 +100,10 @@ const getFrontendTargetLayer = (sourceFile, specifier) => {
     return null;
   }
 
-  return relativeTarget.split(sep)[0];
+  return relativeTarget.split(sep)[0] ?? null;
 };
 
-const getAgentCoreLayer = (filePath) => {
+const getAgentCoreLayer = (filePath: string) => {
   const relativePath = relative(agentCoreRoot, filePath);
   const sourcePath = relativePath.replace(/\.(?:js|jsx|ts|tsx)$/, '');
 
@@ -89,7 +118,7 @@ const getAgentCoreLayer = (filePath) => {
   return 'foundation';
 };
 
-const getAgentCoreTargetLayer = (sourceFile, specifier) => {
+const getAgentCoreTargetLayer = (sourceFile: string, specifier: string) => {
   if (!specifier.startsWith('.')) {
     return null;
   }
@@ -97,7 +126,14 @@ const getAgentCoreTargetLayer = (sourceFile, specifier) => {
   return getAgentCoreLayer(resolve(dirname(sourceFile), specifier));
 };
 
-const checkDependency = ({ sourceFile, sourceLayer, targetLayer, specifier, allowedDependencies, projectRoot }) => {
+const checkDependency = ({
+  sourceFile,
+  sourceLayer,
+  targetLayer,
+  specifier,
+  allowedDependencies,
+  projectRoot
+}: DependencyCheck) => {
   if (!targetLayer || sourceLayer === targetLayer) {
     return null;
   }

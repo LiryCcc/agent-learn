@@ -39,6 +39,13 @@ Use:
 - Use kebab-case for project-authored source file and directory names.
 - Use kebab-case for CSS class names, including CSS Module classes.
 
+## Development runtime
+
+- Use Node.js 26 for local development, dependency installation, linting, testing, and builds.
+- Node.js 26 runs erasable TypeScript directly. Store project checking and tooling scripts as `scripts/*.ts` and execute them with `node scripts/<script-name>.ts`.
+- Do not add `tsx`, `ts-node`, or a custom TypeScript loader for root tooling scripts.
+- Use the root `@ast-grep/napi` dependency for AST-aware source checks.
+
 ## Dependency direction
 
 - Keep dependencies acyclic and flowing from composition layers toward implementation layers.
@@ -52,4 +59,4 @@ Use:
   - `api` and `utils` must not depend on higher frontend layers.
   - Only `api` may import `@liry-a/agent-core`.
 - Agent core dependencies must flow from `index` to orchestration and then to configuration, prompts, and tools.
-- Run `pnpm check-layers` after changing imports.
+- Run `pnpm check-code` after changing project source and `pnpm check-layers` after changing imports.
