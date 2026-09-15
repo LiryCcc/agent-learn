@@ -80,18 +80,23 @@
 
 .model-summary {
   display: grid;
-  grid-template-columns: auto auto;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.1rem 0.55rem;
   align-items: center;
 }
 
+.model-summary strong,
 .model-summary small {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-summary small {
   max-width: min(55vw, 34rem);
   grid-column: 2;
   color: #7c867f;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .status-dot {
@@ -104,6 +109,7 @@
 
 .toolbar-actions {
   display: flex;
+  flex: 0 0 auto;
   gap: 0.8rem;
   align-items: center;
 }
@@ -144,8 +150,11 @@
 
 @media (max-width: 640px) {
   .page {
-    width: min(100% - 1rem, 72rem);
+    width: 100%;
     padding-top: 1.5rem;
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
   }
 
   .hero {
@@ -159,7 +168,8 @@
   }
 
   .chat-card {
-    min-height: calc(100vh - 11rem);
+    height: calc(100dvh - 14.5rem);
+    min-height: 32rem;
   }
 
   .model-summary small {
@@ -181,5 +191,48 @@
 @media (max-width: 760px) {
   .chat-card {
     flex-direction: column;
+  }
+
+  .chat-workspace {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .page {
+    width: 100%;
+    padding-top: 0.5rem;
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .chat-card {
+    height: calc(100dvh - 4.5rem);
+    min-height: 20rem;
+    flex-direction: row;
+  }
+
+  .toolbar {
+    min-height: 3.25rem;
+    padding: 0.45rem 0.75rem;
+    flex-direction: row;
+  }
+
+  .model-summary small {
+    max-width: min(34vw, 20rem);
+  }
+
+  .toolbar-actions {
+    width: auto;
+  }
+
+  .composer-shell {
+    padding: 0.5rem;
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
 }

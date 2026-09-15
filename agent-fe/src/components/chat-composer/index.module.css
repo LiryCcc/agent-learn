@@ -62,11 +62,50 @@
 }
 
 @media (max-width: 640px) {
+  .composer {
+    padding: 0.65rem;
+  }
+
+  .input {
+    min-height: 4rem;
+    font-size: 1rem;
+  }
+
   .footer span {
     display: none;
   }
 
   .footer {
     justify-content: flex-end;
+  }
+
+  .send-button {
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .composer {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .input {
+    min-height: 2.75rem;
+    max-height: 5rem;
+    resize: none;
+    font-size: 1rem;
+  }
+
+  .footer {
+    padding-top: 0.35rem;
+  }
+
+  .footer span {
+    display: none;
+  }
+
+  .send-button {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.9rem;
   }
 }

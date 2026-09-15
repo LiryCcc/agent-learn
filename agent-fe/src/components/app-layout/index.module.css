@@ -1,5 +1,6 @@
 .layout {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .header {
@@ -68,10 +69,73 @@
 
 @media (max-width: 640px) {
   .header {
-    padding: 0 1rem;
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-left: max(1rem, env(safe-area-inset-left));
   }
 
   .brand small {
     display: none;
+  }
+
+  .nav-link {
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 640px) and (orientation: portrait) {
+  .header {
+    gap: 0.65rem;
+    align-items: stretch;
+    padding-top: max(0.65rem, env(safe-area-inset-top));
+    padding-bottom: 0.65rem;
+    flex-direction: column;
+  }
+
+  .brand {
+    align-self: flex-start;
+  }
+
+  .brand-mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .navigation {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    display: grid;
+    padding: 0.55rem 0.25rem;
+    font-size: 0.82rem;
+    text-align: center;
+    place-items: center;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .header {
+    min-height: 3.5rem;
+    padding-top: max(0.4rem, env(safe-area-inset-top));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+    padding-bottom: 0.4rem;
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .brand-mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .navigation {
+    gap: 0.2rem;
+  }
+
+  .nav-link {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
   }
 }

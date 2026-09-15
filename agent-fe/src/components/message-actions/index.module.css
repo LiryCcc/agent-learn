@@ -48,4 +48,9 @@
   .actions {
     opacity: 1;
   }
+
+  .action {
+    min-height: 2.75rem;
+    padding: 0.45rem 0.6rem;
+  }
 }

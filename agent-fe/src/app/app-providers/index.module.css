@@ -11,6 +11,7 @@
     sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
 :global(*) {
@@ -20,6 +21,7 @@
 :global(body) {
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   background: radial-gradient(circle at 15% 0%, rgb(216 239 223 / 70%), transparent 34rem), #f4f5ef;
 }
@@ -37,4 +39,5 @@
 
 .root {
   min-height: 100vh;
+  min-height: 100dvh;
 }

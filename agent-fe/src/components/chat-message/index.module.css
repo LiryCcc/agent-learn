@@ -152,11 +152,37 @@
 @media (max-width: 640px) {
   .assistant,
   .user {
-    max-width: 94%;
+    max-width: 96%;
+  }
+
+  .content {
+    min-width: 0;
+    padding: 0.75rem 0.85rem;
   }
 
   .editor textarea {
-    width: 68vw;
+    width: min(78vw, 34rem);
     min-width: 0;
+    font-size: 1rem;
+  }
+
+  .editor-actions button {
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .assistant,
+  .user {
+    max-width: 88%;
+  }
+
+  .content {
+    padding: 0.65rem 0.8rem;
+  }
+
+  .editor textarea {
+    width: min(54vw, 32rem);
+    max-height: 7rem;
   }
 }

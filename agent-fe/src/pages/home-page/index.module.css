@@ -98,7 +98,11 @@
 
 @media (max-width: 720px) {
   .page {
+    width: 100%;
     padding-top: 4rem;
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(4rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
   }
 
   .feature-grid {
@@ -112,5 +116,69 @@
 
   .feature-card h2 {
     margin-top: 2rem;
+  }
+}
+
+@media (max-width: 420px) and (orientation: portrait) {
+  .page {
+    padding-top: 3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.75rem, 15vw, 4rem);
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    min-height: 3.25rem;
+  }
+
+  .feature-grid {
+    margin-top: 3rem;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .page {
+    width: 100%;
+    padding-top: 1.5rem;
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+  }
+
+  .hero h1 {
+    max-width: 36rem;
+    font-size: clamp(2.8rem, 9vw, 4.8rem);
+  }
+
+  .summary {
+    margin-top: 1rem;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .actions {
+    margin-top: 1.2rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .feature-card {
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .feature-card h2 {
+    margin-top: 1.25rem;
   }
 }

@@ -111,10 +111,74 @@
 
 @media (max-width: 640px) {
   .page {
+    width: 100%;
     padding-top: 3.5rem;
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(4rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
   }
 
   .actions {
     flex-direction: column;
+  }
+
+  .primary-button,
+  .danger-button {
+    min-height: 3rem;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .page {
+    width: 100%;
+    padding-top: 1rem;
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .hero {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    max-width: none;
+    margin-bottom: 1rem;
+  }
+
+  .eyebrow {
+    display: none;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+    white-space: nowrap;
+  }
+
+  .hero > p:last-child {
+    max-width: 24rem;
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .security-warning {
+    align-self: start;
+  }
+
+  .settings-fields {
+    gap: 0.75rem;
+    margin-top: 0;
+  }
+
+  .actions {
+    flex-direction: row;
   }
 }

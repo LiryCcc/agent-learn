@@ -88,3 +88,9 @@
   color: #a13c35;
   font-size: 0.76rem;
 }
+
+@media (max-width: 760px) {
+  .summary {
+    min-height: 2.75rem;
+  }
+}

@@ -56,3 +56,9 @@
 .label {
   white-space: nowrap;
 }
+
+@media (hover: none) {
+  .toggle {
+    min-height: 2.75rem;
+  }
+}
