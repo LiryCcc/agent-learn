@@ -2,9 +2,10 @@ import { useLiveQuery } from '@tanstack/solid-db';
 import { createMutation } from '@tanstack/solid-query';
 import { Link } from '@tanstack/solid-router';
 import { useSelector } from '@tanstack/solid-store';
-import { Show, createEffect, createSignal } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup } from 'solid-js';
 import { sendAgentMessage, type SendAgentMessageInput, type SendAgentMessageResult } from '@/api/agent.js';
 import ChatComposer from '@/components/chat-composer/index.jsx';
+import ConversationFullscreenToggle from '@/components/conversation-fullscreen-toggle/index.jsx';
 import ConversationList from '@/components/conversation-list/index.jsx';
 import DeepThinkingToggle from '@/components/deep-thinking-toggle/index.jsx';
 import MessageList from '@/components/message-list/index.jsx';
@@ -23,6 +24,7 @@ import {
   upsertConversationToolCall
 } from '@/utils/conversation-collection.js';
 import { conversationStore, selectConversation } from '@/utils/conversation-store.js';
+import { isolateFullscreenElement } from '@/utils/fullscreen-isolation.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { providerSettingsCollection } from '@/utils/provider-settings.js';
 import styles from './index.module.css';
@@ -46,15 +48,19 @@ const AgentPage = () => {
   const [prompt, setPrompt] = createSignal('');
   const [activeController, setActiveController] = createSignal<AbortController>();
   const [activeTraceId, setActiveTraceId] = createSignal<string>();
+  const [isFullscreen, setIsFullscreen] = createSignal(false);
   const activeConversationId = useSelector(conversationStore, (state) => state.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
+  let chatCardElement: HTMLElement | undefined;
   let recoveredInterruptedConversations = false;
 
   const conversations = () => sortConversations(conversationsQuery());
   const activeConversation = () => {
     return conversationsQuery().find((conversation) => conversation.id === activeConversationId());
   };
+  const chatCardClass = () =>
+    [styles['chat-card'], isFullscreen() ? styles['chat-card-fullscreen'] : undefined].filter(Boolean).join(' ');
   const messages = () => activeConversation()?.messages ?? [];
 
   createEffect(() => {
@@ -457,6 +463,39 @@ const AgentPage = () => {
     }
   };
 
+  const handleFullscreenChange = (enabled: boolean) => {
+    const conversation = activeConversation();
+
+    setIsFullscreen(enabled);
+    recordObservabilityEvent({
+      ...(conversation ? { conversationId: conversation.id } : {}),
+      details: { enabled },
+      event: 'conversation.fullscreen.changed',
+      scope: 'conversation',
+      traceId: createObservabilityTraceId('conversation')
+    });
+  };
+
+  createEffect(() => {
+    if (!isFullscreen()) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleFullscreenChange(false);
+      }
+    };
+    const restoreFullscreenIsolation = chatCardElement ? isolateFullscreenElement(chatCardElement) : undefined;
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    onCleanup(() => {
+      window.removeEventListener('keydown', handleKeyDown);
+      restoreFullscreenIsolation?.();
+    });
+  });
+
   return (
     <main class={styles['page']}>
       <section class={styles['hero']}>
@@ -481,37 +520,44 @@ const AgentPage = () => {
           </section>
         }
       >
-        <section class={styles['chat-card']}>
-          <ConversationList
-            activeConversationId={activeConversationId()}
-            conversations={conversations()}
-            disabled={sendMessage.isPending}
-            onCreate={handleCreateConversation}
-            onDelete={handleDeleteConversation}
-            onSelect={handleSelectConversation}
-          />
+        <section class={chatCardClass()} ref={chatCardElement}>
+          <Show when={!isFullscreen()}>
+            <ConversationList
+              activeConversationId={activeConversationId()}
+              conversations={conversations()}
+              disabled={sendMessage.isPending}
+              onCreate={handleCreateConversation}
+              onDelete={handleDeleteConversation}
+              onSelect={handleSelectConversation}
+            />
+          </Show>
 
           <div class={styles['chat-workspace']}>
             <div class={styles['toolbar']}>
-              <div class={styles['model-summary']}>
-                <span class={styles['status-dot']} />
-                <strong>{settings()?.model}</strong>
-                <small>{settings()?.baseUrl}</small>
-              </div>
+              <Show when={!isFullscreen()}>
+                <div class={styles['model-summary']}>
+                  <span class={styles['status-dot']} />
+                  <strong>{settings()?.model}</strong>
+                  <small>{settings()?.baseUrl}</small>
+                </div>
+              </Show>
               <div class={styles['toolbar-actions']}>
                 <DeepThinkingToggle
                   checked={activeConversation()?.deepThinking ?? false}
                   disabled={!activeConversation() || sendMessage.isPending}
                   onChange={handleDeepThinkingChange}
                 />
-                <button
-                  class={styles['text-button']}
-                  disabled={sendMessage.isPending || messages().length === 0}
-                  onClick={handleClearMessages}
-                  type='button'
-                >
-                  {'清空当前对话'}
-                </button>
+                <Show when={!isFullscreen()}>
+                  <button
+                    class={styles['text-button']}
+                    disabled={sendMessage.isPending || messages().length === 0}
+                    onClick={handleClearMessages}
+                    type='button'
+                  >
+                    {'清空当前对话'}
+                  </button>
+                </Show>
+                <ConversationFullscreenToggle active={isFullscreen()} onChange={handleFullscreenChange} />
               </div>
             </div>
 

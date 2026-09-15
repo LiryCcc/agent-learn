@@ -1,0 +1,33 @@
+.toggle-button {
+  display: inline-flex;
+  min-height: 2rem;
+  padding: 0.35rem 0.55rem;
+  gap: 0.35rem;
+  align-items: center;
+  border: 0;
+  border-radius: 0.4rem;
+  color: #617068;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.toggle-button:hover,
+.toggle-button[aria-pressed='true'] {
+  color: #176c46;
+  background: #edf3ee;
+}
+
+.toggle-button:focus-visible {
+  outline: 2px solid #2e8a60;
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .toggle-button {
+    min-height: 2.75rem;
+  }
+}

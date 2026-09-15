@@ -65,6 +65,40 @@
   min-height: 26rem;
 }
 
+.chat-card.chat-card-fullscreen {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  overscroll-behavior: none;
+}
+
+.chat-card-fullscreen .toolbar {
+  min-height: 3.5rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top));
+  padding-right: max(1.15rem, env(safe-area-inset-right));
+  padding-left: max(1.15rem, env(safe-area-inset-left));
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.chat-card-fullscreen .toolbar-actions {
+  width: auto;
+  margin-left: auto;
+}
+
+.chat-card-fullscreen .composer-shell {
+  padding-right: max(0.85rem, env(safe-area-inset-right));
+  padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
+  padding-left: max(0.85rem, env(safe-area-inset-left));
+}
+
 .chat-workspace {
   display: flex;
   overflow: hidden;
