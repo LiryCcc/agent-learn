@@ -1,8 +1,25 @@
-import { Link, Outlet } from '@tanstack/solid-router';
+import { Link, Outlet, useLocation } from '@tanstack/solid-router';
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools';
+import { createEffect } from 'solid-js';
+import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import styles from './index.module.css';
 
 const AppLayout = () => {
+  const location = useLocation();
+
+  createEffect(() => {
+    recordObservabilityEvent({
+      details: {
+        hash: location().hash,
+        path: location().pathname,
+        search: location().searchStr
+      },
+      event: 'navigation.changed',
+      scope: 'navigation',
+      traceId: createObservabilityTraceId('navigation')
+    });
+  });
+
   return (
     <div class={styles['layout']}>
       <header class={styles['header']}>

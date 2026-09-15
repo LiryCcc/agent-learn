@@ -9,6 +9,7 @@ import {
   saveProviderSettings
 } from '@/utils/provider-settings.js';
 import ControlledInput from '@/components/controlled-input/index.jsx';
+import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import styles from './index.module.css';
 
 const SettingsPage = () => {
@@ -46,11 +47,31 @@ const SettingsPage = () => {
 
     if (!result.success) {
       setError(result.error.issues[0]?.message ?? '配置无效。');
+      recordObservabilityEvent({
+        details: {
+          issueCount: result.error.issues.length,
+          issues: result.error.issues.map((issue) => ({ code: issue.code, path: issue.path }))
+        },
+        event: 'settings.validation.failed',
+        level: 'warn',
+        scope: 'settings',
+        traceId: createObservabilityTraceId('settings')
+      });
       return;
     }
 
     saveProviderSettings(result.data);
     setSaved(true);
+    recordObservabilityEvent({
+      details: {
+        baseUrl: result.data.baseUrl,
+        hasApiKey: result.data.apiKey.length > 0,
+        model: result.data.model
+      },
+      event: 'settings.saved',
+      scope: 'settings',
+      traceId: createObservabilityTraceId('settings')
+    });
   };
 
   const handleClear = () => {
@@ -61,6 +82,11 @@ const SettingsPage = () => {
     setError('');
     setSaved(false);
     loadedSavedSettings = false;
+    recordObservabilityEvent({
+      event: 'settings.cleared',
+      scope: 'settings',
+      traceId: createObservabilityTraceId('settings')
+    });
   };
 
   return (

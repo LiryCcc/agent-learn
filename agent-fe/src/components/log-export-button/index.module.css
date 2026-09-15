@@ -1,0 +1,63 @@
+.export-control {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: #e5eee7;
+}
+
+.export-control div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.export-control strong {
+  color: #234132;
+  font-size: 0.9rem;
+}
+
+.export-control span {
+  color: #6f7c74;
+  font-size: 0.78rem;
+}
+
+.export-control button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: white;
+  background: #176c46;
+  cursor: pointer;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.export-control button:hover {
+  background: #125a3a;
+}
+
+@media (max-width: 520px) and (orientation: portrait) {
+  .export-control {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 560px) and (orientation: landscape) {
+  .export-control {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .export-control span {
+    display: none;
+  }
+
+  .export-control button {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.8rem;
+  }
+}

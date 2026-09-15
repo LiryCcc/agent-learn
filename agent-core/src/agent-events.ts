@@ -1,5 +1,17 @@
 export type AgentToolCallStatus = 'error' | 'finished' | 'running';
 
+export type AgentLogLevel = 'debug' | 'error' | 'info' | 'warn';
+
+export type AgentObservabilityEvent = {
+  details: Record<string, unknown>;
+  event: string;
+  level: AgentLogLevel;
+  scope: 'agent-core';
+  timestamp: string;
+  traceId: string;
+  traceSequence: number;
+};
+
 export type AgentToolCallRecord = {
   id: string;
   input: string;
@@ -22,6 +34,8 @@ export type BrowserAgentResult = {
 
 export type BrowserAgentInvokeOptions = {
   signal?: AbortSignal;
+  traceId?: string;
+  onLog?: (event: AgentObservabilityEvent) => void;
   onReasoning?: (reasoning: string) => void;
   onText?: (content: string) => void;
   onToolCall?: (toolCall: AgentToolCallRecord) => void;

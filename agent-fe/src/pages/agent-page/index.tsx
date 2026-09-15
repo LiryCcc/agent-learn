@@ -23,6 +23,7 @@ import {
   upsertConversationToolCall
 } from '@/utils/conversation-collection.js';
 import { conversationStore, selectConversation } from '@/utils/conversation-store.js';
+import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { providerSettingsCollection } from '@/utils/provider-settings.js';
 import styles from './index.module.css';
 
@@ -44,6 +45,7 @@ const sortConversations = (conversations: ChatConversation[]) => {
 const AgentPage = () => {
   const [prompt, setPrompt] = createSignal('');
   const [activeController, setActiveController] = createSignal<AbortController>();
+  const [activeTraceId, setActiveTraceId] = createSignal<string>();
   const activeConversationId = useSelector(conversationStore, (state) => state.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
@@ -65,6 +67,12 @@ const AgentPage = () => {
     if (!recoveredInterruptedConversations) {
       recoveredInterruptedConversations = true;
       availableConversations.forEach((conversation) => recoverInterruptedConversation(conversation.id));
+      recordObservabilityEvent({
+        details: { conversationCount: availableConversations.length },
+        event: 'conversation.interrupted-runs.recovered',
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
 
     if (availableConversations.some((conversation) => conversation.id === activeConversationId())) {
@@ -74,6 +82,16 @@ const AgentPage = () => {
     const nextConversation = availableConversations[0] ?? createConversation();
 
     selectConversation(nextConversation.id);
+
+    if (availableConversations.length === 0) {
+      recordObservabilityEvent({
+        conversationId: nextConversation.id,
+        details: { source: 'initialization' },
+        event: 'conversation.created',
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
+    }
   });
 
   const sendMessage = createMutation<SendAgentMessageResult, Error, AgentMutationInput>(() => ({
@@ -85,6 +103,18 @@ const AgentPage = () => {
         status: 'complete',
         toolCalls: result.toolCalls,
         ...(result.reasoning ? { reasoning: result.reasoning } : {})
+      });
+      recordObservabilityEvent({
+        conversationId: input.conversationId,
+        details: {
+          contentLength: result.content.length,
+          reasoningLength: result.reasoning?.length ?? 0,
+          toolCallCount: result.toolCalls.length
+        },
+        event: 'conversation.response.persisted',
+        messageId: input.assistantMessageId,
+        scope: 'conversation',
+        traceId: input.traceId ?? createObservabilityTraceId('agent')
       });
     },
     onError: (error, input) => {
@@ -98,8 +128,23 @@ const AgentPage = () => {
               status: 'failed'
             }
       );
+      recordObservabilityEvent({
+        conversationId: input.conversationId,
+        details: {
+          aborted: input.signal?.aborted ?? false,
+          error
+        },
+        event: 'conversation.response.failed',
+        level: input.signal?.aborted ? 'warn' : 'error',
+        messageId: input.assistantMessageId,
+        scope: 'conversation',
+        traceId: input.traceId ?? createObservabilityTraceId('agent')
+      });
     },
-    onSettled: () => setActiveController(undefined)
+    onSettled: () => {
+      setActiveController(undefined);
+      setActiveTraceId(undefined);
+    }
   }));
 
   const settings = () => settingsQuery()[0];
@@ -108,7 +153,9 @@ const AgentPage = () => {
   const runAssistant = (
     conversation: ChatConversation,
     conversationMessages: ReturnType<typeof toConversationMessages>,
-    assistantMessageId: string
+    assistantMessageId: string,
+    trigger: 'regenerate' | 'resend' | 'send',
+    requestedTraceId?: string
   ) => {
     const providerSettings = settings();
 
@@ -117,12 +164,42 @@ const AgentPage = () => {
     }
 
     const controller = new AbortController();
+    const traceId = requestedTraceId ?? createObservabilityTraceId('agent');
 
     setActiveController(controller);
+    setActiveTraceId(traceId);
+    recordObservabilityEvent({
+      conversationId: conversation.id,
+      details: {
+        deepThinking: conversation.deepThinking,
+        messageCount: conversationMessages.length,
+        model: providerSettings.model,
+        trigger
+      },
+      event: 'conversation.agent.dispatched',
+      messageId: assistantMessageId,
+      scope: 'conversation',
+      traceId
+    });
     sendMessage.mutate({
       assistantMessageId,
       conversationId: conversation.id,
       messages: conversationMessages,
+      onLog: (event) =>
+        recordObservabilityEvent(
+          {
+            conversationId: conversation.id,
+            details: event.details,
+            event: event.event,
+            level: event.level,
+            messageId: assistantMessageId,
+            scope: event.scope,
+            timestamp: event.timestamp,
+            traceId: event.traceId,
+            traceSequence: event.traceSequence
+          },
+          { print: false }
+        ),
       onReasoning: (reasoning) => updateConversationMessage(conversation.id, assistantMessageId, { reasoning }),
       onText: (content) => updateConversationMessage(conversation.id, assistantMessageId, { content }),
       onToolCall: (toolCall) => upsertConversationToolCall(conversation.id, assistantMessageId, toolCall),
@@ -130,7 +207,8 @@ const AgentPage = () => {
         ...providerSettings,
         deepThinking: conversation.deepThinking
       },
-      signal: controller.signal
+      signal: controller.signal,
+      traceId
     });
   };
 
@@ -152,12 +230,25 @@ const AgentPage = () => {
 
     selectConversation(conversation.id);
     setPrompt('');
+    recordObservabilityEvent({
+      conversationId: conversation.id,
+      details: { source: 'user' },
+      event: 'conversation.created',
+      scope: 'conversation',
+      traceId: createObservabilityTraceId('conversation')
+    });
   };
 
   const handleSelectConversation = (conversationId: string) => {
     if (!sendMessage.isPending) {
       selectConversation(conversationId);
       setPrompt('');
+      recordObservabilityEvent({
+        conversationId,
+        event: 'conversation.selected',
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
   };
 
@@ -167,8 +258,19 @@ const AgentPage = () => {
     }
 
     const remainingConversations = conversations().filter((conversation) => conversation.id !== conversationId);
+    const deletedConversation = conversationsQuery().find((conversation) => conversation.id === conversationId);
 
     deleteConversation(conversationId);
+    recordObservabilityEvent({
+      conversationId,
+      details: {
+        messageCount: deletedConversation?.messages.length ?? 0,
+        wasActive: activeConversationId() === conversationId
+      },
+      event: 'conversation.deleted',
+      scope: 'conversation',
+      traceId: createObservabilityTraceId('conversation')
+    });
 
     if (activeConversationId() === conversationId) {
       selectConversation(remainingConversations[0]?.id ?? null);
@@ -189,15 +291,50 @@ const AgentPage = () => {
     const assistantMessage = appendAssistantPlaceholder(conversation.id);
 
     setPrompt('');
-    runAssistant(conversation, conversationMessages, assistantMessage.id);
+    runAssistant(conversation, conversationMessages, assistantMessage.id, 'send');
   };
 
   const handleStop = () => {
+    const conversation = activeConversation();
+
+    if (conversation) {
+      recordObservabilityEvent({
+        conversationId: conversation.id,
+        event: 'conversation.agent.stop-requested',
+        level: 'warn',
+        scope: 'conversation',
+        traceId: activeTraceId() ?? createObservabilityTraceId('agent')
+      });
+    }
+
     activeController()?.abort();
   };
 
   const handleCopy = (content: string) => {
-    void navigator.clipboard.writeText(content).catch(() => undefined);
+    const conversation = activeConversation();
+    const traceId = createObservabilityTraceId('clipboard');
+
+    void navigator.clipboard
+      .writeText(content)
+      .then(() =>
+        recordObservabilityEvent({
+          ...(conversation ? { conversationId: conversation.id } : {}),
+          details: { contentLength: content.length },
+          event: 'conversation.message.copied',
+          scope: 'conversation',
+          traceId
+        })
+      )
+      .catch((error: unknown) =>
+        recordObservabilityEvent({
+          ...(conversation ? { conversationId: conversation.id } : {}),
+          details: { error },
+          event: 'conversation.message.copy-failed',
+          level: 'error',
+          scope: 'conversation',
+          traceId
+        })
+      );
   };
 
   const handleSave = (messageId: string, content: string) => {
@@ -205,6 +342,14 @@ const AgentPage = () => {
 
     if (conversation) {
       updateConversationMessage(conversation.id, messageId, { content });
+      recordObservabilityEvent({
+        conversationId: conversation.id,
+        details: { contentLength: content.length },
+        event: 'conversation.message.edited',
+        messageId,
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
   };
 
@@ -224,8 +369,17 @@ const AgentPage = () => {
     updateConversationMessage(conversation.id, messageId, { content });
     removeConversationMessagesAfter(conversation.id, messageId);
     const assistantMessage = appendAssistantPlaceholder(conversation.id);
+    const traceId = createObservabilityTraceId('agent');
 
-    runAssistant(conversation, conversationMessages, assistantMessage.id);
+    recordObservabilityEvent({
+      conversationId: conversation.id,
+      details: { contentLength: content.length },
+      event: 'conversation.message.resent',
+      messageId,
+      scope: 'conversation',
+      traceId
+    });
+    runAssistant(conversation, conversationMessages, assistantMessage.id, 'resend', traceId);
   };
 
   const handleDeleteMessage = (messageId: string) => {
@@ -233,6 +387,13 @@ const AgentPage = () => {
 
     if (conversation && !sendMessage.isPending) {
       removeConversationMessagesFrom(conversation.id, messageId);
+      recordObservabilityEvent({
+        conversationId: conversation.id,
+        event: 'conversation.messages.deleted-from',
+        messageId,
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
   };
 
@@ -252,15 +413,32 @@ const AgentPage = () => {
 
     removeConversationMessagesFrom(conversation.id, messageId);
     const assistantMessage = appendAssistantPlaceholder(conversation.id);
+    const traceId = createObservabilityTraceId('agent');
 
-    runAssistant(conversation, conversationMessages, assistantMessage.id);
+    recordObservabilityEvent({
+      conversationId: conversation.id,
+      event: 'conversation.response.regenerated',
+      messageId,
+      scope: 'conversation',
+      traceId
+    });
+    runAssistant(conversation, conversationMessages, assistantMessage.id, 'regenerate', traceId);
   };
 
   const handleClearMessages = () => {
     const conversation = activeConversation();
 
     if (conversation && !sendMessage.isPending) {
+      const messageCount = conversation.messages.length;
+
       clearConversationMessages(conversation.id);
+      recordObservabilityEvent({
+        conversationId: conversation.id,
+        details: { messageCount },
+        event: 'conversation.messages.cleared',
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
   };
 
@@ -269,6 +447,13 @@ const AgentPage = () => {
 
     if (conversation && !sendMessage.isPending) {
       setConversationDeepThinking(conversation.id, enabled);
+      recordObservabilityEvent({
+        conversationId: conversation.id,
+        details: { enabled },
+        event: 'conversation.deep-thinking.changed',
+        scope: 'conversation',
+        traceId: createObservabilityTraceId('conversation')
+      });
     }
   };
 

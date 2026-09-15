@@ -1,6 +1,8 @@
 export { createBrowserAgent, type BrowserAgent } from './browser-agent.js';
 export { browserAgentConfigSchema, type BrowserAgentConfig } from './browser-agent-config.js';
 export type {
+  AgentLogLevel,
+  AgentObservabilityEvent,
   AgentToolCallRecord,
   AgentToolCallStatus,
   BrowserAgentInvokeOptions,
