@@ -83,6 +83,9 @@ importers:
 
   agent-fe:
     dependencies:
+      '@fontsource-variable/roboto-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@liry-a/agent-core':
         specifier: workspace:*
         version: link:../agent-core
@@ -901,6 +904,10 @@ packages:
     engines: { node: '>=18' }
     cpu: [x64]
     os: [win32]
+
+  '@fontsource-variable/roboto-mono@5.3.0':
+    resolution:
+      { integrity: sha512-h5r+KY/6qy8JEOj33JgcrFO81YAnvrc1EAwMpl/EPJLb2OIvOy0/jmB5M7qs7x/uXk5JUP5Ux4LrkeOK7faHkQ== }
 
   '@jest/diff-sequences@30.0.1':
     resolution:
@@ -3972,6 +3979,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@fontsource-variable/roboto-mono@5.3.0': {}
 
   '@jest/diff-sequences@30.0.1': {}
 

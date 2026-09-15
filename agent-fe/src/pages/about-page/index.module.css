@@ -97,7 +97,7 @@
   overflow: hidden;
   margin: 0.7rem 0 0;
   color: #173929;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   font-size: 0.9rem;
   font-weight: 650;
   text-overflow: ellipsis;

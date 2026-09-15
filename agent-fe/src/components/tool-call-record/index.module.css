@@ -22,7 +22,7 @@
 
 .summary strong {
   overflow: hidden;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   font-size: 0.78rem;
   text-overflow: ellipsis;
   white-space: nowrap;
