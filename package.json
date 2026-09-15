@@ -6,7 +6,7 @@
     "check-code": "node scripts/check-source-conventions.ts",
     "check-layers": "node scripts/check-layer-dependencies.ts",
     "check-runtime": "node scripts/check-runtime.ts",
-    "check-scripts": "tsc -p scripts/tsconfig.json",
+    "check-scripts": "tsc -p tsconfig.json",
     "check-spell": "cspell . --cache",
     "format": "prettier . --write --cache",
     "lint": "pnpm check-runtime && pnpm check-spell && pnpm check-scripts && pnpm check-code && pnpm check-layers && pnpm -r lint"

@@ -37,8 +37,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run lint checks
-        run: pnpm lint
+      - name: Verify Node.js runtime
+        run: pnpm check-runtime
+
+      - name: Type-check repository scripts
+        run: pnpm check-scripts
+
+      - name: Check source conventions
+        run: pnpm check-code
+
+      - name: Check layer dependencies
+        run: pnpm check-layers
+
+      - name: Check spelling
+        run: pnpm check-spell
+
+      - name: Lint workspace packages
+        run: pnpm -r lint
 
       - name: Build workspace
         run: pnpm build
