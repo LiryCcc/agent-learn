@@ -1,0 +1,23 @@
+.field {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.label {
+  font-size: 0.86rem;
+  font-weight: 720;
+}
+
+.input {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #d6ddd5;
+  border-radius: 0.75rem;
+  outline: none;
+  background: white;
+}
+
+.input:focus {
+  border-color: #31805b;
+  box-shadow: 0 0 0 0.22rem rgb(49 128 91 / 13%);
+}

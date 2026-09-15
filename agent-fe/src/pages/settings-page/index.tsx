@@ -8,6 +8,7 @@ import {
   providerSettingsSchema,
   saveProviderSettings
 } from '@/utils/provider-settings.js';
+import ControlledInput from '@/components/controlled-input/index.jsx';
 import styles from './index.module.css';
 
 const SettingsPage = () => {
@@ -32,8 +33,7 @@ const SettingsPage = () => {
     loadedSavedSettings = true;
   });
 
-  const handleSubmit = (event: SubmitEvent) => {
-    event.preventDefault();
+  const handleSave = () => {
     setError('');
     setSaved(false);
 
@@ -77,38 +77,37 @@ const SettingsPage = () => {
           <p>{'仅在个人可信设备上使用，不要填写应用或团队共享的长期密钥。'}</p>
         </div>
 
-        <form class={styles['form']} onSubmit={handleSubmit}>
-          <label>
-            <span>{'API Key'}</span>
-            <input
-              autocomplete='new-password'
-              onInput={(event) => setApiKey(event.currentTarget.value)}
-              placeholder='sk-...'
-              type='password'
-              value={apiKey()}
-            />
-          </label>
+        <div class={styles['settings-fields']}>
+          <ControlledInput
+            autocomplete='off'
+            label='API Key'
+            name='api-key'
+            onValueChange={setApiKey}
+            placeholder='sk-...'
+            type='password'
+            value={apiKey()}
+          />
 
-          <label>
-            <span>{'Base URL'}</span>
-            <input
-              inputmode='url'
-              onInput={(event) => setBaseUrl(event.currentTarget.value)}
-              placeholder='https://api.openai.com/v1'
-              type='url'
-              value={baseUrl()}
-            />
-          </label>
+          <ControlledInput
+            autocomplete='url'
+            inputmode='url'
+            label='Base URL'
+            name='base-url'
+            onValueChange={setBaseUrl}
+            placeholder='https://api.openai.com/v1'
+            type='url'
+            value={baseUrl()}
+          />
 
-          <label>
-            <span>{'模型名'}</span>
-            <input
-              onInput={(event) => setModel(event.currentTarget.value)}
-              placeholder='gpt-4o-mini'
-              type='text'
-              value={model()}
-            />
-          </label>
+          <ControlledInput
+            autocomplete='off'
+            label='模型名'
+            name='model'
+            onValueChange={setModel}
+            placeholder='gpt-4o-mini'
+            type='text'
+            value={model()}
+          />
 
           <Show when={error()}>
             <p class={styles['error']}>{error()}</p>
@@ -118,14 +117,14 @@ const SettingsPage = () => {
           </Show>
 
           <div class={styles['actions']}>
-            <button class={styles['primary-button']} type='submit'>
+            <button class={styles['primary-button']} type='button' onClick={handleSave}>
               {'保存设置'}
             </button>
             <button class={styles['danger-button']} type='button' onClick={handleClear}>
               {'删除本地设置'}
             </button>
           </div>
-        </form>
+        </div>
       </section>
     </main>
   );

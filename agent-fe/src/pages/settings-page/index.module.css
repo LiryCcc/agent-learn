@@ -54,34 +54,10 @@
   line-height: 1.55;
 }
 
-.form {
+.settings-fields {
   display: grid;
   gap: 1.2rem;
   margin-top: 1.7rem;
-}
-
-.form label {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.form label span {
-  font-size: 0.86rem;
-  font-weight: 720;
-}
-
-.form input {
-  width: 100%;
-  padding: 0.85rem 0.95rem;
-  border: 1px solid #d6ddd5;
-  border-radius: 0.75rem;
-  outline: none;
-  background: white;
-}
-
-.form input:focus {
-  border-color: #31805b;
-  box-shadow: 0 0 0 0.22rem rgb(49 128 91 / 13%);
 }
 
 .actions {
