@@ -6,15 +6,18 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite dev",
+    "lint": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {
     "@liry-a/agent-core": "workspace:*",
+    "@tanstack/solid-db": "^0.2.43",
     "@tanstack/solid-query": "^5.102.8",
     "@tanstack/solid-query-devtools": "^5.102.8",
     "@tanstack/solid-router": "^1.170.34",
     "@tanstack/solid-router-devtools": "^1.167.2",
     "@tanstack/solid-store": "^0.11.1",
+    "normalize.css": "^8.0.1",
     "solid-js": "^1.9.15",
     "zod": "^4.6.5"
   },

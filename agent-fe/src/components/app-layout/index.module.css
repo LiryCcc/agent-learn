@@ -1,0 +1,77 @@
+.layout {
+  min-height: 100vh;
+}
+
+.header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  padding: 0 6vw;
+  border-bottom: 1px solid rgb(24 32 28 / 9%);
+  background: rgb(244 245 239 / 86%);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  color: inherit;
+  font-weight: 760;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.brand small {
+  display: block;
+  margin-top: 0.35rem;
+  color: #758078;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.7rem;
+  color: #f5fff7;
+  background: #176c46;
+  box-shadow: 0 0.5rem 1.5rem rgb(23 108 70 / 25%);
+  place-items: center;
+}
+
+.navigation {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.nav-link {
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  color: #68736b;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link[aria-current='page'] {
+  color: #125f3d;
+  background: #e1eee5;
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0 1rem;
+  }
+
+  .brand small {
+    display: none;
+  }
+}

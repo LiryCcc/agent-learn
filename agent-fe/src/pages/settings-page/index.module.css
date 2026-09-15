@@ -1,0 +1,144 @@
+.page {
+  width: min(92vw, 48rem);
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+}
+
+.hero {
+  max-width: 44rem;
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  color: #227a52;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.hero > p:last-child {
+  margin: 1.3rem 0 0;
+  color: #667168;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.card {
+  padding: clamp(1.3rem, 4vw, 2.2rem);
+  border: 1px solid rgb(24 32 28 / 10%);
+  border-radius: 1.4rem;
+  background: rgb(255 255 252 / 88%);
+  box-shadow: 0 1.5rem 4rem rgb(44 61 51 / 8%);
+}
+
+.security-warning {
+  padding: 1rem 1.1rem;
+  border: 1px solid #ead9a9;
+  border-radius: 0.9rem;
+  color: #5f4c19;
+  background: #fff9e7;
+}
+
+.security-warning p {
+  margin: 0.45rem 0 0;
+  color: #756636;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.form {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1.7rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.form label span {
+  font-size: 0.86rem;
+  font-weight: 720;
+}
+
+.form input {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #d6ddd5;
+  border-radius: 0.75rem;
+  outline: none;
+  background: white;
+}
+
+.form input:focus {
+  border-color: #31805b;
+  box-shadow: 0 0 0 0.22rem rgb(49 128 91 / 13%);
+}
+
+.actions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.3rem;
+}
+
+.primary-button,
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.primary-button {
+  color: white;
+  background: #176c46;
+  box-shadow: 0 0.6rem 1.4rem rgb(23 108 70 / 18%);
+}
+
+.danger-button {
+  border-color: #e3c8c3;
+  color: #9e4032;
+  background: #fff9f7;
+}
+
+.error,
+.success {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.7rem;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #9c362a;
+  background: #fff0ed;
+}
+
+.success {
+  color: #176c46;
+  background: #eaf6ee;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-top: 3.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

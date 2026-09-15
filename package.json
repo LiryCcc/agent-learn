@@ -3,9 +3,10 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
+    "check-layers": "node check-layer-dependencies.js",
     "check-spell": "cspell . --cache",
     "format": "prettier . --write --cache",
-    "lint": "pnpm check-spell && pnpm -r lint"
+    "lint": "pnpm check-spell && pnpm check-layers && pnpm -r lint"
   },
   "devDependencies": {
     "@types/node": "^26.5.1",

@@ -7,9 +7,12 @@ const commands = [
       '--filter',
       '@liry-a/agent-core',
       'add',
+      '@langchain/core',
+      '@langchain/langgraph',
       '@langchain/openai',
-      'zod',
-    ],
+      'langchain',
+      'zod'
+    ]
   },
   {
     description: 'Installing Solid and TanStack dependencies in agent-fe',
@@ -18,13 +21,17 @@ const commands = [
       '@liry-a/agent-fe',
       'add',
       '@liry-a/agent-core@workspace:*',
+      '@tanstack/solid-db',
       '@tanstack/solid-query',
       '@tanstack/solid-query-devtools',
       '@tanstack/solid-router',
       '@tanstack/solid-router-devtools',
       '@tanstack/solid-store',
-    ],
-  },
+      'normalize.css',
+      'solid-js',
+      'zod'
+    ]
+  }
 ];
 
 const runPnpm = ({ description, args }) => {
@@ -33,7 +40,7 @@ const runPnpm = ({ description, args }) => {
   const result = spawnSync('pnpm', args, {
     cwd: import.meta.dirname,
     shell: false,
-    stdio: 'inherit',
+    stdio: 'inherit'
   });
 
   if (result.error) {

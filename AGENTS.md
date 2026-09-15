@@ -14,3 +14,42 @@ const Example = () => {
 
 export default Example;
 ```
+
+## JSX text nodes
+
+- Do not write visible text as a bare JSX text node.
+- Wrap numeric and string content in a JSX expression.
+
+Do not use:
+
+```tsx
+<div>123</div>
+```
+
+Use:
+
+```tsx
+<div>{123}</div>
+<div>{'123'}</div>
+<div>{'123abc'}</div>
+```
+
+## Naming
+
+- Use kebab-case for project-authored source file and directory names.
+- Use kebab-case for CSS class names, including CSS Module classes.
+
+## Dependency direction
+
+- Keep dependencies acyclic and flowing from composition layers toward implementation layers.
+- Never add a reverse dependency from a lower layer to a higher layer.
+- Frontend dependencies must follow these boundaries:
+  - `entry` may depend on `app`.
+  - `app` may depend on `router` and `utils`.
+  - `router` may depend on `pages` and `components`.
+  - `pages` may depend on `components`, `api`, and `utils`.
+  - `components` may depend on `utils`.
+  - `api` and `utils` must not depend on higher frontend layers.
+  - Only `api` may import `@liry-a/agent-core`.
+- Agent core dependencies must flow from `index` to orchestration and then to configuration, prompts, and tools.
+- Run `pnpm check-layers` after changing imports.

@@ -1,0 +1,44 @@
+.assistant,
+.user {
+  max-width: 78%;
+}
+
+.user {
+  align-self: flex-end;
+}
+
+.label {
+  display: block;
+  margin: 0 0 0.4rem 0.3rem;
+  color: #7d8880;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.user .label {
+  text-align: right;
+}
+
+.content {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  color: #26312a;
+  background: #edf1ec;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.user .content {
+  border-radius: 1rem 1rem 0.25rem;
+  color: white;
+  background: #176c46;
+}
+
+@media (max-width: 640px) {
+  .assistant,
+  .user {
+    max-width: 92%;
+  }
+}

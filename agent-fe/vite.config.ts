@@ -3,6 +3,9 @@ import { defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
 
 export default defineConfig({
+  build: {
+    target: 'es2020'
+  },
   plugins: [solid()],
   resolve: {
     alias: {
