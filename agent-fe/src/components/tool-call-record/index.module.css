@@ -1,0 +1,90 @@
+.record {
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+  border: 1px solid #dce3dd;
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 70%);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary strong {
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tool-icon {
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 0.4rem;
+  color: #176c46;
+  background: #e2f1e7;
+  font-size: 0.8rem;
+  place-items: center;
+}
+
+.status-running,
+.status-finished,
+.status-error {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.status-running {
+  color: #a56a12;
+}
+
+.status-finished {
+  color: #277552;
+}
+
+.status-error {
+  color: #a13c35;
+}
+
+.details {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0 0.75rem 0.75rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #7b867f;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.details pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  background: #f1f4f1;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.error {
+  margin: 0;
+  color: #a13c35;
+  font-size: 0.76rem;
+}

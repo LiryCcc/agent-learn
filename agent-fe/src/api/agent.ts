@@ -1,11 +1,26 @@
-import { createBrowserAgent, type BrowserAgentConfig } from '@liry-a/agent-core';
+import {
+  createBrowserAgent,
+  type AgentToolCallRecord,
+  type BrowserAgentConfig,
+  type BrowserAgentMessage,
+  type BrowserAgentResult
+} from '@liry-a/agent-core';
 
 export type SendAgentMessageInput = {
-  message: string;
+  messages: BrowserAgentMessage[];
   provider: BrowserAgentConfig;
+  signal?: AbortSignal;
+  onText?: (content: string) => void;
+  onToolCall?: (toolCall: AgentToolCallRecord) => void;
 };
 
-export const sendAgentMessage = async ({ message, provider }: SendAgentMessageInput) => {
+export type SendAgentMessageResult = BrowserAgentResult;
+
+export const sendAgentMessage = async ({ messages, provider, signal, onText, onToolCall }: SendAgentMessageInput) => {
   const agent = createBrowserAgent(provider);
-  return agent.invoke(message);
+  return agent.invoke(messages, {
+    ...(signal ? { signal } : {}),
+    ...(onText ? { onText } : {}),
+    ...(onToolCall ? { onToolCall } : {})
+  });
 };

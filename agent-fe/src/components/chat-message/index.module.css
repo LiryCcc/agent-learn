@@ -1,6 +1,11 @@
 .assistant,
 .user {
-  max-width: 78%;
+  width: fit-content;
+  max-width: min(82%, 46rem);
+}
+
+.assistant {
+  align-self: flex-start;
 }
 
 .user {
@@ -9,10 +14,11 @@
 
 .label {
   display: block;
-  margin: 0 0 0.4rem 0.3rem;
+  margin: 0 0 0.35rem 0.3rem;
   color: #7d8880;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -21,41 +27,136 @@
 }
 
 .content {
-  margin: 0;
-  padding: 0.9rem 1rem;
+  min-width: 7rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e0e5e0;
   border-radius: 1rem 1rem 1rem 0.25rem;
   color: #26312a;
-  background: #edf1ec;
-  line-height: 1.55;
-  white-space: normal;
-}
-
-.content > :first-child {
-  margin-top: 0;
-}
-
-.content > :last-child {
-  margin-bottom: 0;
-}
-
-.content pre {
-  overflow-x: auto;
-  white-space: pre;
-}
-
-.content a {
-  color: inherit;
+  background: #f3f5f2;
+  line-height: 1.58;
 }
 
 .user .content {
+  border-color: #176c46;
   border-radius: 1rem 1rem 0.25rem;
   color: white;
   background: #176c46;
 }
 
+.markdown > :first-child,
+.markdown > :first-child > :first-child {
+  margin-top: 0;
+}
+
+.markdown > :last-child,
+.markdown > :last-child > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  padding: 0.75rem;
+  border-radius: 0.55rem;
+  background: rgb(15 26 20 / 8%);
+  white-space: pre;
+}
+
+.markdown code {
+  font-size: 0.88em;
+}
+
+.markdown a {
+  color: inherit;
+}
+
+.markdown table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown th,
+.markdown td {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid rgb(31 48 38 / 18%);
+}
+
+.status-text,
+.error {
+  margin: 0;
+}
+
+.status-text {
+  color: #6f7b73;
+}
+
+.error {
+  color: #a13c35;
+}
+
+.caret {
+  display: inline-block;
+  width: 0.42rem;
+  height: 1em;
+  margin-left: 0.25rem;
+  vertical-align: -0.14em;
+  background: currentcolor;
+  animation: blink 900ms steps(1) infinite;
+}
+
+.editor textarea {
+  width: min(70vw, 34rem);
+  min-width: 16rem;
+  padding: 0.7rem;
+  resize: vertical;
+  border: 1px solid #b9c7bd;
+  border-radius: 0.55rem;
+  outline: none;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.editor textarea:focus {
+  border-color: #176c46;
+  box-shadow: 0 0 0 0.2rem rgb(23 108 70 / 12%);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+  margin-top: 0.6rem;
+}
+
+.editor-actions button {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccd5ce;
+  border-radius: 0.45rem;
+  color: #405047;
+  background: white;
+  cursor: pointer;
+  font-size: 0.74rem;
+}
+
+.editor-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .assistant,
   .user {
-    max-width: 92%;
+    max-width: 94%;
+  }
+
+  .editor textarea {
+    width: 68vw;
+    min-width: 0;
   }
 }

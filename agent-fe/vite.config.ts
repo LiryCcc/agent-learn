@@ -6,6 +6,12 @@ import solid from 'vite-plugin-solid';
 export default defineConfig({
   base: process.env['VITE_BASE_PATH'] ?? '/',
   build: {
+    rollupOptions: {
+      output: {
+        sourcemapExcludeSources: false
+      }
+    },
+    sourcemap: true,
     target: 'es2020'
   },
   plugins: [

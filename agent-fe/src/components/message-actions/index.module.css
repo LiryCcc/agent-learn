@@ -1,0 +1,51 @@
+.actions {
+  display: flex;
+  gap: 0.25rem;
+  padding-top: 0.4rem;
+  opacity: 0.55;
+  transition: opacity 140ms ease;
+}
+
+.actions:hover,
+.actions:focus-within {
+  opacity: 1;
+}
+
+.actions-end {
+  justify-content: flex-end;
+}
+
+.actions-visible {
+  opacity: 1;
+}
+
+.action {
+  padding: 0.25rem 0.45rem;
+  border: 0;
+  border-radius: 0.4rem;
+  color: #6e7972;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.action:hover:not(:disabled) {
+  color: #176c46;
+  background: #edf3ee;
+}
+
+.action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.danger-action:hover:not(:disabled) {
+  color: #a13c35;
+  background: #fff0ee;
+}
+
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+  }
+}

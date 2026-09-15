@@ -1,0 +1,36 @@
+.message-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-height: 26rem;
+  padding: 1.4rem clamp(1rem, 3vw, 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.empty-state {
+  display: grid;
+  flex: 1;
+  color: #89938c;
+  text-align: center;
+  place-content: center;
+}
+
+.empty-state span {
+  color: #2a885d;
+  font-size: 2rem;
+}
+
+.empty-state strong {
+  margin-top: 0.65rem;
+  color: #566159;
+}
+
+.empty-state p {
+  max-width: 28rem;
+  margin: 0.5rem auto 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
