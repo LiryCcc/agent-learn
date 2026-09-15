@@ -10,7 +10,7 @@ import {
 import { createAgentTraceId, emitAgentEvent, getAgentErrorDetails } from './agent-observability.js';
 import { browserAgentConfigSchema, type BrowserAgentConfig } from './browser-agent-config.js';
 import { formatAgentValue } from './format-agent-value.js';
-import { SYSTEM_PROMPT } from './prompts/system-prompt.js';
+import { createSystemPrompt } from './prompts/system-prompt.js';
 import { toolCallCompatibilityMiddleware } from './tool-call-compatibility.js';
 import { agentTools } from './tools/agent-tools.js';
 
@@ -33,7 +33,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
     middleware: [toolCallCompatibilityMiddleware],
     model,
     tools: agentTools,
-    systemPrompt: SYSTEM_PROMPT
+    systemPrompt: createSystemPrompt(config.model)
   });
 
   const invoke = async (inputMessages: BrowserAgentMessage[], options: BrowserAgentInvokeOptions = {}) => {
