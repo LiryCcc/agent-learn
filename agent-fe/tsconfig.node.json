@@ -1,0 +1,10 @@
+{
+  "extends": "@liry-a/tsconfig",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "esnext",
+    "lib": ["ESNext"],
+    "types": ["node"]
+  },
+  "include": ["./*.ts"]
+}
