@@ -59,6 +59,24 @@ importers:
 
   tsconfig: {}
 
+  utils:
+    devDependencies:
+      '@liry-a/build':
+        specifier: workspace:*
+        version: link:../build
+      '@liry-a/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      dayjs:
+        specifier: ^1.11.21
+        version: 1.11.23
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
 packages:
   '@cspell/cspell-bundled-dicts@10.3.1':
     resolution:
@@ -1033,6 +1051,10 @@ packages:
     engines: { node: '>=22.18.0' }
     hasBin: true
 
+  dayjs@1.11.23:
+    resolution:
+      { integrity: sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ== }
+
   defu@6.1.7:
     resolution:
       { integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ== }
@@ -1972,6 +1994,8 @@ snapshots:
       flatted: 3.4.4
       semver: 7.8.5
       tinyglobby: 0.2.17
+
+  dayjs@1.11.23: {}
 
   defu@6.1.7: {}
 
