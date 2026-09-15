@@ -1,4 +1,5 @@
 /* @refresh reload */
+import 'solid-devtools';
 import { render } from 'solid-js/web';
 import 'normalize.css';
 import AppProviders from '@/app/app-providers/index.jsx';

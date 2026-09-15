@@ -24,8 +24,9 @@
   "devDependencies": {
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "solid-devtools": "^0.34.5",
     "typescript": "catalog:",
-    "vite": "^8.3.0",
+    "vite": "^7.3.6",
     "vite-plugin-solid": "^2.11.14"
   }
 }

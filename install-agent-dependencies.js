@@ -31,6 +31,10 @@ const commands = [
       'solid-js',
       'zod'
     ]
+  },
+  {
+    description: 'Installing Solid Devtools in agent-fe',
+    args: ['--filter', '@liry-a/agent-fe', 'add', '--save-dev', 'solid-devtools', 'vite@^7']
   }
 ];
 

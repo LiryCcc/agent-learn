@@ -5,6 +5,9 @@ packages:
   - 'utils'
   - 'build'
 
+allowBuilds:
+  esbuild: true
+
 catalog:
   typescript: 7.0.2
   '@types/node': 26.5.1
