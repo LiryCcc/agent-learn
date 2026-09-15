@@ -176,7 +176,7 @@
   .chat-card {
     height: calc(100vh - 14.5rem);
     height: calc(100dvh - 14.5rem);
-    min-height: 32rem;
+    min-height: 36rem;
   }
 
   .model-summary small {

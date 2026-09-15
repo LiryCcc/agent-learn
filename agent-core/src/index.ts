@@ -10,3 +10,4 @@ export type {
   BrowserAgentResult
 } from './agent-events.js';
 export { MONOREPO_SCOPE } from './constants.js';
+export { agentTools } from './tools/agent-tools.js';

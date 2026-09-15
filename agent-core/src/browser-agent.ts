@@ -12,7 +12,7 @@ import { browserAgentConfigSchema, type BrowserAgentConfig } from './browser-age
 import { formatAgentValue } from './format-agent-value.js';
 import { SYSTEM_PROMPT } from './prompts/system-prompt.js';
 import { toolCallCompatibilityMiddleware } from './tool-call-compatibility.js';
-import { addNumbers } from './tools/add-numbers.js';
+import { agentTools } from './tools/agent-tools.js';
 
 export type BrowserAgent = {
   invoke: (messages: BrowserAgentMessage[], options?: BrowserAgentInvokeOptions) => Promise<BrowserAgentResult>;
@@ -32,7 +32,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
   const agent = createAgent({
     middleware: [toolCallCompatibilityMiddleware],
     model,
-    tools: [addNumbers],
+    tools: agentTools,
     systemPrompt: SYSTEM_PROMPT
   });
 
@@ -57,7 +57,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
         deepThinking: config.deepThinking,
         inputMessageCount: inputMessages.length,
         model: config.model,
-        toolNames: [addNumbers.name]
+        toolNames: agentTools.map((agentTool) => agentTool.name)
       });
 
       const messages = inputMessages
