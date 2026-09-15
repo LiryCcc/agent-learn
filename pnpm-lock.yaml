@@ -38,6 +38,24 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
+  agent-core:
+    devDependencies:
+      '@liry-a/build':
+        specifier: workspace:*
+        version: link:../build
+      '@liry-a/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      dayjs:
+        specifier: ^1.11.21
+        version: 1.11.23
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
   agent-fe:
     dependencies:
       solid-js:

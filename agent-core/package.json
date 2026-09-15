@@ -1,0 +1,28 @@
+{
+  "name": "@liry-a/agent-core",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "liry-build",
+    "lint": "tsc -b"
+  },
+  "devDependencies": {
+    "@liry-a/build": "workspace:*",
+    "@liry-a/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "dayjs": "^1.11.21",
+    "typescript": "catalog:"
+  }
+}

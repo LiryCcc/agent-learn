@@ -1,0 +1,7 @@
+{
+  "extends": "@liry-a/tsconfig",
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["src"]
+}
