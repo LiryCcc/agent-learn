@@ -1,0 +1,21 @@
+{
+  "name": "@liry-a/build",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./build.ts",
+  "module": "./build.ts",
+  "types": "./build.ts",
+  "bin": {
+    "liry-build": "./build.ts"
+  },
+  "dependencies": {
+    "@liry-a/tsconfig": "workspace:*",
+    "rolldown": "1.1.3",
+    "tsdown": "^0.22.12"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

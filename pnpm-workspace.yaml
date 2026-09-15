@@ -5,3 +5,7 @@ packages:
   - 'utils'
   - 'build'
   - 'tsconfig'
+
+catalog:
+  typescript: 7.0.2
+  '@types/node': 26.5.1
