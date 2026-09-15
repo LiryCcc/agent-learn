@@ -5,14 +5,16 @@
     "build": "pnpm -r build",
     "check-code": "node scripts/check-source-conventions.ts",
     "check-layers": "node scripts/check-layer-dependencies.ts",
+    "check-packages": "node scripts/check-package-boundaries.ts",
     "check-runtime": "node scripts/check-runtime.ts",
     "check-scripts": "tsc -p tsconfig.json",
     "check-spell": "cspell . --cache",
     "format": "prettier . --write --cache",
-    "lint": "pnpm check-runtime && pnpm check-spell && pnpm check-scripts && pnpm check-code && pnpm check-layers && pnpm -r lint"
+    "lint": "pnpm check-runtime && pnpm check-spell && pnpm check-scripts && pnpm check-code && pnpm check-packages && pnpm check-layers && pnpm -r lint"
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.45.3",
+    "@liry-a/tsconfig": "workspace:*",
     "@types/node": "^26.5.1",
     "cspell": "^10.3.1",
     "prettier": "^3.9.6",

@@ -19,6 +19,9 @@ importers:
       '@ast-grep/napi':
         specifier: ^0.45.3
         version: 0.45.3
+      '@liry-a/tsconfig':
+        specifier: workspace:*
+        version: link:tsconfig
       '@types/node':
         specifier: ^26.5.1
         version: 26.5.1

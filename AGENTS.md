@@ -50,6 +50,9 @@ Use:
 
 - Keep dependencies acyclic and flowing from composition layers toward implementation layers.
 - Never add a reverse dependency from a lower layer to a higher layer.
+- Import another workspace package through its declared package name.
+- Never use a relative import, export, dynamic import, or `require` path that leaves the current workspace package.
+- Root tooling must not reference a child workspace package through a relative module path.
 - Frontend dependencies must follow these boundaries:
   - `entry` may depend on `app`.
   - `app` may depend on `router` and `utils`.
@@ -59,4 +62,4 @@ Use:
   - `api` and `utils` must not depend on higher frontend layers.
   - Only `api` may import `@liry-a/agent-core`.
 - Agent core dependencies must flow from `index` to orchestration and then to configuration, prompts, and tools.
-- Run `pnpm check-code` after changing project source and `pnpm check-layers` after changing imports.
+- Run `pnpm check-code` after changing project source, `pnpm check-packages` after changing workspace imports, and `pnpm check-layers` after changing layer imports.

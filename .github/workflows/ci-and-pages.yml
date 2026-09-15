@@ -46,6 +46,9 @@ jobs:
       - name: Check source conventions
         run: pnpm check-code
 
+      - name: Check workspace package boundaries
+        run: pnpm check-packages
+
       - name: Check layer dependencies
         run: pnpm check-layers
 
