@@ -18,6 +18,11 @@
     "build": "liry-build",
     "lint": "tsc -b"
   },
+  "dependencies": {
+    "@langchain/core": "^1.2.11",
+    "@langchain/langgraph": "^1.4.15",
+    "langchain": "^1.5.11"
+  },
   "devDependencies": {
     "@liry-a/build": "workspace:*",
     "@liry-a/tsconfig": "workspace:*",
