@@ -3,4 +3,5 @@ packages:
   - 'agent-fe'
   - 'tsconfig'
   - 'utils'
-  - 'liry-build'
+  - 'build'
+  - 'tsconfig'
