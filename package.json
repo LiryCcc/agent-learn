@@ -4,7 +4,8 @@
   "scripts": {
     "build": "pnpm -r build",
     "check-spell": "cspell . --cache",
-    "format": "prettier . --write --cache"
+    "format": "prettier . --write --cache",
+    "lint": "pnpm check-spell && pnpm -r lint"
   },
   "devDependencies": {
     "@types/node": "^26.5.1",
