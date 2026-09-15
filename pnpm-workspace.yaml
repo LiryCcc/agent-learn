@@ -4,7 +4,6 @@ packages:
   - 'tsconfig'
   - 'utils'
   - 'build'
-  - 'tsconfig'
 
 catalog:
   typescript: 7.0.2
