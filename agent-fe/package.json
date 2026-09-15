@@ -28,5 +28,23 @@
     "typescript": "catalog:",
     "vite": "^7.3.6",
     "vite-plugin-solid": "^2.11.14"
+  },
+  "nx": {
+    "targets": {
+      "dev": {
+        "cache": false,
+        "continuous": true,
+        "dependsOn": [
+          "^build"
+        ]
+      },
+      "preview": {
+        "cache": false,
+        "continuous": true,
+        "dependsOn": [
+          "build"
+        ]
+      }
+    }
   }
 }

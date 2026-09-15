@@ -1,0 +1,122 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "@liry-a/monorepo",
+  "root": ".",
+  "targets": {
+    "build": {
+      "executor": "nx:noop",
+      "cache": false,
+      "dependsOn": [
+        {
+          "projects": "@liry-a/agent-core",
+          "target": "build"
+        },
+        {
+          "projects": "@liry-a/agent-fe",
+          "target": "build"
+        },
+        {
+          "projects": "@liry-a/utils",
+          "target": "build"
+        }
+      ],
+      "inputs": [],
+      "outputs": [],
+      "metadata": {
+        "description": "Build every publishable or deployable workspace package"
+      }
+    },
+    "check": {
+      "executor": "nx:noop",
+      "cache": false,
+      "dependsOn": ["check-runtime", "check-spell", "check-scripts", "check-code", "check-packages", "check-layers"],
+      "metadata": {
+        "description": "Run every repository-level check"
+      }
+    },
+    "check-code": {
+      "command": "node scripts/check-source-conventions.ts",
+      "cache": true,
+      "inputs": ["default"],
+      "metadata": {
+        "description": "Check source naming and syntax conventions"
+      }
+    },
+    "check-layers": {
+      "command": "node scripts/check-layer-dependencies.ts",
+      "cache": true,
+      "inputs": ["default"],
+      "metadata": {
+        "description": "Check frontend layer dependency direction"
+      }
+    },
+    "check-packages": {
+      "command": "node scripts/check-package-boundaries.ts",
+      "cache": true,
+      "inputs": ["default"],
+      "metadata": {
+        "description": "Check workspace package import boundaries"
+      }
+    },
+    "check-runtime": {
+      "command": "node scripts/check-runtime.ts",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/.nvmrc",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/scripts/check-runtime.ts",
+        {
+          "runtime": "node --version"
+        }
+      ],
+      "metadata": {
+        "description": "Verify the required Node.js runtime"
+      }
+    },
+    "check-scripts": {
+      "command": "tsc -p tsconfig.json",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/scripts/**/*.ts",
+        "{workspaceRoot}/tsconfig.json",
+        "{workspaceRoot}/tsconfig/tsconfig.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "metadata": {
+        "description": "Type-check repository maintenance scripts"
+      }
+    },
+    "check-spell": {
+      "command": "cspell . --cache",
+      "cache": true,
+      "inputs": ["default"],
+      "metadata": {
+        "description": "Check repository spelling"
+      }
+    },
+    "lint": {
+      "executor": "nx:noop",
+      "cache": false,
+      "dependsOn": [
+        "check",
+        {
+          "projects": "@liry-a/agent-core",
+          "target": "lint"
+        },
+        {
+          "projects": "@liry-a/agent-fe",
+          "target": "lint"
+        },
+        {
+          "projects": "@liry-a/utils",
+          "target": "lint"
+        }
+      ],
+      "inputs": [],
+      "metadata": {
+        "description": "Run repository checks and lint every source package"
+      }
+    }
+  }
+}

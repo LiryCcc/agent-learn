@@ -2,25 +2,33 @@
   "name": "@liry-a/monorepo",
   "type": "module",
   "scripts": {
-    "build": "pnpm -r build",
-    "check-code": "node scripts/check-source-conventions.ts",
-    "check-layers": "node scripts/check-layer-dependencies.ts",
-    "check-packages": "node scripts/check-package-boundaries.ts",
-    "check-runtime": "node scripts/check-runtime.ts",
-    "check-scripts": "tsc -p tsconfig.json",
-    "check-spell": "cspell . --cache",
+    "build": "nx run @liry-a/monorepo:build",
+    "check": "nx run @liry-a/monorepo:check",
+    "check-code": "nx run @liry-a/monorepo:check-code",
+    "check-layers": "nx run @liry-a/monorepo:check-layers",
+    "check-packages": "nx run @liry-a/monorepo:check-packages",
+    "check-runtime": "nx run @liry-a/monorepo:check-runtime",
+    "check-scripts": "nx run @liry-a/monorepo:check-scripts",
+    "check-spell": "nx run @liry-a/monorepo:check-spell",
+    "dev": "nx run @liry-a/agent-fe:dev",
     "format": "prettier . --write --cache",
-    "lint": "pnpm check-runtime && pnpm check-spell && pnpm check-scripts && pnpm check-code && pnpm check-packages && pnpm check-layers && pnpm -r lint"
+    "graph": "nx graph",
+    "lint": "nx run @liry-a/monorepo:lint",
+    "lint-packages": "nx run-many -t lint --exclude=@liry-a/monorepo"
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.45.3",
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "^26.5.1",
     "cspell": "^10.3.1",
+    "nx": "^23.2.1",
     "prettier": "^3.9.6",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-packagejson": "^3.0.2",
     "prettier-plugin-toml": "^2.0.6",
     "typescript": "^7.0.2"
+  },
+  "nx": {
+    "includedScripts": []
   }
 }

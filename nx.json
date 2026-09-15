@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": ["default", "!{projectRoot}/**/*.md"],
+    "sharedGlobals": [
+      "{workspaceRoot}/.nvmrc",
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/tsconfig/tsconfig.json",
+      {
+        "runtime": "node --version"
+      }
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "env": "VITE_BASE_PATH"
+        },
+        {
+          "env": "VITE_USE_HASH_ROUTING"
+        }
+      ],
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": ["default", "^default"]
+    }
+  },
+  "analytics": false
+}

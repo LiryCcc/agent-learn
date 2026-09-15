@@ -45,6 +45,10 @@ Use:
 - Node.js 26 runs erasable TypeScript directly. Store project checking and tooling scripts as `scripts/*.ts` and execute them with `node scripts/<script-name>.ts`.
 - Do not add `tsx`, `ts-node`, or a custom TypeScript loader for root tooling scripts.
 - Use the root `@ast-grep/napi` dependency for AST-aware source checks.
+- Use pnpm for workspace and dependency management.
+- Use Nx for repository checks, package linting, builds, and development task orchestration.
+- Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
+- Keep individual root checks as Nx targets and invoke them through their existing `pnpm check-*` scripts.
 
 ## Dependency direction
 
