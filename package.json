@@ -2,8 +2,8 @@
   "name": "@liry-a/monorepo",
   "type": "module",
   "scripts": {
-    "format": "prettier . --write --cache",
-    "check-spell":"cspell . --cache"
+    "check-spell": "cspell . --cache",
+    "format": "prettier . --write --cache"
   },
   "devDependencies": {
     "cspell": "^10.3.1",
