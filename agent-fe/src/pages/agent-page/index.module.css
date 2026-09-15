@@ -60,18 +60,23 @@
 .chat-card {
   display: flex;
   overflow: hidden;
-  min-height: min(44rem, calc(100vh - 14rem));
+  height: min(44rem, calc(100vh - 14rem));
+  height: min(44rem, calc(100dvh - 14rem));
+  min-height: 26rem;
 }
 
 .chat-workspace {
   display: flex;
+  overflow: hidden;
   min-width: 0;
+  min-height: 0;
   flex: 1;
   flex-direction: column;
 }
 
 .toolbar {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.15rem;
@@ -134,6 +139,7 @@
 }
 
 .composer-shell {
+  flex: 0 0 auto;
   padding: 0.85rem;
   border-top: 1px solid #e5e9e3;
   background: #f6f8f5;
@@ -168,6 +174,7 @@
   }
 
   .chat-card {
+    height: calc(100vh - 14.5rem);
     height: calc(100dvh - 14.5rem);
     min-height: 32rem;
   }
@@ -212,6 +219,7 @@
   }
 
   .chat-card {
+    height: calc(100vh - 4.5rem);
     height: calc(100dvh - 4.5rem);
     min-height: 20rem;
     flex-direction: row;

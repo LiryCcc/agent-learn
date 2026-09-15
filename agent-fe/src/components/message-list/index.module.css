@@ -1,13 +1,15 @@
 .message-list {
   display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 0;
   flex: 1;
   flex-direction: column;
   gap: 0.8rem;
-  min-height: 26rem;
   padding: 1.4rem clamp(1rem, 3vw, 2rem);
-  overflow-y: auto;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 .empty-state {

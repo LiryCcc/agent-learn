@@ -1,6 +1,8 @@
 .sidebar {
   display: flex;
+  overflow: hidden;
   min-width: 14.5rem;
+  min-height: 0;
   max-width: 14.5rem;
   flex-direction: column;
   border-right: 1px solid #e5e9e3;
@@ -38,7 +40,9 @@
 .list {
   display: flex;
   overflow-y: auto;
+  min-height: 0;
   padding: 0.55rem;
+  flex: 1;
   flex-direction: column;
   gap: 0.35rem;
 }
