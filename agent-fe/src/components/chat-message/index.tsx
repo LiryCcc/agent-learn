@@ -1,8 +1,9 @@
 import { Markdown } from '@liry-a/markdown';
 import { For, Show, createSignal, type JSX } from 'solid-js';
 import MessageActions, { type MessageAction } from '@/components/message-actions/index.jsx';
+import ThinkingRecord from '@/components/thinking-record/index.jsx';
 import ToolCallRecord from '@/components/tool-call-record/index.jsx';
-import type { ChatMessage as ChatMessageValue } from '@/utils/chat-store.js';
+import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
 import styles from './index.module.css';
 
 type ChatMessageProps = {
@@ -123,6 +124,9 @@ const ChatMessage = (props: ChatMessageProps) => {
             </div>
           }
         >
+          <Show when={props.message.reasoning}>
+            {(reasoning) => <ThinkingRecord content={reasoning()} streaming={props.message.status === 'streaming'} />}
+          </Show>
           <For each={props.message.toolCalls}>{(toolCall) => <ToolCallRecord toolCall={toolCall} />}</For>
           <Show
             when={props.message.status !== 'failed'}

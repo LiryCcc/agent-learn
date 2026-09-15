@@ -17,10 +17,12 @@ export type BrowserAgentMessage = {
 export type BrowserAgentResult = {
   content: string;
   toolCalls: AgentToolCallRecord[];
+  reasoning?: string;
 };
 
 export type BrowserAgentInvokeOptions = {
   signal?: AbortSignal;
+  onReasoning?: (reasoning: string) => void;
   onText?: (content: string) => void;
   onToolCall?: (toolCall: AgentToolCallRecord) => void;
 };

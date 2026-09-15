@@ -61,6 +61,12 @@
   display: flex;
   overflow: hidden;
   min-height: min(44rem, calc(100vh - 14rem));
+}
+
+.chat-workspace {
+  display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
 }
 
@@ -94,6 +100,12 @@
   border-radius: 50%;
   background: #22a866;
   box-shadow: 0 0 0 0.25rem #dcf4e6;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
 }
 
 .text-button {
@@ -152,5 +164,22 @@
 
   .model-summary small {
     max-width: 50vw;
+  }
+
+  .toolbar {
+    gap: 0.7rem;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 760px) {
+  .chat-card {
+    flex-direction: column;
   }
 }

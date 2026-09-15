@@ -1,6 +1,6 @@
 import { Index, Show, createEffect } from 'solid-js';
 import ChatMessage from '@/components/chat-message/index.jsx';
-import type { ChatMessage as ChatMessageValue } from '@/utils/chat-store.js';
+import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
 import styles from './index.module.css';
 
 type MessageListProps = {
@@ -24,7 +24,7 @@ const MessageList = (props: MessageListProps) => {
           ?.map((toolCall) => `${toolCall.id}:${toolCall.status}:${toolCall.output ?? ''}`)
           .join(',');
 
-        return `${message.content}:${message.status}:${toolCallSnapshot ?? ''}`;
+        return `${message.content}:${message.reasoning ?? ''}:${message.status}:${toolCallSnapshot ?? ''}`;
       })
       .join('|');
 

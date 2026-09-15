@@ -1,0 +1,37 @@
+.record {
+  margin-bottom: 0.65rem;
+  border: 1px solid #dce3dd;
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 70%);
+}
+
+.record summary {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+  color: #5e6a62;
+  cursor: pointer;
+  list-style: none;
+}
+
+.record summary::-webkit-details-marker {
+  display: none;
+}
+
+.record summary span {
+  color: #7d59a5;
+}
+
+.record summary strong {
+  font-size: 0.75rem;
+}
+
+.record p {
+  margin: 0;
+  padding: 0 0.75rem 0.75rem;
+  color: #68736c;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}

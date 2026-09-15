@@ -9,6 +9,7 @@ import {
 import { browserAgentConfigSchema, type BrowserAgentConfig } from './browser-agent-config.js';
 import { formatAgentValue } from './format-agent-value.js';
 import { SYSTEM_PROMPT } from './prompts/system-prompt.js';
+import { toolCallCompatibilityMiddleware } from './tool-call-compatibility.js';
 import { addNumbers } from './tools/add-numbers.js';
 
 export type BrowserAgent = {
@@ -20,13 +21,14 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
   const model = new ChatOpenAI({
     apiKey: config.apiKey,
     model: config.model,
-    temperature: 0,
+    ...(config.deepThinking ? { reasoning: { effort: 'high' as const } } : { temperature: 0 }),
     configuration: {
       baseURL: config.baseUrl,
       dangerouslyAllowBrowser: true
     }
   });
   const agent = createAgent({
+    middleware: [toolCallCompatibilityMiddleware],
     model,
     tools: [addNumbers],
     systemPrompt: SYSTEM_PROMPT
@@ -45,13 +47,31 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
       ? await agent.streamEvents({ messages }, { version: 'v3', signal: options.signal })
       : await agent.streamEvents({ messages }, { version: 'v3' });
     const toolCalls: AgentToolCallRecord[] = [];
+    const reasoningParts: string[] = [];
     let streamedContent = '';
 
     const consumeMessages = async () => {
       for await (const message of run.messages) {
-        for await (const content of message.text.full) {
-          streamedContent = content;
-          options.onText?.(content);
+        let currentReasoning = '';
+
+        const consumeText = async () => {
+          for await (const content of message.text.full) {
+            streamedContent = content;
+            options.onText?.(content);
+          }
+        };
+
+        const consumeReasoning = async () => {
+          for await (const reasoning of message.reasoning.full) {
+            currentReasoning = reasoning;
+            options.onReasoning?.([...reasoningParts, reasoning].join('\n\n'));
+          }
+        };
+
+        await Promise.all([consumeText(), consumeReasoning()]);
+
+        if (currentReasoning) {
+          reasoningParts.push(currentReasoning);
         }
       }
     };
@@ -91,7 +111,8 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
 
     return {
       content: finalMessage.text || streamedContent,
-      toolCalls
+      toolCalls,
+      ...(reasoningParts.length > 0 ? { reasoning: reasoningParts.join('\n\n') } : {})
     };
   };
 
