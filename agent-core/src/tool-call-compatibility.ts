@@ -11,22 +11,32 @@ const hasToolName = (toolName: string) => {
   return typeof toolName === 'string' && toolName.trim().length > 0;
 };
 
-export const normalizeToolCallNames = (message: AIMessage, toolNames: string[]) => {
+const hasToolCallId = (toolCallId: string | undefined): toolCallId is string => {
+  return typeof toolCallId === 'string' && toolCallId.trim().length > 0;
+};
+
+const createToolCallId = () => {
+  return `call_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
+export const normalizeToolCalls = (message: AIMessage, toolNames: string[]) => {
   const toolCalls = message.tool_calls ?? [];
 
-  if (toolCalls.every((toolCall) => hasToolName(toolCall.name))) {
+  if (toolCalls.every((toolCall) => hasToolName(toolCall.name) && hasToolCallId(toolCall.id))) {
     return message;
   }
 
-  const fallbackToolName = getFallbackToolName(toolNames);
+  const requiresFallbackToolName = toolCalls.some((toolCall) => !hasToolName(toolCall.name));
+  const fallbackToolName = requiresFallbackToolName ? getFallbackToolName(toolNames) : undefined;
 
-  if (!fallbackToolName) {
+  if (requiresFallbackToolName && !fallbackToolName) {
     throw new Error('The model returned a tool call without a function name.');
   }
 
   message.tool_calls = toolCalls.map((toolCall) => ({
     ...toolCall,
-    name: hasToolName(toolCall.name) ? toolCall.name : fallbackToolName
+    id: hasToolCallId(toolCall.id) ? toolCall.id : createToolCallId(),
+    name: hasToolName(toolCall.name) ? toolCall.name : (fallbackToolName ?? toolCall.name)
   }));
 
   return message;
@@ -35,16 +45,14 @@ export const normalizeToolCallNames = (message: AIMessage, toolNames: string[]) 
 export const toolCallCompatibilityMiddleware = createMiddleware({
   name: 'tool-call-compatibility',
   wrapModelCall: async (request, handler) => {
-    const toolNames = request.tools.flatMap((tool) =>
-      typeof tool.name === 'string' ? [tool.name] : []
-    );
+    const toolNames = request.tools.flatMap((tool) => (typeof tool.name === 'string' ? [tool.name] : []));
 
     request.messages.forEach((message) => {
       if (AIMessage.isInstance(message)) {
-        normalizeToolCallNames(message, toolNames);
+        normalizeToolCalls(message, toolNames);
       }
     });
 
-    return normalizeToolCallNames(await handler(request), toolNames);
+    return normalizeToolCalls(await handler(request), toolNames);
   }
 });

@@ -39,6 +39,21 @@ Use:
 - Use kebab-case for project-authored source file and directory names.
 - Use kebab-case for CSS class names, including CSS Module classes.
 
+## Tool-call compatibility
+
+- Normalize model-produced tool calls before they enter the LangGraph tool execution pipeline.
+- Every tool call must have a non-empty function name and a unique, non-empty call ID, including calls returned by OpenAI-compatible providers that omit either field.
+- Preserve the same call ID across the assistant tool call, tool result, frontend record, persisted conversation, and observability events.
+- Do not convert an absent tool result into the visible string `undefined`. Only add or render an output field when a concrete result exists.
+- When changing tool-call streaming or compatibility code, test a provider response with a missing call ID and verify that the tool result and logs use the generated ID.
+
+## Observability
+
+- Emit structured logs with a trace ID and ordered trace sequence so frontend, agent, tool-call, persistence, and failure events can be correlated.
+- Pass objects to console methods only after serializing them with `JSON.stringify`.
+- Log tool-call start and completion events with the call ID, function name, status, duration, input, and available output or error.
+- Never log or export API keys, authorization headers, cookies, passwords, secrets, or tokens. Redact sensitive fields before persistence and export.
+
 ## Development runtime
 
 - Use Node.js 26 for local development, dependency installation, linting, testing, and builds.

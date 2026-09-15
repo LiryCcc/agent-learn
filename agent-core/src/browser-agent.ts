@@ -177,10 +177,11 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
           });
 
           const status = await toolCall.status;
+          const output = status === 'finished' ? await toolCall.output : undefined;
           const completedToolCall: AgentToolCallRecord = {
             ...runningToolCall,
             status,
-            ...(status === 'finished' ? { output: formatAgentValue(await toolCall.output) } : {}),
+            ...(output === undefined ? {} : { output: formatAgentValue(output) }),
             ...(status === 'error' ? { error: (await toolCall.error) ?? 'Tool call failed.' } : {})
           };
           const toolCallIndex = toolCalls.findIndex((record) => record.id === completedToolCall.id);
