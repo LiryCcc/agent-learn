@@ -15,6 +15,7 @@ const cspellConfig = defineConfig({
     'isordered',
     'istask',
     'langchain',
+    'liryccc',
     'langgraph',
     'lheading',
     'liry',
