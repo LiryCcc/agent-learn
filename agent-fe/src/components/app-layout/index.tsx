@@ -28,6 +28,9 @@ const AppLayout = () => {
           <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/settings'>
             {'设置'}
           </Link>
+          <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/about'>
+            {'关于'}
+          </Link>
         </nav>
       </header>
       <Outlet />
