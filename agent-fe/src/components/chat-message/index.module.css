@@ -27,7 +27,24 @@
   color: #26312a;
   background: #edf1ec;
   line-height: 1.55;
-  white-space: pre-wrap;
+  white-space: normal;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content > :last-child {
+  margin-bottom: 0;
+}
+
+.content pre {
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.content a {
+  color: inherit;
 }
 
 .user .content {

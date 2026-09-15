@@ -16,6 +16,10 @@
           "target": "build"
         },
         {
+          "projects": "@liry-a/markdown",
+          "target": "build"
+        },
+        {
           "projects": "@liry-a/utils",
           "target": "build"
         }
@@ -106,6 +110,10 @@
         },
         {
           "projects": "@liry-a/agent-fe",
+          "target": "lint"
+        },
+        {
+          "projects": "@liry-a/markdown",
           "target": "lint"
         },
         {

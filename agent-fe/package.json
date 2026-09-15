@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@liry-a/agent-core": "workspace:*",
+    "@liry-a/markdown": "workspace:*",
     "@tanstack/solid-db": "^0.2.43",
     "@tanstack/solid-query": "^5.102.8",
     "@tanstack/solid-query-devtools": "^5.102.8",
@@ -31,6 +32,11 @@
   },
   "nx": {
     "targets": {
+      "lint": {
+        "dependsOn": [
+          "^build"
+        ]
+      },
       "dev": {
         "cache": false,
         "continuous": true,

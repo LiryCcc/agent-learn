@@ -16,12 +16,18 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "pnpm run typecheck && tsdown",
-    "typecheck": "tsc -b"
+    "build": "tsdown",
+    "lint": "tsc -b"
   },
   "devDependencies": {
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "solid-js": "^1.9.15",
+    "tsdown": "^0.22.12",
+    "typescript": "catalog:",
+    "vite-plugin-solid": "^2.11.14"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.9.15"
   }
 }

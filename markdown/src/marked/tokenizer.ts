@@ -110,7 +110,7 @@ export class Tokenizer {
     this.options = options || getCurrentDefaults();
   }
 
-  space(src: string): SpaceToken | undefined {
+  space = (src: string): SpaceToken | undefined => {
     const cap = this.rules.block.newline.exec(src);
     if (cap && capture(cap, 0).length > 0) {
       return {
@@ -120,9 +120,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  code(src: string): CodeToken | undefined {
+  code = (src: string): CodeToken | undefined => {
     const cap = this.rules.block.code.exec(src);
     if (cap) {
       const text = capture(cap, 0).replaceAll(/^ {1,4}/gm, '');
@@ -135,9 +135,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  fences(src: string): CodeToken | undefined {
+  fences = (src: string): CodeToken | undefined => {
     const cap = this.rules.block.fences.exec(src);
     if (cap) {
       const raw = capture(cap, 0);
@@ -154,9 +154,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  heading(src: string): HeadingToken | undefined {
+  heading = (src: string): HeadingToken | undefined => {
     const cap = this.rules.block.heading.exec(src);
     if (cap) {
       let text = capture(cap, 2).trim();
@@ -182,9 +182,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  hr(src: string): HorizontalRuleToken | undefined {
+  hr = (src: string): HorizontalRuleToken | undefined => {
     const cap = this.rules.block.hr.exec(src);
     if (cap) {
       return {
@@ -194,9 +194,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  blockquote(src: string): BlockquoteToken | undefined {
+  blockquote = (src: string): BlockquoteToken | undefined => {
     const cap = this.rules.block.blockquote.exec(src);
     if (cap) {
       let lines = rtrim(capture(cap, 0), '\n').split('\n');
@@ -282,9 +282,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  list(src: string): ListToken | undefined {
+  list = (src: string): ListToken | undefined => {
     let cap = this.rules.block.list.exec(src);
     if (cap) {
       let bull = capture(cap, 1).trim();
@@ -494,9 +494,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  html(src: string): HtmlToken | undefined {
+  html = (src: string): HtmlToken | undefined => {
     const cap = this.rules.block.html.exec(src);
     if (cap) {
       const token: HtmlToken = {
@@ -510,9 +510,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  def(src: string): DefinitionToken | undefined {
+  def = (src: string): DefinitionToken | undefined => {
     const cap = this.rules.block.def.exec(src);
     if (cap) {
       const tag = capture(cap, 1).toLowerCase().replaceAll(/\s+/g, ' ');
@@ -536,9 +536,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  table(src: string): TableToken | undefined {
+  table = (src: string): TableToken | undefined => {
     const cap = this.rules.block.table.exec(src);
     if (!cap) {
       return;
@@ -608,9 +608,9 @@ export class Tokenizer {
     }
 
     return item;
-  }
+  };
 
-  lheading(src: string): HeadingToken | undefined {
+  lheading = (src: string): HeadingToken | undefined => {
     const cap = this.rules.block.lheading.exec(src);
     if (cap) {
       return {
@@ -623,9 +623,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  paragraph(src: string): ParagraphToken | undefined {
+  paragraph = (src: string): ParagraphToken | undefined => {
     const cap = this.rules.block.paragraph.exec(src);
     if (cap) {
       const text =
@@ -639,9 +639,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  text(src: string): TextToken | undefined {
+  text = (src: string): TextToken | undefined => {
     const cap = this.rules.block.text.exec(src);
     if (cap) {
       return {
@@ -653,9 +653,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  escape(src: string): EscapeToken | undefined {
+  escape = (src: string): EscapeToken | undefined => {
     const cap = this.rules.inline.escape.exec(src);
     if (cap) {
       return {
@@ -666,9 +666,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  tag(src: string): TagToken | undefined {
+  tag = (src: string): TagToken | undefined => {
     const cap = this.rules.inline.tag.exec(src);
     if (cap) {
       if (!this.lexer.state.inLink && /^<a /i.test(capture(cap, 0))) {
@@ -693,9 +693,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  link(src: string): LinkToken | ImageToken | undefined {
+  link = (src: string): LinkToken | ImageToken | undefined => {
     const cap = this.rules.inline.link.exec(src);
     if (cap) {
       const trimmedUrl = capture(cap, 2).trim();
@@ -756,9 +756,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  reflink(src: string, links: Links): LinkToken | ImageToken | TextToken | undefined {
+  reflink = (src: string, links: Links): LinkToken | ImageToken | TextToken | undefined => {
     let cap: Captures | null;
     if ((cap = this.rules.inline.reflink.exec(src)) || (cap = this.rules.inline.nolink.exec(src))) {
       const linkString = (capture(cap, 2) || capture(cap, 1)).replaceAll(/\s+/g, ' ');
@@ -775,9 +775,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  emStrong(src: string, maskedSrc: string, prevChar = ''): EmphasisToken | StrongToken | undefined {
+  emStrong = (src: string, maskedSrc: string, prevChar = ''): EmphasisToken | StrongToken | undefined => {
     let match = this.rules.inline.emStrongLDelim.exec(src);
     if (!match) return;
 
@@ -860,9 +860,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  codespan(src: string): CodeSpanToken | undefined {
+  codespan = (src: string): CodeSpanToken | undefined => {
     const cap = this.rules.inline.code.exec(src);
     if (cap) {
       let text = capture(cap, 2).replaceAll('\n', ' ');
@@ -879,9 +879,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  br(src: string): BreakToken | undefined {
+  br = (src: string): BreakToken | undefined => {
     const cap = this.rules.inline.br.exec(src);
     if (cap) {
       return {
@@ -891,9 +891,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  del(src: string): DeleteToken | undefined {
+  del = (src: string): DeleteToken | undefined => {
     const cap = this.rules.inline.del.exec(src);
     if (cap) {
       return {
@@ -905,9 +905,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  autolink(src: string): LinkToken | undefined {
+  autolink = (src: string): LinkToken | undefined => {
     const cap = this.rules.inline.autolink.exec(src);
     if (cap) {
       let text: string;
@@ -936,9 +936,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  url(src: string): LinkToken | undefined {
+  url = (src: string): LinkToken | undefined => {
     let cap: Captures | null;
     if ((cap = this.rules.inline.url.exec(src))) {
       let text: string;
@@ -976,9 +976,9 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 
-  inlineText(src: string): TextToken | undefined {
+  inlineText = (src: string): TextToken | undefined => {
     const cap = this.rules.inline.text.exec(src);
     if (cap) {
       const text = capture(cap, 0);
@@ -990,5 +990,5 @@ export class Tokenizer {
     }
 
     return undefined;
-  }
+  };
 }

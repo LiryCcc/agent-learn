@@ -1,3 +1,4 @@
+import { Markdown } from '@liry-a/markdown';
 import type { ChatMessage as ChatMessageValue } from '@/utils/chat-store.js';
 import styles from './index.module.css';
 
@@ -9,7 +10,9 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
   return (
     <article class={styles[message.role]}>
       <span class={styles['label']}>{message.role === 'user' ? '你' : 'Agent'}</span>
-      <p class={styles['content']}>{message.content}</p>
+      <div class={styles['content']}>
+        <Markdown>{message.content}</Markdown>
+      </div>
     </article>
   );
 };

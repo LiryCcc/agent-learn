@@ -1,21 +1,20 @@
 import { defineConfig } from 'tsdown';
+import solid from 'vite-plugin-solid';
 
 const config = defineConfig({
-  entry: 'src/index.ts',
+  entry: 'src/index.tsx',
   outDir: 'dist',
   format: 'esm',
   platform: 'browser',
   fixedExtension: false,
   target: 'esnext',
-  dts: {
-    resolver: 'tsc',
-    sourcemap: true
-  },
+  dts: true,
   sourcemap: true,
   minify: false,
   clean: true,
+  plugins: [solid({ dev: false, hot: false })],
   deps: {
-    neverBundle: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime']
+    neverBundle: ['solid-js', 'solid-js/web']
   },
   outputOptions: {
     comments: {

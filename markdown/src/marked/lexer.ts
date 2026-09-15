@@ -64,33 +64,31 @@ export class Lexer {
   /**
    * Expose Rules
    */
-  static get rules() {
-    return {
-      block,
-      inline
-    };
-  }
+  static readonly rules = {
+    block,
+    inline
+  };
 
   /**
    * Static Lex Method
    */
-  static lex(src: string, options?: MarkedOptions) {
+  static lex = (src: string, options?: MarkedOptions) => {
     const lexer = new Lexer(options);
     return lexer.lex(src);
-  }
+  };
 
   /**
    * Static Lex Inline Method
    */
-  static lexInline(src: string, options?: MarkedOptions) {
+  static lexInline = (src: string, options?: MarkedOptions) => {
     const lexer = new Lexer(options);
     return lexer.inlineTokens(src);
-  }
+  };
 
   /**
    * Preprocessing
    */
-  lex(src: string) {
+  lex = (src: string) => {
     src = src.replaceAll(/\r\n|\r/g, '\n');
 
     this.blockTokens(src, this.tokens);
@@ -102,14 +100,12 @@ export class Lexer {
     this.inlineQueue = [];
 
     return this.tokens;
-  }
+  };
 
   /**
    * Lexing
    */
-  blockTokens(src: string, tokens?: Token[], lastParagraphClipped?: boolean): Token[];
-  blockTokens(src: string, tokens?: TokensList, lastParagraphClipped?: boolean): TokensList;
-  blockTokens(src: string, tokens: Token[] = [], lastParagraphClipped = false) {
+  blockTokens = (src: string, tokens: Token[] = [], lastParagraphClipped = false): Token[] => {
     if (this.options.pedantic) {
       src = src.replaceAll('\t', ' '.repeat(4)).replaceAll(/^ +$/gm, '');
     } else {
@@ -268,17 +264,17 @@ export class Lexer {
 
     this.state.top = true;
     return tokens;
-  }
+  };
 
-  inline(src: string, tokens: Token[] = []) {
+  inline = (src: string, tokens: Token[] = []) => {
     this.inlineQueue.push({ src, tokens });
     return tokens;
-  }
+  };
 
   /**
    * Lexing/Compiling
    */
-  inlineTokens(src: string, tokens: Token[] = []): Token[] {
+  inlineTokens = (src: string, tokens: Token[] = []): Token[] => {
     let token: Token | undefined;
     let lastToken: Token | undefined;
     let cutSrc: string;
@@ -439,5 +435,5 @@ export class Lexer {
     }
 
     return tokens;
-  }
+  };
 }

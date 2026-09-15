@@ -4,6 +4,7 @@ packages:
   - 'tsconfig'
   - 'utils'
   - 'build'
+  - 'markdown'
 
 allowBuilds:
   esbuild: true

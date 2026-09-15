@@ -1,9 +1,11 @@
 {
   "extends": "@liry-a/tsconfig",
   "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
     "lib": ["ESNext", "DOM"],
-    "types": ["node", "react"]
+    "types": ["node"]
   },
   "include": ["src", "scripts", "eslint.config.ts", "tsdown.config.ts"]
 }

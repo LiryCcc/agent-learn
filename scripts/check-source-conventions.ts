@@ -80,7 +80,9 @@ const checkScriptConventions = (filePath: string, language: SourceLanguage) => {
   const errors: string[] = [];
 
   rootNode.findAll({ rule: { any: [...functionKinds].map((kind) => ({ kind })) } }).forEach((node) => {
-    errors.push(`${formatLocation(filePath, node)}: define functions with const arrow functions`);
+    if (node.kind() !== 'method_definition' || !node.text().trimStart().startsWith('constructor(')) {
+      errors.push(`${formatLocation(filePath, node)}: define functions with const arrow functions`);
+    }
   });
 
   if (filePath.endsWith('.tsx') || filePath.endsWith('.jsx')) {
