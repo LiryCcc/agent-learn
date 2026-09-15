@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     devDependencies:
+      '@types/node':
+        specifier: ^26.5.1
+        version: 26.5.1
       cspell:
         specifier: ^10.3.1
         version: 10.3.1
@@ -340,6 +343,10 @@ packages:
   '@taplo/lib@0.5.0':
     resolution:
       { integrity: sha512-+xIqpQXJco3T+VGaTTwmhxLa51qpkQxCjRwezjFZgr+l21ExlywJFcDfTrNmL6lG6tqb0h8GyJKO3UPGPtSCWg== }
+
+  '@types/node@26.5.1':
+    resolution:
+      { integrity: sha512-CzNm2FezW4VR/LjG6yUdiEgLE/rAQ9Slj5gCu/C2VrdcW7I0ahNZ8DRbHT7zOZ6r3ONgd/bsQIeSaoDGrd1C6g== }
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     resolution:
@@ -722,6 +729,10 @@ packages:
     engines: { node: '>=16.20.0' }
     hasBin: true
 
+  undici-types@8.9.0:
+    resolution:
+      { integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg== }
+
   vscode-languageserver-textdocument@1.0.14:
     resolution:
       { integrity: sha512-EQyqJMi552E4ZTf46izQ4Fj6XquqxCySR3J5ZSD1SisMf6RfpeOWHxGBE8Gr6V0/3GHIGdAzDn8F8+1nTGCnoQ== }
@@ -969,6 +980,10 @@ snapshots:
   '@taplo/lib@0.5.0':
     dependencies:
       '@taplo/core': 0.2.0
+
+  '@types/node@26.5.1':
+    dependencies:
+      undici-types: 8.9.0
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
@@ -1242,6 +1257,8 @@ snapshots:
       '@typescript/typescript-sunos-x64': 7.0.2
       '@typescript/typescript-win32-arm64': 7.0.2
       '@typescript/typescript-win32-x64': 7.0.2
+
+  undici-types@8.9.0: {}
 
   vscode-languageserver-textdocument@1.0.14: {}
 
