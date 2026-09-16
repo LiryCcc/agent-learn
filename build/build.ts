@@ -12,6 +12,7 @@ const defaultConfig = defineConfig({
   },
   outExtensions: () => ({ js: '.js', dts: '.ts' }),
   dts: true,
+  tsconfig: resolve(c, 'tsconfig.lib.json'),
   target: false,
   format: 'es',
   outDir: resolve(c, 'dist'),

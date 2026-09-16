@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => {
         reportsDirectory: 'coverage'
       },
       environment: 'jsdom',
-      include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx'],
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
       reporters: isCi ? ['default', ['junit', { outputFile: 'test-results/junit.xml' }]] : ['default']
     }
   };

@@ -8,6 +8,7 @@ const config = defineConfig({
   platform: 'browser',
   fixedExtension: false,
   target: 'esnext',
+  tsconfig: 'tsconfig.lib.json',
   dts: true,
   sourcemap: true,
   minify: false,

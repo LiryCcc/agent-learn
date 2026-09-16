@@ -39,6 +39,11 @@ Use:
 - Use kebab-case for project-authored source file and directory names.
 - Use kebab-case for CSS class names, including CSS Module classes.
 
+## Tests
+
+- Name TypeScript test files `*.test.ts` or `*.test.tsx`.
+- Do not use `*.spec.ts` or `*.spec.tsx` test filenames.
+
 ## Tool-call compatibility
 
 - Normalize model-produced tool calls before they enter the LangGraph tool execution pipeline.

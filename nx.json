@@ -5,8 +5,9 @@
     "production": [
       "default",
       "!{projectRoot}/**/*.md",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.test.tsx",
+      "!{projectRoot}/tsconfig.test.json",
       "!{projectRoot}/src/test-setup.[jt]s"
     ],
     "sharedGlobals": [

@@ -11,7 +11,7 @@ const config = defineConfig({
       reportsDirectory: 'coverage'
     },
     environment: 'node',
-    include: ['src/**/*.spec.ts'],
+    include: ['src/**/*.test.ts'],
     reporters: isCi ? ['default', ['junit', { outputFile: 'test-results/junit.xml' }]] : ['default']
   }
 });
