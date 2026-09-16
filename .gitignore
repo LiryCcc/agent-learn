@@ -5,3 +5,6 @@ node_modules
 dist
 .cspellcache
 .nx
+
+.claude/worktrees
+.claude/settings.local.json
