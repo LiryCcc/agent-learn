@@ -62,9 +62,11 @@ Use:
 - Use `.js` or `.ts` for project scripts; do not add `.mjs` files.
 - Use the root `@ast-grep/napi` dependency for AST-aware source checks.
 - Use pnpm for workspace and dependency management.
+- Keep shared tooling versions in the root `pnpm-workspace.yaml` catalog and reference them with `catalog:` from package manifests.
 - Run command-line tools through repository `pnpm` scripts instead of download-on-demand package runners.
 - Use Nx for repository checks, package linting, builds, and development task orchestration.
-- Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
+- Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all unit tests with `pnpm test`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
+- Keep each workspace package connected to the Nx Vitest plugin with its own Vitest configuration and at least one unit test.
 - Keep individual root checks as Nx targets and invoke them through their existing `pnpm check-*` scripts.
 
 ## Dependency direction

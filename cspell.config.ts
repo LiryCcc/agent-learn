@@ -14,6 +14,8 @@ const cspellConfig = defineConfig({
     'ischecked',
     'isordered',
     'istask',
+    'jiti',
+    'jsdom',
     'langchain',
     'liryccc',
     'langgraph',
@@ -25,6 +27,8 @@ const cspellConfig = defineConfig({
     'rtrim',
     'setext',
     'suff',
+    'vite',
+    'vitest',
     'xmpp'
   ]
 });

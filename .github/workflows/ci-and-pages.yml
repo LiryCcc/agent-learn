@@ -67,6 +67,9 @@ jobs:
       - name: Lint workspace packages
         run: pnpm lint-packages
 
+      - name: Test workspace packages
+        run: pnpm test
+
       - name: Build workspace
         run: pnpm build
 

@@ -1,10 +1,10 @@
 {
-  "extends": "@liry-a/tsconfig",
+  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "lib": ["ESNext", "DOM"]
+    "outDir": "../dist/out-tsc",
+    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"]
   },
-  "include": ["src"],
-  "exclude": [
+  "include": [
     "vite.config.ts",
     "vite.config.mts",
     "vitest.config.ts",
@@ -16,6 +16,8 @@
     "src/**/*.test.js",
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
-    "src/**/*.spec.jsx"
-  ]
+    "src/**/*.spec.jsx",
+    "src/**/*.d.ts"
+  ],
+  "exclude": []
 }

@@ -125,6 +125,28 @@
       "metadata": {
         "description": "Run repository checks and lint every source package"
       }
+    },
+    "test": {
+      "executor": "nx:noop",
+      "cache": false,
+      "dependsOn": [
+        {
+          "projects": [
+            "@liry-a/agent-core",
+            "@liry-a/agent-fe",
+            "@liry-a/build",
+            "@liry-a/markdown",
+            "@liry-a/tsconfig",
+            "@liry-a/utils"
+          ],
+          "target": "test"
+        }
+      ],
+      "inputs": [],
+      "outputs": [],
+      "metadata": {
+        "description": "Run unit tests for every workspace package"
+      }
     }
   }
 }

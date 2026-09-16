@@ -22,10 +22,13 @@
   "devDependencies": {
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "jsdom": "catalog:",
     "solid-js": "^1.9.15",
     "tsdown": "^0.22.12",
     "typescript": "catalog:",
-    "vite-plugin-solid": "^2.11.14"
+    "vite-plugin-solid": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "solid-js": "^1.9.15"

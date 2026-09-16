@@ -4,10 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
-    "dev": "vite dev",
-    "lint": "tsc -b",
-    "preview": "vite preview"
+    "lint": "tsc -b"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "^5.3.0",
@@ -26,13 +23,22 @@
   "devDependencies": {
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "solid-devtools": "^0.34.5",
+    "@vitest/coverage-v8": "catalog:",
+    "jsdom": "catalog:",
+    "solid-devtools": "catalog:",
     "typescript": "catalog:",
-    "vite": "^7.3.6",
-    "vite-plugin-solid": "^2.11.14"
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vitest": "catalog:"
   },
   "nx": {
     "targets": {
+      "build": {
+        "dependsOn": [
+          "^build",
+          "typecheck"
+        ]
+      },
       "lint": {
         "dependsOn": [
           "^build"

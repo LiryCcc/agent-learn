@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import devtools from 'solid-devtools/vite';
-import { defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
+import { defineConfig } from 'vitest/config';
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
 
@@ -56,6 +56,14 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 30312
+    },
+    test: {
+      coverage: {
+        provider: 'v8',
+        reportsDirectory: 'coverage'
+      },
+      environment: 'jsdom',
+      include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx']
     }
   };
 });
