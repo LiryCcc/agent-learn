@@ -66,7 +66,7 @@ Use:
 - Run command-line tools through repository `pnpm` scripts instead of download-on-demand package runners.
 - Use Nx for repository checks, package linting, builds, and development task orchestration.
 - Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all unit tests with `pnpm test`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
-- Keep each workspace package connected to the Nx Vitest plugin with its own Vitest configuration and at least one unit test.
+- Keep `agent-core`, `agent-fe`, `markdown`, and `utils` connected to the Nx Vitest plugin with their own Vitest configuration and at least one unit test; tooling-only `build` and `tsconfig` packages do not need unit tests.
 - Keep individual root checks as Nx targets and invoke them through their existing `pnpm check-*` scripts.
 
 ## Dependency direction

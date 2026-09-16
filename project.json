@@ -134,9 +134,7 @@
           "projects": [
             "@liry-a/agent-core",
             "@liry-a/agent-fe",
-            "@liry-a/build",
             "@liry-a/markdown",
-            "@liry-a/tsconfig",
             "@liry-a/utils"
           ],
           "target": "test"
@@ -145,7 +143,7 @@
       "inputs": [],
       "outputs": [],
       "metadata": {
-        "description": "Run unit tests for every workspace package"
+        "description": "Run unit tests for application and runtime library packages"
       }
     }
   }
