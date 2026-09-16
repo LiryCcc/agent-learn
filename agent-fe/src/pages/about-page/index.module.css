@@ -10,7 +10,7 @@
 
 .eyebrow {
   margin: 0 0 1rem;
-  color: #227a52;
+  color: var(--color-accent);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -26,7 +26,7 @@
 .summary {
   max-width: 42rem;
   margin: 1.6rem 0 0;
-  color: #637067;
+  color: var(--color-muted);
   font-size: clamp(1.05rem, 2vw, 1.25rem);
   line-height: 1.75;
 }
@@ -34,10 +34,10 @@
 .build-section {
   margin-top: 5rem;
   padding: 2rem;
-  border: 1px solid rgb(24 32 28 / 10%);
+  border: 1px solid var(--color-panel-border);
   border-radius: 1.4rem;
-  background: rgb(255 255 252 / 76%);
-  box-shadow: 0 1.5rem 4rem rgb(36 60 46 / 7%);
+  background: var(--color-panel-background);
+  box-shadow: var(--shadow-panel);
 }
 
 .section-heading {
@@ -52,7 +52,7 @@
 }
 
 .section-heading p {
-  color: #778078;
+  color: var(--color-subtle);
   font-size: 0.72rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -67,9 +67,9 @@
 .status-dot {
   width: 0.75rem;
   height: 0.75rem;
-  border: 0.22rem solid #cae8d6;
+  border: 0.22rem solid var(--color-accent-soft);
   border-radius: 50%;
-  background: #218455;
+  background: var(--color-accent);
   box-sizing: content-box;
 }
 
@@ -84,11 +84,11 @@
   min-width: 0;
   padding: 1.25rem;
   border-radius: 1rem;
-  background: #f0f4ef;
+  background: var(--color-panel-muted);
 }
 
 .build-card dt {
-  color: #738078;
+  color: var(--color-subtle);
   font-size: 0.75rem;
   font-weight: 720;
 }
@@ -96,7 +96,7 @@
 .build-card dd {
   overflow: hidden;
   margin: 0.7rem 0 0;
-  color: #173929;
+  color: var(--color-page-text);
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 650;

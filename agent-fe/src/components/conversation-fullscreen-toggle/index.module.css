@@ -6,7 +6,7 @@
   align-items: center;
   border: 0;
   border-radius: 0.4rem;
-  color: #617068;
+  color: var(--color-muted);
   background: none;
   cursor: pointer;
   font: inherit;
@@ -17,12 +17,12 @@
 
 .toggle-button:hover,
 .toggle-button[aria-pressed='true'] {
-  color: #176c46;
-  background: #edf3ee;
+  color: var(--color-accent);
+  background: var(--color-accent-softer);
 }
 
 .toggle-button:focus-visible {
-  outline: 2px solid #2e8a60;
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 

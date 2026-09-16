@@ -23,15 +23,15 @@
   padding: 0.25rem 0.45rem;
   border: 0;
   border-radius: 0.4rem;
-  color: #6e7972;
+  color: var(--color-muted);
   background: transparent;
   cursor: pointer;
   font-size: 0.72rem;
 }
 
 .action:hover:not(:disabled) {
-  color: #176c46;
-  background: #edf3ee;
+  color: var(--color-accent);
+  background: var(--color-accent-softer);
 }
 
 .action:disabled {
@@ -40,8 +40,8 @@
 }
 
 .danger-action:hover:not(:disabled) {
-  color: #a13c35;
-  background: #fff0ee;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 @media (hover: none) {

@@ -14,7 +14,7 @@
 
 .eyebrow {
   margin: 0 0 0.65rem;
-  color: #227a52;
+  color: var(--color-accent);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -30,17 +30,17 @@
 .hero > p {
   max-width: 27rem;
   margin: 0;
-  color: #667168;
+  color: var(--color-muted);
   line-height: 1.6;
   text-align: right;
 }
 
 .notice-card,
 .chat-card {
-  border: 1px solid rgb(24 32 28 / 10%);
+  border: 1px solid var(--color-panel-border);
   border-radius: 1.25rem;
-  background: rgb(255 255 252 / 92%);
-  box-shadow: 0 1.5rem 4rem rgb(44 61 51 / 8%);
+  background: var(--color-panel-background);
+  box-shadow: var(--shadow-panel);
 }
 
 .notice-card {
@@ -53,7 +53,7 @@
 
 .notice-card p {
   margin: 0.45rem 0 0;
-  color: #6a746d;
+  color: var(--color-muted);
   line-height: 1.55;
 }
 
@@ -114,7 +114,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.15rem;
-  border-bottom: 1px solid #e5e9e3;
+  border-bottom: 1px solid var(--color-panel-border);
 }
 
 .model-summary {
@@ -135,15 +135,15 @@
 .model-summary small {
   max-width: min(55vw, 34rem);
   grid-column: 2;
-  color: #7c867f;
+  color: var(--color-subtle);
 }
 
 .status-dot {
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 50%;
-  background: #22a866;
-  box-shadow: 0 0 0 0.25rem #dcf4e6;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 0.25rem var(--color-accent-soft);
 }
 
 .toolbar-actions {
@@ -157,14 +157,14 @@
   padding: 0.35rem 0.5rem;
   border: 0;
   border-radius: 0.4rem;
-  color: #617068;
+  color: var(--color-muted);
   background: none;
   cursor: pointer;
 }
 
 .text-button:hover:not(:disabled) {
-  color: #176c46;
-  background: #edf3ee;
+  color: var(--color-accent);
+  background: var(--color-accent-softer);
 }
 
 .text-button:disabled {
@@ -175,15 +175,15 @@
 .composer-shell {
   flex: 0 0 auto;
   padding: 0.85rem;
-  border-top: 1px solid #e5e9e3;
-  background: #f6f8f5;
+  border-top: 1px solid var(--color-panel-border);
+  background: var(--color-panel-subtle);
 }
 
 .secondary-button {
   padding: 0.7rem 1rem;
   border-radius: 0.7rem;
-  color: white;
-  background: #176c46;
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
   text-decoration: none;
   white-space: nowrap;
 }

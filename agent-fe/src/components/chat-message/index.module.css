@@ -15,7 +15,7 @@
 .label {
   display: block;
   margin: 0 0 0.35rem 0.3rem;
-  color: #7d8880;
+  color: var(--color-subtle);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -29,18 +29,18 @@
 .content {
   min-width: 7rem;
   padding: 0.85rem 1rem;
-  border: 1px solid #e0e5e0;
+  border: 1px solid var(--color-panel-border);
   border-radius: 1rem 1rem 1rem 0.25rem;
-  color: #26312a;
-  background: #f3f5f2;
+  color: var(--color-page-text);
+  background: var(--color-panel-muted);
   line-height: 1.58;
 }
 
 .user .content {
-  border-color: #176c46;
+  border-color: var(--color-accent-emphasis);
   border-radius: 1rem 1rem 0.25rem;
-  color: white;
-  background: #176c46;
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
 }
 
 .markdown > :first-child,
@@ -57,7 +57,7 @@
   overflow-x: auto;
   padding: 0.75rem;
   border-radius: 0.55rem;
-  background: rgb(15 26 20 / 8%);
+  background: var(--color-code-background);
   white-space: pre;
 }
 
@@ -78,7 +78,7 @@
 .markdown th,
 .markdown td {
   padding: 0.4rem 0.55rem;
-  border: 1px solid rgb(31 48 38 / 18%);
+  border: 1px solid var(--color-panel-border);
 }
 
 .status-text,
@@ -87,11 +87,11 @@
 }
 
 .status-text {
-  color: #6f7b73;
+  color: var(--color-muted);
 }
 
 .error {
-  color: #a13c35;
+  color: var(--color-danger);
 }
 
 .caret {
@@ -109,16 +109,18 @@
   min-width: 16rem;
   padding: 0.7rem;
   resize: vertical;
-  border: 1px solid #b9c7bd;
+  border: 1px solid var(--color-control-border);
   border-radius: 0.55rem;
   outline: none;
+  color: var(--color-page-text);
+  background: var(--color-panel-solid);
   font: inherit;
   line-height: 1.5;
 }
 
 .editor textarea:focus {
-  border-color: #176c46;
-  box-shadow: 0 0 0 0.2rem rgb(23 108 70 / 12%);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.2rem var(--color-focus-ring);
 }
 
 .editor-actions {
@@ -130,10 +132,10 @@
 
 .editor-actions button {
   padding: 0.4rem 0.6rem;
-  border: 1px solid #ccd5ce;
+  border: 1px solid var(--color-control-border);
   border-radius: 0.45rem;
-  color: #405047;
-  background: white;
+  color: var(--color-muted);
+  background: var(--color-panel-solid);
   cursor: pointer;
   font-size: 0.74rem;
 }

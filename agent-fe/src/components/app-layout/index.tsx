@@ -1,3 +1,4 @@
+import ColorThemeToggle from '@/components/color-theme-toggle/index.jsx';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { Link, Outlet, useLocation } from '@tanstack/solid-router';
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools';
@@ -30,25 +31,28 @@ const AppLayout = () => {
             <small>{'Browser workspace'}</small>
           </span>
         </Link>
-        <nav aria-label='主导航' class={styles['navigation']}>
-          <Link
-            activeOptions={{ exact: true }}
-            activeProps={{ 'aria-current': 'page' }}
-            class={styles['nav-link']}
-            to='/'
-          >
-            {'首页'}
-          </Link>
-          <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/agent'>
-            {'Agent'}
-          </Link>
-          <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/settings'>
-            {'设置'}
-          </Link>
-          <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/about'>
-            {'关于'}
-          </Link>
-        </nav>
+        <div class={styles['header-actions']}>
+          <nav aria-label='主导航' class={styles['navigation']}>
+            <Link
+              activeOptions={{ exact: true }}
+              activeProps={{ 'aria-current': 'page' }}
+              class={styles['nav-link']}
+              to='/'
+            >
+              {'首页'}
+            </Link>
+            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/agent'>
+              {'Agent'}
+            </Link>
+            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/settings'>
+              {'设置'}
+            </Link>
+            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/about'>
+              {'关于'}
+            </Link>
+          </nav>
+          <ColorThemeToggle />
+        </div>
       </header>
       <Outlet />
       <TanStackRouterDevtools position='bottom-right' />

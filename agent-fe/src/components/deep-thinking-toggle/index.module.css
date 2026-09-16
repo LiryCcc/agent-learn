@@ -2,7 +2,7 @@
   display: flex;
   gap: 0.45rem;
   align-items: center;
-  color: #657169;
+  color: var(--color-muted);
   cursor: pointer;
   font-size: 0.74rem;
   font-weight: 700;
@@ -22,7 +22,7 @@
   padding: 0.15rem;
   align-items: center;
   border-radius: 999px;
-  background: #cbd3cd;
+  background: var(--color-switch-track);
   transition: background 140ms ease;
 }
 
@@ -30,13 +30,13 @@
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 1px 3px rgb(34 49 40 / 25%);
+  background: var(--color-switch-thumb);
+  box-shadow: var(--shadow-thumb);
   transition: transform 140ms ease;
 }
 
 .toggle input:checked + .track {
-  background: #176c46;
+  background: var(--color-accent-emphasis);
 }
 
 .toggle input:checked + .track .thumb {
@@ -44,7 +44,7 @@
 }
 
 .toggle input:focus-visible + .track {
-  outline: 2px solid #2e8a60;
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 

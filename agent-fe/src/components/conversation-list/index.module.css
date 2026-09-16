@@ -5,8 +5,8 @@
   min-height: 0;
   max-width: 14.5rem;
   flex-direction: column;
-  border-right: 1px solid #e5e9e3;
-  background: #f7f9f6;
+  border-right: 1px solid var(--color-panel-border);
+  background: var(--color-panel-subtle);
 }
 
 .header {
@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem;
-  border-bottom: 1px solid #e5e9e3;
+  border-bottom: 1px solid var(--color-panel-border);
 }
 
 .header strong {
@@ -25,8 +25,8 @@
   padding: 0.35rem 0.55rem;
   border: 0;
   border-radius: 0.45rem;
-  color: white;
-  background: #176c46;
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
   cursor: pointer;
   font-size: 0.72rem;
   font-weight: 700;
@@ -56,7 +56,7 @@
 
 .item:hover,
 .active-item {
-  background: #e9efea;
+  background: var(--color-panel-hover);
 }
 
 .select-button,
@@ -81,13 +81,13 @@
 }
 
 .select-button strong {
-  color: #334039;
+  color: var(--color-page-text);
   font-size: 0.78rem;
 }
 
 .select-button span {
   margin-top: 0.25rem;
-  color: #89928c;
+  color: var(--color-faint);
   font-size: 0.64rem;
 }
 
@@ -96,13 +96,13 @@
   height: 1.8rem;
   margin-right: 0.35rem;
   border-radius: 0.4rem;
-  color: #89928c;
+  color: var(--color-faint);
   font-size: 1rem;
 }
 
 .delete-button:hover:not(:disabled) {
-  color: #a13c35;
-  background: #fff0ee;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .select-button:disabled,
@@ -116,7 +116,7 @@
     min-width: 0;
     max-width: none;
     border-right: 0;
-    border-bottom: 1px solid #e5e9e3;
+    border-bottom: 1px solid var(--color-panel-border);
   }
 
   .list {
@@ -142,7 +142,7 @@
   .sidebar {
     min-width: 12rem;
     max-width: 12rem;
-    border-right: 1px solid #e5e9e3;
+    border-right: 1px solid var(--color-panel-border);
     border-bottom: 0;
   }
 

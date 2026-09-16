@@ -15,19 +15,19 @@
 .empty-state {
   display: grid;
   flex: 1;
-  color: #89938c;
+  color: var(--color-faint);
   text-align: center;
   place-content: center;
 }
 
 .empty-state span {
-  color: #2a885d;
+  color: var(--color-accent);
   font-size: 2rem;
 }
 
 .empty-state strong {
   margin-top: 0.65rem;
-  color: #566159;
+  color: var(--color-muted);
 }
 
 .empty-state p {

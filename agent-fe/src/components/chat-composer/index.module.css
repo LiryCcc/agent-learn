@@ -1,9 +1,9 @@
 .composer {
   padding: 0.85rem;
-  border: 1px solid #dbe2dc;
+  border: 1px solid var(--color-panel-border);
   border-radius: 1rem;
-  background: #fff;
-  box-shadow: 0 0.75rem 2rem rgb(40 58 48 / 7%);
+  background: var(--color-panel-solid);
+  box-shadow: var(--shadow-control);
 }
 
 .input {
@@ -14,14 +14,14 @@
   resize: vertical;
   border: 0;
   outline: 0;
-  color: #26312a;
+  color: var(--color-page-text);
   background: transparent;
   font: inherit;
   line-height: 1.55;
 }
 
 .input::placeholder {
-  color: #98a19b;
+  color: var(--color-placeholder);
 }
 
 .input:disabled {
@@ -37,7 +37,7 @@
 }
 
 .footer span {
-  color: #8a948d;
+  color: var(--color-faint);
   font-size: 0.74rem;
 }
 
@@ -46,8 +46,8 @@
   padding: 0.65rem 1rem;
   border: 0;
   border-radius: 0.75rem;
-  color: white;
-  background: #176c46;
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
   cursor: pointer;
   font-weight: 700;
 }
@@ -58,7 +58,7 @@
 }
 
 .stop-button {
-  background: #a13c35;
+  background: var(--color-danger-emphasis);
 }
 
 @media (max-width: 640px) {

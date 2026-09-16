@@ -10,7 +10,7 @@
 
 .eyebrow {
   margin: 0 0 1.1rem;
-  color: #227a52;
+  color: var(--color-accent);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -27,7 +27,7 @@
 .summary {
   max-width: 42rem;
   margin: 1.8rem 0 0;
-  color: #637067;
+  color: var(--color-muted);
   font-size: clamp(1.05rem, 2vw, 1.3rem);
   line-height: 1.7;
 }
@@ -52,15 +52,15 @@
 }
 
 .primary-button {
-  color: white;
-  background: #176c46;
-  box-shadow: 0 0.7rem 1.6rem rgb(23 108 70 / 20%);
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
+  box-shadow: var(--shadow-accent);
 }
 
 .secondary-button {
-  border-color: #c9d8ce;
-  color: #176c46;
-  background: #f7fbf8;
+  border-color: var(--color-control-border);
+  color: var(--color-accent);
+  background: var(--color-panel-subtle);
 }
 
 .feature-grid {
@@ -73,13 +73,13 @@
 .feature-card {
   min-height: 14rem;
   padding: 1.5rem;
-  border: 1px solid rgb(24 32 28 / 10%);
+  border: 1px solid var(--color-panel-border);
   border-radius: 1.2rem;
-  background: rgb(255 255 252 / 76%);
+  background: var(--color-panel-background);
 }
 
 .feature-card > span {
-  color: #2e815b;
+  color: var(--color-accent);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -92,7 +92,7 @@
 
 .feature-card p {
   margin: 0;
-  color: #6b766e;
+  color: var(--color-muted);
   line-height: 1.6;
 }
 

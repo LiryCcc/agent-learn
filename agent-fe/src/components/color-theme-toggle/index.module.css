@@ -1,0 +1,44 @@
+.toggle-button {
+  display: inline-flex;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.7rem;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-panel-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  background: var(--color-panel-background);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.toggle-button:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.toggle-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (max-width: 420px) and (orientation: portrait) {
+  .toggle-button {
+    width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+  }
+
+  .label {
+    display: none;
+  }
+}

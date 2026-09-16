@@ -6,7 +6,7 @@
   margin-top: 1rem;
   padding: 1rem 1.25rem;
   border-radius: 1rem;
-  background: #e5eee7;
+  background: var(--color-accent-soft);
 }
 
 .export-control div {
@@ -15,12 +15,12 @@
 }
 
 .export-control strong {
-  color: #234132;
+  color: var(--color-page-text);
   font-size: 0.9rem;
 }
 
 .export-control span {
-  color: #6f7c74;
+  color: var(--color-muted);
   font-size: 0.78rem;
 }
 
@@ -29,15 +29,15 @@
   padding: 0.65rem 1rem;
   border: 0;
   border-radius: 0.75rem;
-  color: white;
-  background: #176c46;
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
   cursor: pointer;
   font-weight: 720;
   white-space: nowrap;
 }
 
 .export-control button:hover {
-  background: #125a3a;
+  background: var(--color-accent-hover);
 }
 
 @media (max-width: 520px) and (orientation: portrait) {

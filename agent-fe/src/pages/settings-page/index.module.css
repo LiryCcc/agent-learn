@@ -11,7 +11,7 @@
 
 .eyebrow {
   margin: 0 0 1rem;
-  color: #227a52;
+  color: var(--color-accent);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -26,30 +26,30 @@
 
 .hero > p:last-child {
   margin: 1.3rem 0 0;
-  color: #667168;
+  color: var(--color-muted);
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
 .card {
   padding: clamp(1.3rem, 4vw, 2.2rem);
-  border: 1px solid rgb(24 32 28 / 10%);
+  border: 1px solid var(--color-panel-border);
   border-radius: 1.4rem;
-  background: rgb(255 255 252 / 88%);
-  box-shadow: 0 1.5rem 4rem rgb(44 61 51 / 8%);
+  background: var(--color-panel-background);
+  box-shadow: var(--shadow-panel);
 }
 
 .security-warning {
   padding: 1rem 1.1rem;
-  border: 1px solid #ead9a9;
+  border: 1px solid var(--color-warning-border);
   border-radius: 0.9rem;
-  color: #5f4c19;
-  background: #fff9e7;
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
 }
 
 .security-warning p {
   margin: 0.45rem 0 0;
-  color: #756636;
+  color: var(--color-warning-muted);
   font-size: 0.9rem;
   line-height: 1.55;
 }
@@ -80,15 +80,15 @@
 }
 
 .primary-button {
-  color: white;
-  background: #176c46;
-  box-shadow: 0 0.6rem 1.4rem rgb(23 108 70 / 18%);
+  color: var(--color-on-accent);
+  background: var(--color-accent-emphasis);
+  box-shadow: var(--shadow-accent);
 }
 
 .danger-button {
-  border-color: #e3c8c3;
-  color: #9e4032;
-  background: #fff9f7;
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .error,
@@ -100,13 +100,13 @@
 }
 
 .error {
-  color: #9c362a;
-  background: #fff0ed;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .success {
-  color: #176c46;
-  background: #eaf6ee;
+  color: var(--color-success);
+  background: var(--color-success-soft);
 }
 
 @media (max-width: 640px) {

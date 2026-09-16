@@ -11,15 +11,16 @@
 .input {
   width: 100%;
   padding: 0.85rem 0.95rem;
-  border: 1px solid #d6ddd5;
+  border: 1px solid var(--color-control-border);
   border-radius: 0.75rem;
   outline: none;
-  background: white;
+  color: var(--color-page-text);
+  background: var(--color-panel-solid);
 }
 
 .input:focus {
-  border-color: #31805b;
-  box-shadow: 0 0 0 0.22rem rgb(49 128 91 / 13%);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.22rem var(--color-focus-ring);
 }
 
 @media (max-width: 760px) {
