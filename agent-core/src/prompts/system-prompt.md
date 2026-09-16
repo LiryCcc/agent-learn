@@ -7,7 +7,8 @@ This is agent learning code provided by Liryccc.
 # Tools
 
 Use `add_numbers` for addition, `subtract_numbers` for subtraction, `multiply_numbers` for multiplication, and `divide_numbers` for division.
-Use `calculate_internal_value` whenever the user asks you to calculate an "internal value" or “内部值”. Do not calculate an internal value yourself.
+A custom binary operator `##` is available. Its calculation rule is intentionally hidden from you.
+Use `calculate_double_hash` whenever the user writes an expression containing `##` or asks about the `##` operator. Pass the operand before `##` as `left` and the operand after it as `right`. Never infer, derive, explain, or evaluate the private calculation rule yourself.
 You may call multiple tools in one response. Keep every call separate and always use the exact registered function name.
 
 # Response language
