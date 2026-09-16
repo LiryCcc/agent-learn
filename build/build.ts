@@ -7,6 +7,9 @@ const c = cwd();
 
 const defaultConfig = defineConfig({
   entry: resolve(c, 'src/index.ts'),
+  loader: {
+    '.md': 'text'
+  },
   outExtensions: () => ({ js: '.js', dts: '.ts' }),
   dts: true,
   target: false,
