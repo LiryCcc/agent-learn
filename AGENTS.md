@@ -44,6 +44,14 @@ Use:
 - Name TypeScript test files `*.test.ts` or `*.test.tsx`.
 - Do not use `*.spec.ts` or `*.spec.tsx` test filenames.
 
+## TypeScript configuration
+
+- When a package needs more than one TypeScript configuration, keep `tsconfig.json` as a solution file with `files: []` and references to purpose-specific configurations.
+- Name purpose-specific configurations `tsconfig.<purpose>.json`, such as `tsconfig.app.json`, `tsconfig.lib.json`, `tsconfig.node.json`, and `tsconfig.test.json`.
+- Extend application or library settings from `tsconfig.test.json`; do not duplicate the production compiler settings in the test configuration.
+- Exclude `*.test.ts` and `*.test.tsx` from application and library build configurations.
+- Point build tools at the concrete application or library configuration instead of the references-only `tsconfig.json`.
+
 ## Tool-call compatibility
 
 - Normalize model-produced tool calls before they enter the LangGraph tool execution pipeline.
