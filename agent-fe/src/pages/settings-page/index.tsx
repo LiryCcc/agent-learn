@@ -1,5 +1,5 @@
-import { useLiveQuery } from '@tanstack/solid-db';
-import { Show, createEffect, createSignal } from 'solid-js';
+import ControlledInput from '@/components/controlled-input/index.jsx';
+import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import {
   PROVIDER_SETTINGS_ID,
   clearProviderSettings,
@@ -8,8 +8,8 @@ import {
   providerSettingsSchema,
   saveProviderSettings
 } from '@/utils/provider-settings.js';
-import ControlledInput from '@/components/controlled-input/index.jsx';
-import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
+import { useLiveQuery } from '@tanstack/solid-db';
+import { Show, createEffect, createSignal } from 'solid-js';
 import styles from './index.module.css';
 
 const SettingsPage = () => {

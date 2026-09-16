@@ -1,7 +1,7 @@
+import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { Link, Outlet, useLocation } from '@tanstack/solid-router';
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools';
 import { createEffect } from 'solid-js';
-import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import styles from './index.module.css';
 
 const AppLayout = () => {

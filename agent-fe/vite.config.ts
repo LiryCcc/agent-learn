@@ -5,6 +5,7 @@ import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
+const isCi = process.env['CI'] === 'true';
 
 const readGitValue = (arguments_: string[]) => {
   try {
@@ -59,11 +60,14 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       coverage: {
+        enabled: isCi,
         provider: 'v8',
+        reporter: ['text', 'html', 'json', 'lcov'],
         reportsDirectory: 'coverage'
       },
       environment: 'jsdom',
-      include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx']
+      include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx'],
+      reporters: isCi ? ['default', ['junit', { outputFile: 'test-results/junit.xml' }]] : ['default']
     }
   };
 });

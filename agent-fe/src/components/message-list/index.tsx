@@ -1,6 +1,6 @@
-import { Index, Show, createEffect } from 'solid-js';
 import ChatMessage from '@/components/chat-message/index.jsx';
 import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
+import { Index, Show, createEffect } from 'solid-js';
 import styles from './index.module.css';
 
 type MessageListProps = {

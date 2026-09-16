@@ -131,12 +131,7 @@
       "cache": false,
       "dependsOn": [
         {
-          "projects": [
-            "@liry-a/agent-core",
-            "@liry-a/agent-fe",
-            "@liry-a/markdown",
-            "@liry-a/utils"
-          ],
+          "projects": ["@liry-a/agent-core", "@liry-a/agent-fe", "@liry-a/markdown", "@liry-a/utils"],
           "target": "test"
         }
       ],

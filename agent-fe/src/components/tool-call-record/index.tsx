@@ -1,5 +1,5 @@
-import { Show } from 'solid-js';
 import type { ChatToolCall } from '@/utils/chat-types.js';
+import { Show } from 'solid-js';
 import styles from './index.module.css';
 
 type ToolCallRecordProps = {

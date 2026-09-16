@@ -1,5 +1,5 @@
-import { createSignal } from 'solid-js';
 import { exportObservabilityLogs } from '@/utils/observability-log.js';
+import { createSignal } from 'solid-js';
 import styles from './index.module.css';
 
 const LogExportButton = () => {

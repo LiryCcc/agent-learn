@@ -1,5 +1,5 @@
-import { For } from 'solid-js';
 import type { ChatConversation } from '@/utils/chat-types.js';
+import { For } from 'solid-js';
 import styles from './index.module.css';
 
 type ConversationListProps = {

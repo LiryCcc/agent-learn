@@ -70,6 +70,32 @@ jobs:
       - name: Test workspace packages
         run: pnpm test
 
+      - name: Upload coverage reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-reports
+          path: |
+            agent-core/coverage
+            agent-fe/coverage
+            markdown/coverage
+            utils/coverage
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload test reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-reports
+          path: |
+            agent-core/test-results
+            agent-fe/test-results
+            markdown/test-results
+            utils/test-results
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Build workspace
         run: pnpm build
 

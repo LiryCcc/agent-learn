@@ -1,5 +1,5 @@
-import { buildInfo, formatBuildTime, formatBuildValue, formatCommit } from '@/utils/build-info.js';
 import LogExportButton from '@/components/log-export-button/index.jsx';
+import { buildInfo, formatBuildTime, formatBuildValue, formatCommit } from '@/utils/build-info.js';
 import styles from './index.module.css';
 
 const AboutPage = () => {

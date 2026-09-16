@@ -30,7 +30,7 @@
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "dayjs": "^1.11.21",
+    "dayjs": "^1.11.23",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

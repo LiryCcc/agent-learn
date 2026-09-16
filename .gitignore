@@ -3,6 +3,8 @@
 node_modules
 .eslintcache
 dist
+coverage
+test-results
 .cspellcache
 .nx
 

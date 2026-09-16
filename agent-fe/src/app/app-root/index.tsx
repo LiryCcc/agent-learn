@@ -1,5 +1,5 @@
-import { RouterProvider } from '@tanstack/solid-router';
 import { router } from '@/router/index.js';
+import { RouterProvider } from '@tanstack/solid-router';
 import styles from './index.module.css';
 
 const AppRoot = () => {

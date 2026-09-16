@@ -1,8 +1,3 @@
-import { useLiveQuery } from '@tanstack/solid-db';
-import { createMutation } from '@tanstack/solid-query';
-import { Link } from '@tanstack/solid-router';
-import { useSelector } from '@tanstack/solid-store';
-import { Show, createEffect, createSignal, onCleanup } from 'solid-js';
 import { sendAgentMessage, type SendAgentMessageInput, type SendAgentMessageResult } from '@/api/agent.js';
 import ChatComposer from '@/components/chat-composer/index.jsx';
 import ConversationFullscreenToggle from '@/components/conversation-fullscreen-toggle/index.jsx';
@@ -27,6 +22,11 @@ import { conversationStore, selectConversation } from '@/utils/conversation-stor
 import { isolateFullscreenElement } from '@/utils/fullscreen-isolation.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { providerSettingsCollection } from '@/utils/provider-settings.js';
+import { useLiveQuery } from '@tanstack/solid-db';
+import { createMutation } from '@tanstack/solid-query';
+import { Link } from '@tanstack/solid-router';
+import { useSelector } from '@tanstack/solid-store';
+import { Show, createEffect, createSignal, onCleanup } from 'solid-js';
 import styles from './index.module.css';
 
 type AgentMutationInput = SendAgentMessageInput & {

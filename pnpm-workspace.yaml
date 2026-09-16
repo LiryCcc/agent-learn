@@ -7,8 +7,8 @@ packages:
   - 'markdown'
 
 allowBuilds:
-  esbuild: true
-  nx: true
+  esbuild: false
+  nx: false
 
 catalog:
   '@nx/vite': 23.2.1
