@@ -1,11 +1,14 @@
 import AppRoot from '@/app/app-root/index.jsx';
 import { buildInfo } from '@/utils/build-info.js';
+import { initializeColorTheme } from '@/utils/color-theme.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { queryClient } from '@/utils/query-client.js';
 import { QueryClientProvider } from '@tanstack/solid-query';
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools';
 import { onMount } from 'solid-js';
 import styles from './index.module.css';
+
+initializeColorTheme();
 
 const AppProviders = () => {
   onMount(() => {
