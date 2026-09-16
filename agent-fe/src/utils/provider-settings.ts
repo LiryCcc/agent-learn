@@ -7,7 +7,8 @@ export const providerSettingsSchema = z.object({
   id: z.literal(PROVIDER_SETTINGS_ID),
   apiKey: z.string().trim().min(1, '请输入 API Key。'),
   baseUrl: z.url('请输入有效的 Base URL。'),
-  model: z.string().trim().min(1, '请输入模型名。')
+  model: z.string().trim().min(1, '请输入模型名。'),
+  streamingEnabled: z.boolean().default(false)
 });
 
 export type ProviderSettings = z.infer<typeof providerSettingsSchema>;
@@ -16,7 +17,8 @@ export const defaultProviderSettings: ProviderSettings = {
   id: PROVIDER_SETTINGS_ID,
   apiKey: '',
   baseUrl: 'https://api.openai.com/v1',
-  model: 'gpt-4o-mini'
+  model: 'gpt-4o-mini',
+  streamingEnabled: false
 };
 
 export const providerSettingsCollection = createCollection(
@@ -34,6 +36,7 @@ export const saveProviderSettings = (settings: ProviderSettings) => {
       draft.apiKey = settings.apiKey;
       draft.baseUrl = settings.baseUrl;
       draft.model = settings.model;
+      draft.streamingEnabled = settings.streamingEnabled;
     });
     return;
   }

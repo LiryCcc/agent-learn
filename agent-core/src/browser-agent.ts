@@ -22,7 +22,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
   const config = browserAgentConfigSchema.parse(inputConfig);
   const model = new ChatOpenAI({
     apiKey: config.apiKey,
-    disableStreaming: true,
+    disableStreaming: !config.streamingEnabled,
     model: config.model,
     ...(config.deepThinking ? { reasoning: { effort: 'high' as const } } : { temperature: 0 }),
     configuration: {
@@ -58,6 +58,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
         deepThinking: config.deepThinking,
         inputMessageCount: inputMessages.length,
         model: config.model,
+        streamingEnabled: config.streamingEnabled,
         toolNames: agentTools.map((agentTool) => agentTool.name)
       });
 

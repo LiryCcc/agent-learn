@@ -1,0 +1,83 @@
+.setting {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgb(24 32 28 / 10%);
+  border-radius: 0.9rem;
+  background: #f8faf8;
+  cursor: pointer;
+}
+
+.copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.copy strong {
+  color: #253029;
+  font-size: 0.92rem;
+}
+
+.copy small {
+  max-width: 32rem;
+  color: #667168;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.track {
+  display: flex;
+  width: 2.8rem;
+  height: 1.55rem;
+  padding: 0.2rem;
+  align-items: center;
+  border-radius: 999px;
+  background: #cbd3cd;
+  transition: background 140ms ease;
+}
+
+.thumb {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgb(34 49 40 / 25%);
+  transition: transform 140ms ease;
+}
+
+.control input:checked + .track {
+  background: #176c46;
+}
+
+.control input:checked + .track .thumb {
+  transform: translateX(1.25rem);
+}
+
+.control input:focus-visible + .track {
+  outline: 2px solid #2e8a60;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .setting {
+    align-items: flex-start;
+  }
+
+  .control {
+    margin-top: 0.15rem;
+  }
+}

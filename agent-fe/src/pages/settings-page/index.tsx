@@ -1,4 +1,5 @@
 import ControlledInput from '@/components/controlled-input/index.jsx';
+import TokenStreamingSetting from '@/components/token-streaming-setting/index.jsx';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import {
   PROVIDER_SETTINGS_ID,
@@ -17,6 +18,7 @@ const SettingsPage = () => {
   const [apiKey, setApiKey] = createSignal(defaultProviderSettings.apiKey);
   const [baseUrl, setBaseUrl] = createSignal(defaultProviderSettings.baseUrl);
   const [model, setModel] = createSignal(defaultProviderSettings.model);
+  const [streamingEnabled, setStreamingEnabled] = createSignal(defaultProviderSettings.streamingEnabled);
   const [error, setError] = createSignal('');
   const [saved, setSaved] = createSignal(false);
   let loadedSavedSettings = false;
@@ -31,6 +33,7 @@ const SettingsPage = () => {
     setApiKey(currentSettings.apiKey);
     setBaseUrl(currentSettings.baseUrl);
     setModel(currentSettings.model);
+    setStreamingEnabled(currentSettings.streamingEnabled);
     loadedSavedSettings = true;
   });
 
@@ -42,7 +45,8 @@ const SettingsPage = () => {
       id: PROVIDER_SETTINGS_ID,
       apiKey: apiKey(),
       baseUrl: baseUrl(),
-      model: model()
+      model: model(),
+      streamingEnabled: streamingEnabled()
     });
 
     if (!result.success) {
@@ -66,7 +70,8 @@ const SettingsPage = () => {
       details: {
         baseUrl: result.data.baseUrl,
         hasApiKey: result.data.apiKey.length > 0,
-        model: result.data.model
+        model: result.data.model,
+        streamingEnabled: result.data.streamingEnabled
       },
       event: 'settings.saved',
       scope: 'settings',
@@ -79,6 +84,7 @@ const SettingsPage = () => {
     setApiKey(defaultProviderSettings.apiKey);
     setBaseUrl(defaultProviderSettings.baseUrl);
     setModel(defaultProviderSettings.model);
+    setStreamingEnabled(defaultProviderSettings.streamingEnabled);
     setError('');
     setSaved(false);
     loadedSavedSettings = false;
@@ -134,6 +140,8 @@ const SettingsPage = () => {
             type='text'
             value={model()}
           />
+
+          <TokenStreamingSetting checked={streamingEnabled()} onChange={setStreamingEnabled} />
 
           <Show when={error()}>
             <p class={styles['error']}>{error()}</p>
