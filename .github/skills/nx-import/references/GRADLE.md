@@ -5,7 +5,7 @@
 - If the target workspace has no Gradle setup yet, consider moving those files to the root (especially when using `@nx/gradle`).
 - If the target workspace already has Gradle configured, avoid duplicate wrappers: remove imported duplicates from the subfolder or merge carefully.
 - Because the import lands in a subfolder, Gradle project references can break; review settings and project path references, then fix any errors.
-- If `@nx/gradle` is installed, run `nx show projects` to verify that Gradle projects are being inferred.
+- If `@nx/gradle` is installed, run `pnpm nx show projects` to verify that Gradle projects are being inferred.
 
 Helpful docs:
 

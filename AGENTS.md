@@ -59,8 +59,10 @@ Use:
 - Use Node.js 26 for local development, dependency installation, linting, testing, and builds.
 - Node.js 26 runs erasable TypeScript directly. Store project checking and tooling scripts as `scripts/*.ts` and execute them with `node scripts/<script-name>.ts`.
 - Do not add `tsx`, `ts-node`, or a custom TypeScript loader for root tooling scripts.
+- Use `.js` or `.ts` for project scripts; do not add `.mjs` files.
 - Use the root `@ast-grep/napi` dependency for AST-aware source checks.
 - Use pnpm for workspace and dependency management.
+- Run command-line tools through repository `pnpm` scripts instead of download-on-demand package runners.
 - Use Nx for repository checks, package linting, builds, and development task orchestration.
 - Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
 - Keep individual root checks as Nx targets and invoke them through their existing `pnpm check-*` scripts.
@@ -89,8 +91,8 @@ Use:
 ## General Guidelines for working with Nx
 
 - For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
-- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
-- Prefix nx commands with the workspace's package manager (e.g., `pnpm nx build`, `npm exec nx test`) - avoids using globally installed CLI
+- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `pnpm nx run`, `pnpm nx run-many`, `pnpm nx affected`) instead of using the underlying tooling directly
+- Prefix nx commands with the workspace's package manager (e.g., `pnpm nx build`, `pnpm nx test`) - avoids using globally installed CLI
 - You have access to the Nx MCP server and its tools, use them to help the user
 - For Nx plugin best practices, check `node_modules/@nx/<plugin>/PLUGIN.md`. Not all plugins have this file - proceed without it if unavailable.
 - NEVER guess CLI flags - always check nx_docs or `--help` first when unsure
@@ -102,7 +104,7 @@ Use:
 ## When to use nx_docs
 
 - USE for: advanced config options, unfamiliar flags, migration guides, plugin configuration, edge cases
-- DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
+- DON'T USE for: basic generator syntax (`pnpm nx g @nx/react:app`), standard commands, things you already know
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
 <!-- nx configuration end-->

@@ -11,7 +11,7 @@
  *   buildOutput() — maps classification to full output with messages, delays, counters
  *
  * Usage:
- *   node ci-poll-decide.mjs '<ci_info_json>' <poll_count> <verbosity> \
+ *   node ci-poll-decide.js '<ci_info_json>' <poll_count> <verbosity> \
  *     [--wait-mode] [--prev-cipe-url <url>] [--expected-sha <sha>] \
  *     [--prev-status <status>] [--timeout <minutes>] [--new-cipe-timeout <minutes>] \
  *     [--elapsed-seconds <n>] [--env-rerun-count <n>] [--no-progress-count <n>] \
@@ -31,14 +31,14 @@ const ciInfoJson = args[0];
 const pollCount = parseInt(args[1], 10) || 0;
 const verbosity = args[2] || 'medium';
 
-function getFlag(name) {
+const getFlag = (name) => {
   return args.includes(name);
-}
+};
 
-function getArg(name) {
+const getArg = (name) => {
   const idx = args.indexOf(name);
   return idx !== -1 && idx + 1 < args.length ? args[idx + 1] : null;
-}
+};
 
 const waitMode = getFlag('--wait-mode');
 const prevCipeUrl = getArg('--prev-cipe-url');
@@ -97,7 +97,7 @@ const failureClassification = rawFailureClassification?.toLowerCase() ?? null;
 
 // --- Helpers ---
 
-function categorizeTasks() {
+const categorizeTasks = () => {
   const verifiedSet = new Set(verifiedTaskIds);
   const unverified = failedTaskIds.filter((t) => !verifiedSet.has(t));
   if (unverified.length === 0) return { category: 'all_verified' };
@@ -113,22 +113,22 @@ function categorizeTasks() {
     return !(parts.length >= 2 && parts[1].includes('e2e'));
   });
   return { category: 'needs_local_verify', verifiableTaskIds: verifiable };
-}
+};
 
-function backoff(count) {
+const backoff = (count) => {
   const delays = [60, 90, 120, 180];
   return delays[Math.min(count, delays.length - 1)];
-}
+};
 
-function hasStateChanged() {
+const hasStateChanged = () => {
   if (prevCipeStatus && cipeStatus !== prevCipeStatus) return true;
   if (prevShStatus && selfHealingStatus !== prevShStatus) return true;
   if (prevVerificationStatus && verificationStatus !== prevVerificationStatus) return true;
   if (prevFailureClassification && failureClassification !== prevFailureClassification) return true;
   return false;
-}
+};
 
-function isTimedOut() {
+const isTimedOut = () => {
   if (timeoutSeconds <= 0) return false;
   // Prefer real wall-clock elapsed (carried across attempts) so --timeout caps
   // total monitor duration, not a single invocation.
@@ -136,16 +136,16 @@ function isTimedOut() {
   // Fallback: estimate elapsed from poll cadence within this invocation.
   const avgDelay = pollCount === 0 ? 0 : backoff(Math.floor(pollCount / 2));
   return pollCount * avgDelay >= timeoutSeconds;
-}
+};
 
-function isWaitTimedOut() {
+const isWaitTimedOut = () => {
   if (newCipeTimeoutSeconds <= 0) return false;
   return pollCount * 30 >= newCipeTimeoutSeconds;
-}
+};
 
-function isNewCipe() {
+const isNewCipe = () => {
   return (prevCipeUrl && cipeUrl && cipeUrl !== prevCipeUrl) || (expectedSha && commitSha && commitSha === expectedSha);
-}
+};
 
 // ============================================================
 // classify() — pure decision tree
@@ -181,7 +181,7 @@ function isNewCipe() {
 //    24. fallback                        → poll  (fallback)
 // ============================================================
 
-function classify() {
+const classify = () => {
   // --- Wait mode ---
   if (waitMode) {
     if (isNewCipe()) return { action: 'poll', code: 'new_cipe_detected' };
@@ -270,7 +270,7 @@ function classify() {
 
   // --- Fallback ---
   return { action: 'poll', code: 'fallback' };
-}
+};
 
 // ============================================================
 // buildOutput() — maps classification to full JSON output
@@ -337,7 +337,7 @@ const resetProgressCodes = new Set([
   'fix_needs_local_verify'
 ]);
 
-function formatMessage(msg) {
+const formatMessage = (msg) => {
   if (verbosity === 'minimal') {
     const currentStatus = `${cipeStatus}|${selfHealingStatus}|${verificationStatus}`;
     if (currentStatus === (prevStatus || '')) return null;
@@ -352,9 +352,9 @@ function formatMessage(msg) {
     ].join('\n');
   }
   return `Poll #${pollCount + 1} | ${msg}`;
-}
+};
 
-function buildOutput(decision) {
+const buildOutput = (decision) => {
   const { action, code, extra } = decision;
 
   // noProgressCount is already computed before classify() was called.
@@ -386,7 +386,7 @@ function buildOutput(decision) {
   if (extra?.autoApplySkipReason) result.autoApplySkipReason = extra.autoApplySkipReason;
 
   console.log(JSON.stringify(result));
-}
+};
 
 // --- Run ---
 

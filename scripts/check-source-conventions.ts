@@ -6,8 +6,9 @@ type SourceLanguage = (typeof Lang)[keyof typeof Lang];
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
 const ignoredDirectories = new Set(['.git', '.pnpm-store', 'dist', 'node_modules']);
-const scriptExtensions = new Set(['.js', '.jsx', '.ts', '.tsx']);
+const scriptExtensions = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const sourceExtensions = new Set([...scriptExtensions, '.css']);
+const commandTextExtensions = new Set([...scriptExtensions, '.json', '.md', '.toml', '.yaml', '.yml']);
 const functionKinds = new Set([
   'function_declaration',
   'function_expression',
@@ -17,15 +18,15 @@ const functionKinds = new Set([
 ]);
 const kebabCasePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const collectSourceFiles = (directory: string): string[] => {
+const collectFiles = (directory: string, extensions: Set<string>): string[] => {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = resolve(directory, entry.name);
 
     if (entry.isDirectory()) {
-      return ignoredDirectories.has(entry.name) ? [] : collectSourceFiles(entryPath);
+      return ignoredDirectories.has(entry.name) ? [] : collectFiles(entryPath, extensions);
     }
 
-    return sourceExtensions.has(extname(entry.name)) ? [entryPath] : [];
+    return extensions.has(extname(entry.name)) ? [entryPath] : [];
   });
 };
 
@@ -42,7 +43,7 @@ const getLanguage = (filePath: string): SourceLanguage | null => {
     return Lang.TypeScript;
   }
 
-  if (filePath.endsWith('.js')) {
+  if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
     return Lang.JavaScript;
   }
 
@@ -113,6 +114,10 @@ const checkSourceFile = (filePath: string) => {
   const language = getLanguage(filePath);
   const errors = checkPathNaming(filePath);
 
+  if (filePath.endsWith('.mjs')) {
+    errors.push(`${relative(workspaceRoot, filePath)}: use .js or .ts instead of .mjs`);
+  }
+
   if (!language) {
     return errors;
   }
@@ -124,7 +129,22 @@ const checkSourceFile = (filePath: string) => {
   return [...errors, ...checkCssConventions(filePath)];
 };
 
-const errors = collectSourceFiles(workspaceRoot).flatMap(checkSourceFile);
+const checkCommandConventions = (filePath: string) => {
+  return readFileSync(filePath, 'utf8')
+    .split('\n')
+    .flatMap((line, lineIndex) => {
+      return /\bn\x70x\b/u.test(line)
+        ? [
+            `${relative(workspaceRoot, filePath)}:${lineIndex + 1}: use a repository pnpm script instead of a package execution shim`
+          ]
+        : [];
+    });
+};
+
+const errors = [
+  ...collectFiles(workspaceRoot, sourceExtensions).flatMap(checkSourceFile),
+  ...collectFiles(workspaceRoot, commandTextExtensions).flatMap(checkCommandConventions)
+];
 
 if (errors.length > 0) {
   console.error('Source convention violations:');

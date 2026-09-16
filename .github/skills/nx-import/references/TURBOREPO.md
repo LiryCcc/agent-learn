@@ -49,7 +49,7 @@ The config package centralizes ESLint plugin dependencies and exports composable
 
 - Remove turbo-specific dependencies: `turbo`, `eslint-plugin-turbo`.
 - Delete all `turbo.json` files (root and per-package).
-- Run workspace validation (`nx run-many -t build lint test typecheck`) to confirm nothing broke.
+- Run workspace validation (`pnpm nx run-many -t build lint test typecheck`) to confirm nothing broke.
 
 ## Key Pitfalls
 

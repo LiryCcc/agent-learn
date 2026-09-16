@@ -1,6 +1,6 @@
 ## ESLint
 
-ESLint-specific guidance for `nx import`. For generic import issues (root deps, pnpm globs, project references), see `SKILL.md`.
+ESLint-specific guidance for `pnpm nx import`. For generic import issues (root deps, pnpm globs, project references), see `SKILL.md`.
 
 ---
 
@@ -8,7 +8,7 @@ ESLint-specific guidance for `nx import`. For generic import issues (root deps, 
 
 `@nx/eslint/plugin` scans for ESLint config files and creates a lint target for each project. It detects **both** flat config files (`eslint.config.{js,mjs,cjs,ts,mts,cts}`) and legacy config files (`.eslintrc.{json,js,cjs,mjs,yml,yaml}`).
 
-**Plugin options (set during `nx add @nx/eslint`):**
+**Plugin options (set during `pnpm nx add @nx/eslint`):**
 
 ```json
 {
@@ -19,7 +19,7 @@ ESLint-specific guidance for `nx import`. For generic import issues (root deps, 
 }
 ```
 
-**Auto-installation**: `nx import` auto-detects ESLint config files and offers to install `@nx/eslint`. Accept the offer — it registers the plugin and updates `namedInputs.production` to exclude ESLint config files.
+**Auto-installation**: `pnpm nx import` auto-detects ESLint config files and offers to install `@nx/eslint`. Accept the offer — it registers the plugin and updates `namedInputs.production` to exclude ESLint config files.
 
 ---
 

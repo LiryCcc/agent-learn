@@ -10,11 +10,14 @@
     "check-runtime": "nx run @liry-a/monorepo:check-runtime",
     "check-scripts": "nx run @liry-a/monorepo:check-scripts",
     "check-spell": "nx run @liry-a/monorepo:check-spell",
+    "configure-ai-agents": "nx configure-ai-agents",
     "dev": "nx run @liry-a/agent-fe:dev",
     "format": "prettier . --write --cache",
     "graph": "nx graph",
     "lint": "nx run @liry-a/monorepo:lint",
-    "lint-packages": "nx run-many -t lint --exclude=@liry-a/monorepo"
+    "lint-packages": "nx run-many -t lint --exclude=@liry-a/monorepo",
+    "nx": "nx",
+    "nx-mcp": "nx mcp"
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.45.3",

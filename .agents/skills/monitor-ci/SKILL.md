@@ -53,8 +53,8 @@ Before starting the monitoring loop, verify the workspace is connected to Nx Clo
 
 1. **This skill (orchestrator)**: spawns subagents, runs scripts, prints status, does local coding work
 2. **ci-monitor-subagent (haiku)**: calls one MCP tool (ci_information or update_self_healing_fix), returns structured result, exits
-3. **ci-poll-decide.mjs (deterministic script)**: takes ci_information result + state, returns action + status message
-4. **ci-state-update.mjs (deterministic script)**: manages budget gates, post-action state transitions, and cycle classification
+3. **ci-poll-decide.js (deterministic script)**: takes ci_information result + state, returns action + status message
+4. **ci-state-update.js (deterministic script)**: manages budget gates, post-action state transitions, and cycle classification
 
 ## Status Reporting
 
@@ -135,7 +135,7 @@ The decision script returns one of the following statuses. This table defines th
 
 - **Git safety**: Stage specific files by name — `git add -A` or `git add .` risks committing the user's unrelated work-in-progress or secrets
 - **Environment failures** (OOM, command not found, permission denied): bail immediately. These aren't code bugs, so spending local-fix budget on them is wasteful
-- **Gate check**: Run `ci-state-update.mjs gate` before local fix attempts — if budget exhausted, print message and exit
+- **Gate check**: Run `ci-state-update.js gate` before local fix attempts — if budget exhausted, print message and exit
 
 ## Main Loop
 
@@ -175,7 +175,7 @@ Call the `ci_information` tool with the determined `select` fields for the curre
 #### 2b. Run decision script
 
 ```bash
-node <skill_dir>/scripts/ci-poll-decide.mjs '<subagent_result_json>' <poll_count> <verbosity> \
+node <skill_dir>/scripts/ci-poll-decide.js '<subagent_result_json>' <poll_count> <verbosity> \
   [--wait-mode] \
   [--prev-cipe-url <last_cipe_url>] \
   [--expected-sha <expected_commit_sha>] \
@@ -243,7 +243,7 @@ Several statuses require fetching additional data or calling tools:
 After actions that should trigger a new CI Attempt, run:
 
 ```bash
-node <skill_dir>/scripts/ci-state-update.mjs post-action \
+node <skill_dir>/scripts/ci-state-update.js post-action \
   --action <type> \
   --cipe-url <current_cipe_url> \
   --commit-sha <git_rev_parse_HEAD>
@@ -258,7 +258,7 @@ The script returns `{ waitMode, pollCount, lastCipeUrl, expectedCommitSha, agent
 When the decision script returns `action == "done"`, run cycle-check **before** handling the code:
 
 ```bash
-node <skill_dir>/scripts/ci-state-update.mjs cycle-check \
+node <skill_dir>/scripts/ci-state-update.js cycle-check \
   --code <code> \
   [--agent-triggered] \
   --cycle-count <cycle_count> --max-cycles <max_cycles> \
@@ -273,8 +273,8 @@ The script returns `{ cycleCount, agentTriggered, envRerunCount, approachingLimi
 
 #### Progress Tracking
 
-- `no_progress_count`, circuit breaker (5 polls), and backoff reset are handled by ci-poll-decide.mjs (progress = any change in cipeStatus, selfHealingStatus, verificationStatus, or failureClassification)
-- `env_rerun_count` reset on non-environment status is handled by ci-state-update.mjs cycle-check
+- `no_progress_count`, circuit breaker (5 polls), and backoff reset are handled by ci-poll-decide.js (progress = any change in cipeStatus, selfHealingStatus, verificationStatus, or failureClassification)
+- `env_rerun_count` reset on non-environment status is handled by ci-state-update.js cycle-check
 - On new CI Attempt detected (poll script returns `newCipeDetected`) → reset `local_verify_count = 0`, `env_rerun_count = 0`
 
 ## Error Handling
@@ -293,13 +293,13 @@ The script returns `{ cycleCount, agentTriggered, envRerunCount, approachingLimi
 
 Users can override default behaviors:
 
-| Instruction                                      | Effect                                              |
-| ------------------------------------------------ | --------------------------------------------------- |
-| "never auto-apply"                               | Always prompt before applying any fix               |
-| "always ask before git push"                     | Prompt before each push                             |
-| "reject any fix for e2e tasks"                   | Auto-reject if `failedTaskIds` contains e2e         |
-| "apply all fixes regardless of verification"     | Skip verification check, apply everything           |
-| "if confidence < 70, reject"                     | Check confidence field before applying              |
-| "run 'nx affected -t typecheck' before applying" | Add local verification step                         |
-| "auto-fix workflow failures"                     | Attempt lockfile updates on pre-CI-Attempt failures |
-| "wait 45 min for new CI Attempt"                 | Override new-CI-Attempt timeout (default: 10 min)   |
+| Instruction                                           | Effect                                              |
+| ----------------------------------------------------- | --------------------------------------------------- |
+| "never auto-apply"                                    | Always prompt before applying any fix               |
+| "always ask before git push"                          | Prompt before each push                             |
+| "reject any fix for e2e tasks"                        | Auto-reject if `failedTaskIds` contains e2e         |
+| "apply all fixes regardless of verification"          | Skip verification check, apply everything           |
+| "if confidence < 70, reject"                          | Check confidence field before applying              |
+| "run 'pnpm nx affected -t typecheck' before applying" | Add local verification step                         |
+| "auto-fix workflow failures"                          | Attempt lockfile updates on pre-CI-Attempt failures |
+| "wait 45 min for new CI Attempt"                      | Override new-CI-Attempt timeout (default: 10 min)   |

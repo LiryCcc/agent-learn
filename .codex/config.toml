@@ -1,6 +1,6 @@
 [mcp_servers.nx-mcp]
-command = "npx"
-args = ["nx", "mcp"]
+command = "pnpm"
+args = ["run", "nx-mcp"]
 
 [features]
 multi_agent = true

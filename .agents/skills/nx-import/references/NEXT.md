@@ -1,6 +1,6 @@
 ## Next.js
 
-Next.js-specific guidance for `nx import`. For generic import issues (pnpm globs, root deps, project references, name collisions, ESLint, frontend tsconfig base settings, `@nx/react` typings, Jest preset, target name prefixing, non-Nx source handling), see `SKILL.md`.
+Next.js-specific guidance for `pnpm nx import`. For generic import issues (pnpm globs, root deps, project references, name collisions, ESLint, frontend tsconfig base settings, `@nx/react` typings, Jest preset, target name prefixing, non-Nx source handling), see `SKILL.md`.
 
 ---
 
@@ -77,7 +77,7 @@ This is the standard "npm Script Rewriting" issue from SKILL.md, but triggered b
 For single-project `create-next-app` repos, use whole-repo import into a subdirectory:
 
 ```bash
-nx import /path/to/source apps/web --ref=main --source=. --no-interactive
+pnpm nx import /path/to/source apps/web --ref=main --source=. --no-interactive
 ```
 
 ### `next-env.d.ts`
@@ -146,14 +146,14 @@ No naming conflicts between frameworks.
 3. Install Next.js-specific deps: `pnpm add -wD @next/eslint-plugin-next`
 4. ESLint setup (see SKILL.md: "Root ESLint Config Missing")
 5. Jest setup (see SKILL.md: "Jest Preset Missing")
-6. `nx reset && nx sync --yes && nx run-many -t typecheck,build,test,lint`
+6. `pnpm nx reset && pnpm nx sync --yes && pnpm nx run-many -t typecheck,build,test,lint`
 
 ## Fix Order — Non-Nx Source (create-next-app)
 
 1. Import into `apps/<name>` (see SKILL.md: "Application vs Library Detection")
 2. Generic fixes from SKILL.md (pnpm globs, stale files cleanup, script rewriting, target name prefixing)
 3. (Optional) If app needs to export types for other workspace projects: fix `noEmit` → `composite` (see SKILL.md)
-4. `nx reset && nx run-many -t next:build,eslint:lint` (or unprefixed names if renamed)
+4. `pnpm nx reset && pnpm nx run-many -t next:build,eslint:lint` (or unprefixed names if renamed)
 
 ---
 
