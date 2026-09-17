@@ -6,12 +6,12 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-const workspaceContentConfig = defineConfig([
-  { files: ['**/*.json'], plugins: { json }, language: 'json/json', extends: ['json/recommended'] },
-  { files: ['**/*.jsonc'], plugins: { json }, language: 'json/jsonc', extends: ['json/recommended'] },
-  { files: ['**/*.json5'], plugins: { json }, language: 'json/json5', extends: ['json/recommended'] },
-  { files: ['**/*.md'], plugins: { markdown }, language: 'markdown/gfm', extends: ['markdown/recommended'] },
-  { files: ['**/*.css'], plugins: { css }, language: 'css/css', extends: ['css/recommended'] }
+const contentConfig = defineConfig([
+  { files: ['**/*.json'], language: 'json/json', extends: [json.configs.recommended] },
+  { files: ['**/*.jsonc'], language: 'json/jsonc', extends: [json.configs.recommended] },
+  { files: ['**/*.json5'], language: 'json/json5', extends: [json.configs.recommended] },
+  { files: ['**/*.md'], language: 'markdown/gfm', extends: [markdown.configs.recommended] },
+  { files: ['**/*.css'], language: 'css/css', extends: [css.configs.recommended] }
 ]);
 
 const config = defineConfig([
@@ -57,8 +57,7 @@ const config = defineConfig([
       ]
     }
   },
-  ...workspaceContentConfig
+  ...contentConfig
 ]);
 
-export { workspaceContentConfig };
 export default config;

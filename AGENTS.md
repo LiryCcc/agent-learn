@@ -4,8 +4,19 @@
 
 - Define every function with a `const` declaration and an arrow function.
 - Do not use function declarations or function expressions written with the `function` keyword.
-- Never use `export default function`.
-- For default exports, define the arrow function first and export it separately.
+- Never use an anonymous or inline default export.
+- Do not directly default-export a function, arrow function, class, object literal, array literal, call expression, or any other expression.
+- Every default-exported value must first be assigned to a named variable, then exported separately with `export default <variableName>`.
+
+Do not use:
+
+```ts
+export default () => {};
+export default {};
+export default defineConfig({});
+```
+
+Use:
 
 ```ts
 const Example = () => {

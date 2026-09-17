@@ -28,7 +28,7 @@ const getBuildInfo = (mode: string) => {
   };
 };
 
-export default defineConfig(({ mode }) => {
+const config = defineConfig(({ mode }) => {
   return {
     base: process.env['VITE_BASE_PATH'] ?? '/',
     build: {
@@ -71,3 +71,5 @@ export default defineConfig(({ mode }) => {
     }
   };
 });
+
+export default config;
