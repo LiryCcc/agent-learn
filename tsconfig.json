@@ -4,5 +4,5 @@
     "tsBuildInfoFile": "./node_modules/.cache/root.tsbuildinfo",
     "types": ["node"]
   },
-  "include": ["cspell.config.ts", "scripts/**/*.ts"]
+  "include": ["./*.ts", "scripts/**/*.ts"]
 }

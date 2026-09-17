@@ -22,6 +22,10 @@
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.45.3",
+    "@eslint/css": "^2.0.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.1.0",
+    "@eslint/markdown": "^8.0.3",
     "@liry-a/tsconfig": "workspace:*",
     "@nx/vite": "catalog:",
     "@nx/vitest": "catalog:",
@@ -30,6 +34,8 @@
     "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "cspell": "^10.3.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
     "jiti": "catalog:",
     "jsdom": "catalog:",
     "nx": "catalog:",
@@ -38,6 +44,7 @@
     "prettier-plugin-packagejson": "^3.0.2",
     "prettier-plugin-toml": "^2.0.6",
     "typescript": "catalog:",
+    "typescript-eslint": "^8.70.0",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
