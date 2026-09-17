@@ -16,7 +16,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "liry-build",
-    "lint": "tsc -b"
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "zod": "^4.6.5"

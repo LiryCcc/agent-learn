@@ -85,6 +85,7 @@
       "command": "tsc -p tsconfig.json",
       "cache": true,
       "inputs": [
+        "{workspaceRoot}/*.ts",
         "{workspaceRoot}/scripts/**/*.ts",
         "{workspaceRoot}/tsconfig.json",
         "{workspaceRoot}/tsconfig/tsconfig.json",
@@ -103,11 +104,31 @@
         "description": "Check repository spelling"
       }
     },
+    "lint-root": {
+      "command": "eslint --config eslint.config.ts .",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/eslint.config.ts",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}",
+        "{workspaceRoot}/scripts/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}",
+        "{workspaceRoot}/**/*.{json,jsonc,json5,md,css}",
+        "!{workspaceRoot}/**/coverage/**",
+        "!{workspaceRoot}/**/dist/**",
+        "!{workspaceRoot}/**/node_modules/**"
+      ],
+      "metadata": {
+        "description": "Lint root tooling and workspace content files with the root ESLint configuration"
+      }
+    },
     "lint": {
       "executor": "nx:noop",
       "cache": false,
       "dependsOn": [
         "check",
+        "typecheck",
+        "lint-root",
         {
           "projects": "@liry-a/agent-core",
           "target": "lint"
@@ -115,23 +136,31 @@
         {
           "projects": "@liry-a/agent-fe",
           "target": "lint"
-        },
-        {
-          "projects": "@liry-a/markdown",
-          "target": "lint"
-        },
-        {
-          "projects": "@liry-a/utils",
-          "target": "lint"
-        },
-        {
-          "projects": "@liry-a/web-search-core",
-          "target": "lint"
         }
       ],
       "inputs": [],
       "metadata": {
-        "description": "Run repository checks and lint every source package"
+        "description": "Run repository checks, type-check every source package, and lint configured files"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:noop",
+      "cache": false,
+      "dependsOn": [
+        {
+          "projects": [
+            "@liry-a/agent-core",
+            "@liry-a/agent-fe",
+            "@liry-a/markdown",
+            "@liry-a/utils",
+            "@liry-a/web-search-core"
+          ],
+          "target": "typecheck"
+        }
+      ],
+      "inputs": [],
+      "metadata": {
+        "description": "Type-check every application and runtime library package"
       }
     },
     "test": {

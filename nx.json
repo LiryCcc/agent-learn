@@ -36,9 +36,15 @@
       ],
       "outputs": ["{projectRoot}/dist"]
     },
-    "lint": {
+    "typecheck": {
       "cache": true,
-      "inputs": ["default", "^default"]
+      "inputs": [
+        "default",
+        "^default",
+        {
+          "externalDependencies": ["typescript"]
+        }
+      ]
     }
   },
   "analytics": false,
@@ -50,7 +56,7 @@
         "devTargetName": "dev",
         "previewTargetName": "preview",
         "serveStaticTargetName": "serve-static",
-        "typecheckTargetName": "typecheck",
+        "typecheckTargetName": "typecheck-app",
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
       }
@@ -62,6 +68,18 @@
         "ciTargetName": "test-ci",
         "testMode": "run"
       }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      },
+      "include": [
+        "agent-core/eslint.config.ts",
+        "agent-core/package.json",
+        "agent-fe/eslint.config.ts",
+        "agent-fe/package.json"
+      ]
     }
   ]
 }

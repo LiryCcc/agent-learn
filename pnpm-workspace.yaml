@@ -12,6 +12,7 @@ allowBuilds:
   nx: false
 
 catalog:
+  '@nx/eslint': 23.2.1
   '@nx/vite': 23.2.1
   '@nx/vitest': 23.2.1
   '@nx/web': 23.2.1

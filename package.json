@@ -15,10 +15,11 @@
     "format": "prettier . --write --cache",
     "graph": "nx graph",
     "lint": "nx run @liry-a/monorepo:lint",
-    "lint-packages": "nx run-many -t lint --exclude=@liry-a/monorepo",
+    "lint-packages": "nx run-many -t lint --projects=@liry-a/agent-core,@liry-a/agent-fe",
     "nx": "nx",
     "nx-mcp": "nx mcp",
-    "test": "nx run @liry-a/monorepo:test"
+    "test": "nx run @liry-a/monorepo:test",
+    "typecheck": "nx run @liry-a/monorepo:typecheck"
   },
   "devDependencies": {
     "@ast-grep/napi": "^0.45.3",
@@ -27,6 +28,7 @@
     "@eslint/json": "^2.1.0",
     "@eslint/markdown": "^8.0.3",
     "@liry-a/tsconfig": "workspace:*",
+    "@nx/eslint": "catalog:",
     "@nx/vite": "catalog:",
     "@nx/vitest": "catalog:",
     "@nx/web": "catalog:",

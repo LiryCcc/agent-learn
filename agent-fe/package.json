@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "tsc -b"
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "^5.3.0",
@@ -42,11 +42,6 @@
         "dependsOn": [
           "^build",
           "typecheck"
-        ]
-      },
-      "lint": {
-        "dependsOn": [
-          "^build"
         ]
       },
       "dev": {
