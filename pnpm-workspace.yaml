@@ -5,6 +5,7 @@ packages:
   - 'utils'
   - 'build'
   - 'markdown'
+  - 'web-search-core'
 
 allowBuilds:
   esbuild: false

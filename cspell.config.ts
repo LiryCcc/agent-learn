@@ -25,8 +25,12 @@ const cspellConfig = defineConfig({
     'punct',
     'reflinks',
     'rtrim',
+    'safesearch',
+    'serp',
+    'serpapi',
     'setext',
     'suff',
+    'tavily',
     'vite',
     'vitest',
     'xmpp'

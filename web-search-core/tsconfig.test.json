@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "outDir": "../dist/out-tsc",
+    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"]
+  },
+  "include": ["vite.config.ts", "vitest.config.ts", "src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.d.ts"],
+  "exclude": []
+}

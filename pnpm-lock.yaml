@@ -293,6 +293,31 @@ importers:
         specifier: 'catalog:'
         version: 5.0.1(@types/node@26.5.1)(@vitest/coverage-v8@5.0.1)(jsdom@30.0.1)(vite@8.3.0(@types/node@26.5.1)(jiti@2.7.0)(yaml@2.9.1))
 
+  web-search-core:
+    dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@liry-a/build':
+        specifier: workspace:*
+        version: link:../build
+      '@liry-a/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.1(vitest@5.0.1)
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.1(@types/node@26.5.1)(@vitest/coverage-v8@5.0.1)(jsdom@30.0.1)(vite@8.3.0(@types/node@26.5.1)(jiti@2.7.0)(yaml@2.9.1))
+
 packages:
 
   '@asamuzakjp/css-color@6.0.7':

@@ -22,6 +22,10 @@
         {
           "projects": "@liry-a/utils",
           "target": "build"
+        },
+        {
+          "projects": "@liry-a/web-search-core",
+          "target": "build"
         }
       ],
       "inputs": [],
@@ -119,6 +123,10 @@
         {
           "projects": "@liry-a/utils",
           "target": "lint"
+        },
+        {
+          "projects": "@liry-a/web-search-core",
+          "target": "lint"
         }
       ],
       "inputs": [],
@@ -131,7 +139,13 @@
       "cache": false,
       "dependsOn": [
         {
-          "projects": ["@liry-a/agent-core", "@liry-a/agent-fe", "@liry-a/markdown", "@liry-a/utils"],
+          "projects": [
+            "@liry-a/agent-core",
+            "@liry-a/agent-fe",
+            "@liry-a/markdown",
+            "@liry-a/utils",
+            "@liry-a/web-search-core"
+          ],
           "target": "test"
         }
       ],
