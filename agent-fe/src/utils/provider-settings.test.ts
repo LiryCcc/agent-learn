@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { PROVIDER_SETTINGS_ID, providerSettingsSchema, webSearchProviderOptions } from './provider-settings.js';
+import {
+  PROVIDER_SETTINGS_ID,
+  modelSettingsSchema,
+  providerSettingsSchema,
+  webSearchProviderOptions,
+  webSearchSettingsSchema
+} from './provider-settings.js';
 
 describe('provider settings', () => {
   it('migrates saved settings with optional features disabled', () => {
@@ -48,5 +54,38 @@ describe('provider settings', () => {
   it('provides an HTTPS website for every search provider', () => {
     expect(webSearchProviderOptions).toHaveLength(4);
     expect(webSearchProviderOptions.every((provider) => provider.websiteUrl.startsWith('https://'))).toBe(true);
+  });
+
+  it('validates model and web search tabs independently', () => {
+    expect(
+      modelSettingsSchema.safeParse({
+        apiKey: '',
+        baseUrl: 'https://example.com/v1',
+        model: 'test-model',
+        streamingEnabled: false
+      }).success
+    ).toBe(false);
+    expect(
+      webSearchSettingsSchema.safeParse({
+        webSearchApiKey: 'search-key',
+        webSearchEnabled: true,
+        webSearchProvider: 'exa'
+      }).success
+    ).toBe(true);
+  });
+
+  it('allows web search settings to be stored before model credentials are configured', () => {
+    const settings = providerSettingsSchema.parse({
+      apiKey: '',
+      baseUrl: 'https://api.openai.com/v1',
+      id: PROVIDER_SETTINGS_ID,
+      model: 'gpt-4o-mini',
+      webSearchApiKey: 'search-key',
+      webSearchEnabled: true,
+      webSearchProvider: 'tavily'
+    });
+
+    expect(settings.apiKey).toBe('');
+    expect(settings.webSearchEnabled).toBe(true);
   });
 });
