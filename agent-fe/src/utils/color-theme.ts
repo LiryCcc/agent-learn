@@ -25,7 +25,7 @@ const readInitialColorTheme = (): ColorTheme => {
     // Storage can be unavailable in privacy-restricted browser contexts.
   }
 
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   return resolveColorTheme(storedTheme, prefersDark);
 };

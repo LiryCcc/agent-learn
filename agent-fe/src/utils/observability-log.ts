@@ -13,7 +13,7 @@ let pendingEntries: ObservabilityLogEntry[] = [];
 let persistTimer: number | undefined;
 
 const createId = (prefix: string) => {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}-${String(Date.now())}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
 const getErrorDetails = (error: unknown) => {
@@ -37,8 +37,12 @@ const sanitizeValue = (value: unknown, seenValues: WeakSet<object>): unknown => 
     return String(value);
   }
 
-  if (!value || typeof value !== 'object') {
-    return value ?? null;
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value !== 'object') {
+    return value;
   }
 
   if (value instanceof Error) {
@@ -71,7 +75,9 @@ const sanitizeValue = (value: unknown, seenValues: WeakSet<object>): unknown => 
 
 const serializeDetails = (details: unknown) => {
   try {
-    return JSON.stringify(sanitizeValue(details, new WeakSet())) ?? '{}';
+    const sanitizedDetails = sanitizeValue(details, new WeakSet());
+
+    return sanitizedDetails === undefined ? '{}' : JSON.stringify(sanitizedDetails);
   } catch (error) {
     return JSON.stringify({ serializationError: getErrorDetails(error) });
   }
@@ -231,7 +237,9 @@ export const exportObservabilityLogs = () => {
   document.body.append(downloadLink);
   downloadLink.click();
   downloadLink.remove();
-  window.setTimeout(() => URL.revokeObjectURL(fileUrl), 0);
+  window.setTimeout(() => {
+    URL.revokeObjectURL(fileUrl);
+  }, 0);
 
   return { entryCount: logs.length, fileName };
 };

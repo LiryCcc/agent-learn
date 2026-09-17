@@ -10,14 +10,17 @@ const LogExportButton = () => {
 
     setLastExportCount(result.entryCount);
   };
+  const exportDescription = () => {
+    const exportCount = lastExportCount();
+
+    return exportCount === undefined ? '导出本地日志与构建信息。' : `已导出 ${String(exportCount)} 条日志。`;
+  };
 
   return (
     <div class={styles['export-control']}>
       <div>
         <strong>{'可观测性日志'}</strong>
-        <span>
-          {lastExportCount() === undefined ? '导出本地日志与构建信息。' : `已导出 ${lastExportCount()} 条日志。`}
-        </span>
+        <span>{exportDescription()}</span>
       </div>
       <button onClick={handleExport} type='button'>
         {'一键导出 JSON'}

@@ -20,7 +20,7 @@ export const conversationCollection = createCollection(
 );
 
 const createId = () => {
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return `${String(Date.now())}-${Math.random().toString(36).slice(2)}`;
 };
 
 const createConversationTitle = (content: string) => {
@@ -187,23 +187,20 @@ export const setConversationDeepThinking = (conversationId: string, enabled: boo
 
 export const recoverInterruptedConversation = (conversationId: string) => {
   conversationCollection.update(conversationId, (draft) => {
-    let changed = false;
+    const interruptedMessages = draft.messages.filter((message) => message.status === 'streaming');
 
-    draft.messages.forEach((message) => {
-      if (message.status === 'streaming') {
-        message.status = 'stopped';
-        changed = true;
+    interruptedMessages.forEach((message) => {
+      message.status = 'stopped';
 
-        message.toolCalls?.forEach((toolCall) => {
-          if (toolCall.status === 'running') {
-            toolCall.status = 'error';
-            toolCall.error = '页面刷新导致工具调用中断。';
-          }
-        });
-      }
+      message.toolCalls?.forEach((toolCall) => {
+        if (toolCall.status === 'running') {
+          toolCall.status = 'error';
+          toolCall.error = '页面刷新导致工具调用中断。';
+        }
+      });
     });
 
-    if (changed) {
+    if (interruptedMessages.length > 0) {
       draft.updatedAt = Date.now();
     }
   });

@@ -31,7 +31,7 @@ const settingsIndexRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/',
   beforeLoad: () => {
-    throw redirect({ to: '/settings/model' });
+    return redirect({ to: '/settings/model' });
   }
 });
 

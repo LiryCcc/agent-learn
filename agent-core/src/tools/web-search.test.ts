@@ -3,20 +3,22 @@ import { createWebSearchTool } from './web-search.js';
 
 describe('web search tool', () => {
   it('registers the expected name and returns normalized search data', async () => {
-    const fetchMock = vi.fn(async () => {
-      return new Response(
-        JSON.stringify({
-          results: [
-            {
-              content: 'Current result',
-              title: 'Example result',
-              url: 'https://example.com/result'
-            }
-          ]
-        }),
-        { headers: { 'Content-Type': 'application/json' }, status: 200 }
-      );
-    });
+    const fetchMock = vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            results: [
+              {
+                content: 'Current result',
+                title: 'Example result',
+                url: 'https://example.com/result'
+              }
+            ]
+          }),
+          { headers: { 'Content-Type': 'application/json' }, status: 200 }
+        )
+      )
+    );
     const webSearchTool = createWebSearchTool({
       apiKey: 'test-key',
       fetch: fetchMock,

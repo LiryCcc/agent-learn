@@ -27,7 +27,8 @@ const config = defineConfig([
           ignoreRestSiblings: true,
           varsIgnorePattern: '^_'
         }
-      ]
+      ],
+      'no-void': 'error'
     }
   }
 ]);

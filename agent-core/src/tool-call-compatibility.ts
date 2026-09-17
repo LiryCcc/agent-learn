@@ -2,7 +2,7 @@ import { AIMessage } from '@langchain/core/messages';
 import { createMiddleware } from 'langchain';
 
 const createToolCallId = () => {
-  return `call_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  return `call_${String(Date.now())}_${Math.random().toString(36).slice(2, 10)}`;
 };
 
 const hasToolName = (toolName: string | undefined): toolName is string => {

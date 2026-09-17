@@ -26,6 +26,11 @@ const Example = () => {
 export default Example;
 ```
 
+## Void operator
+
+- Never use the unary `void` operator in TypeScript or JavaScript.
+- Do not use `void` to discard a value or silence a floating promise; explicitly await or handle the operation instead.
+
 ## JSX text nodes
 
 - Do not write visible text as a bare JSX text node.

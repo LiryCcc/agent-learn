@@ -57,7 +57,7 @@ const getLanguage = (filePath: string): SourceLanguage | null => {
 const formatLocation = (filePath: string, node: SgNode) => {
   const position = node.range().start;
 
-  return `${relative(workspaceRoot, filePath)}:${position.line + 1}:${position.column + 1}`;
+  return `${relative(workspaceRoot, filePath)}:${String(position.line + 1)}:${String(position.column + 1)}`;
 };
 
 const checkPathNaming = (filePath: string) => {
@@ -135,7 +135,7 @@ const checkCommandConventions = (filePath: string) => {
     .flatMap((line, lineIndex) => {
       return /\bn\x70x\b/u.test(line)
         ? [
-            `${relative(workspaceRoot, filePath)}:${lineIndex + 1}: use a repository pnpm script instead of a package execution shim`
+            `${relative(workspaceRoot, filePath)}:${String(lineIndex + 1)}: use a repository pnpm script instead of a package execution shim`
           ]
         : [];
     });
@@ -148,7 +148,9 @@ const errors = [
 
 if (errors.length > 0) {
   console.error('Source convention violations:');
-  errors.forEach((error) => console.error(`- ${error}`));
+  errors.forEach((error) => {
+    console.error(`- ${error}`);
+  });
   process.exitCode = 1;
 } else {
   console.log('Source conventions are valid.');

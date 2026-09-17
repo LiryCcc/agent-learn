@@ -4,7 +4,11 @@ import { tool } from 'langchain';
 export const createWebSearchTool = (config: WebSearchConfig) => {
   return tool(
     async (input, runtime) => {
-      return webSearch(input, runtime.signal ? { ...config, signal: runtime.signal } : config);
+      const parsedInput = webSearchSchema.parse(input);
+      const runtimeSignal: unknown = runtime.signal;
+      const signal = runtimeSignal instanceof AbortSignal ? runtimeSignal : undefined;
+
+      return webSearch(parsedInput, signal ? { ...config, signal } : config);
     },
     {
       name: 'web_search',

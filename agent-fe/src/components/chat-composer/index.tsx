@@ -42,7 +42,9 @@ const ChatComposer = (props: ChatComposerProps) => {
         aria-label='对话输入'
         class={styles['input']}
         disabled={props.disabled}
-        onInput={(event) => props.onChange(event.currentTarget.value)}
+        onInput={(event) => {
+          props.onChange(event.currentTarget.value);
+        }}
         onKeyDown={handleKeyDown}
         placeholder='输入消息，Enter 发送，Shift+Enter 换行'
         rows='3'

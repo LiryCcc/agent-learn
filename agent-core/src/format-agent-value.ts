@@ -4,9 +4,9 @@ export const formatAgentValue = (value: unknown) => {
   }
 
   try {
-    const serializedValue = JSON.stringify(value, null, 2);
+    const serializedValue: unknown = JSON.stringify(value, null, 2);
 
-    return serializedValue ?? String(value);
+    return typeof serializedValue === 'string' ? serializedValue : String(value);
   } catch {
     return String(value);
   }

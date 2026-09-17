@@ -9,8 +9,8 @@ afterEach(() => {
 
 describe('web search validation', () => {
   it('sends a minimal real search request', async () => {
-    const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL, _init?: RequestInit): Promise<Response> =>
+    const fetchMock = vi.fn((_input: RequestInfo | URL, _init?: RequestInit): Promise<Response> =>
+      Promise.resolve(
         new Response(
           JSON.stringify({
             results: [
@@ -23,6 +23,7 @@ describe('web search validation', () => {
           }),
           { headers: { 'Content-Type': 'application/json' }, status: 200 }
         )
+      )
     );
     vi.stubGlobal('fetch', fetchMock);
 
@@ -30,8 +31,16 @@ describe('web search validation', () => {
 
     expect(result).toEqual({ resultCount: 1 });
     const [, requestInit] = fetchMock.mock.calls[0] ?? [];
+    const requestBody = requestInit?.body;
+
     expect(requestInit?.method).toBe('POST');
-    expect(JSON.parse(String(requestInit?.body))).toMatchObject({ max_results: 1 });
+    expect(typeof requestBody).toBe('string');
+
+    if (typeof requestBody !== 'string') {
+      throw new Error('Expected the web search request body to be a string.');
+    }
+
+    expect(JSON.parse(requestBody)).toMatchObject({ max_results: 1 });
   });
 
   it('maps authentication errors to a user-facing message', () => {

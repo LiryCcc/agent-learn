@@ -13,7 +13,9 @@ const ConversationFullscreenToggle = (props: ConversationFullscreenToggleProps) 
       aria-label={label()}
       aria-pressed={props.active}
       class={styles['toggle-button']}
-      onClick={() => props.onChange(!props.active)}
+      onClick={() => {
+        props.onChange(!props.active);
+      }}
       title={label()}
       type='button'
     >

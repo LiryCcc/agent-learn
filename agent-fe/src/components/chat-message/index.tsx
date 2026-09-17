@@ -71,7 +71,15 @@ const ChatMessage = (props: ChatMessageProps) => {
     }
 
     const copyAction: MessageAction[] = copyText()
-      ? [{ label: '复制', disabled: props.pending, onClick: () => props.onCopy(copyText()) }]
+      ? [
+          {
+            label: '复制',
+            disabled: props.pending,
+            onClick: () => {
+              props.onCopy(copyText());
+            }
+          }
+        ]
       : [];
 
     if (props.message.role === 'user') {
@@ -81,7 +89,9 @@ const ChatMessage = (props: ChatMessageProps) => {
         {
           label: '删除后续',
           disabled: props.pending,
-          onClick: () => props.onDelete(props.message.id),
+          onClick: () => {
+            props.onDelete(props.message.id);
+          },
           tone: 'danger'
         }
       ];
@@ -89,7 +99,13 @@ const ChatMessage = (props: ChatMessageProps) => {
 
     return [
       ...copyAction,
-      { label: '重新生成', disabled: props.pending, onClick: () => props.onRegenerate(props.message.id) }
+      {
+        label: '重新生成',
+        disabled: props.pending,
+        onClick: () => {
+          props.onRegenerate(props.message.id);
+        }
+      }
     ];
   };
 

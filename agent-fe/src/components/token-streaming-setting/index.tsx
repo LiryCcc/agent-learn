@@ -15,7 +15,9 @@ const TokenStreamingSetting = (props: TokenStreamingSettingProps) => {
       <span class={styles['control']}>
         <input
           checked={props.checked}
-          onChange={(event) => props.onChange(event.currentTarget.checked)}
+          onChange={(event) => {
+            props.onChange(event.currentTarget.checked);
+          }}
           type='checkbox'
         />
         <span class={styles['track']} aria-hidden='true'>

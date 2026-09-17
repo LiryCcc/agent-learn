@@ -94,7 +94,7 @@ const WebSearchSettingsPage = () => {
       });
 
       setValidationStatus('success');
-      setValidationMessage(`校验成功，搜索服务返回 ${result.resultCount} 条结果。`);
+      setValidationMessage(`校验成功，搜索服务返回 ${String(result.resultCount)} 条结果。`);
       recordObservabilityEvent({
         details: { provider: providerValue, resultCount: result.resultCount },
         event: 'settings.web-search.validation.completed',
@@ -117,6 +117,25 @@ const WebSearchSettingsPage = () => {
         traceId
       });
     }
+  };
+
+  const handleWebSearchValidationClick = () => {
+    handleWebSearchValidation().catch((validationError: unknown) => {
+      const validationErrorMessage = getWebSearchValidationErrorMessage(validationError);
+
+      setValidationStatus('error');
+      setValidationMessage(validationErrorMessage);
+      recordObservabilityEvent({
+        details: {
+          error: validationErrorMessage,
+          provider: webSearchProvider()
+        },
+        event: 'settings.web-search.validation.failed',
+        level: 'error',
+        scope: 'settings',
+        traceId: createObservabilityTraceId('settings')
+      });
+    });
   };
 
   const handleSave = () => {
@@ -192,7 +211,9 @@ const WebSearchSettingsPage = () => {
           <span class={styles['toggle-control']}>
             <input
               checked={webSearchEnabled()}
-              onChange={(event) => handleWebSearchEnabledChange(event.currentTarget.checked)}
+              onChange={(event) => {
+                handleWebSearchEnabledChange(event.currentTarget.checked);
+              }}
               type='checkbox'
             />
             <span class={styles['toggle-track']} aria-hidden='true'>
@@ -207,7 +228,9 @@ const WebSearchSettingsPage = () => {
             <select
               class={styles['select']}
               name='web-search-provider'
-              onChange={(event) => handleWebSearchProviderChange(event.currentTarget.value)}
+              onChange={(event) => {
+                handleWebSearchProviderChange(event.currentTarget.value);
+              }}
               value={webSearchProvider()}
             >
               <For each={webSearchProviderOptions}>
@@ -237,7 +260,7 @@ const WebSearchSettingsPage = () => {
             <button
               class={styles['secondary-button']}
               disabled={validationStatus() === 'validating'}
-              onClick={() => void handleWebSearchValidation()}
+              onClick={handleWebSearchValidationClick}
               type='button'
             >
               {validationStatus() === 'validating' ? '正在校验…' : '校验联网搜索'}

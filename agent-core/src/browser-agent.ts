@@ -200,7 +200,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
           });
 
           const status = await toolCall.status;
-          const output = status === 'finished' ? await toolCall.output : undefined;
+          const output: unknown = status === 'finished' ? await toolCall.output : undefined;
           const completedToolCall: AgentToolCallRecord = {
             ...runningToolCall,
             status,

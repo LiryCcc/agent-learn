@@ -193,7 +193,9 @@ const errors = [...checkFrontend(), ...checkAgentCore()];
 
 if (errors.length > 0) {
   console.error('Layer dependency violations:');
-  errors.forEach((error) => console.error(`- ${error}`));
+  errors.forEach((error) => {
+    console.error(`- ${error}`);
+  });
   process.exitCode = 1;
 } else {
   console.log('Layer dependencies are valid.');

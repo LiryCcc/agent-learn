@@ -67,7 +67,8 @@ const config = defineConfig(({ mode }) => {
       },
       environment: 'jsdom',
       include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-      reporters: isCi ? ['default', ['junit', { outputFile: 'test-results/junit.xml' }]] : ['default']
+      reporters: isCi ? ['default', ['junit', { outputFile: 'test-results/junit.xml' }]] : ['default'],
+      setupFiles: ['./src/test-setup.ts']
     }
   };
 });

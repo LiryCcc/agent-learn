@@ -21,7 +21,9 @@ const ControlledInput = (props: ControlledInputProps) => {
         class={styles['input']}
         inputmode={props.inputmode}
         name={props.name}
-        onInput={(event) => props.onValueChange(event.currentTarget.value)}
+        onInput={(event) => {
+          props.onValueChange(event.currentTarget.value);
+        }}
         placeholder={props.placeholder}
         type={props.type}
         value={props.value}

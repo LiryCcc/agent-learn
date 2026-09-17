@@ -12,7 +12,9 @@ const DeepThinkingToggle = (props: DeepThinkingToggleProps) => {
       <input
         checked={props.checked}
         disabled={props.disabled}
-        onChange={(event) => props.onChange(event.currentTarget.checked)}
+        onChange={(event) => {
+          props.onChange(event.currentTarget.checked);
+        }}
         type='checkbox'
       />
       <span class={styles['track']} aria-hidden='true'>

@@ -38,17 +38,21 @@ const ConversationList = (props: ConversationListProps) => {
               <button
                 class={styles['select-button']}
                 disabled={props.disabled}
-                onClick={() => props.onSelect(conversation.id)}
+                onClick={() => {
+                  props.onSelect(conversation.id);
+                }}
                 type='button'
               >
                 <strong>{conversation.title}</strong>
-                <span>{`${conversation.messages.length} 条消息 · ${formatUpdatedAt(conversation.updatedAt)}`}</span>
+                <span>{`${String(conversation.messages.length)} 条消息 · ${formatUpdatedAt(conversation.updatedAt)}`}</span>
               </button>
               <button
                 aria-label={`删除对话：${conversation.title}`}
                 class={styles['delete-button']}
                 disabled={props.disabled}
-                onClick={() => props.onDelete(conversation.id)}
+                onClick={() => {
+                  props.onDelete(conversation.id);
+                }}
                 title='删除对话'
                 type='button'
               >

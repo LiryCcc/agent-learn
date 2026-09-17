@@ -28,13 +28,23 @@ const MessageList = (props: MessageListProps) => {
       })
       .join('|');
 
-    if (contentSnapshot && listElement) {
-      queueMicrotask(() => listElement?.scrollTo({ behavior: 'smooth', top: listElement.scrollHeight }));
+    const currentListElement = listElement;
+
+    if (contentSnapshot && currentListElement) {
+      queueMicrotask(() => {
+        currentListElement.scrollTo({ behavior: 'smooth', top: currentListElement.scrollHeight });
+      });
     }
   });
 
   return (
-    <div class={styles['message-list']} aria-live='polite' ref={listElement}>
+    <div
+      class={styles['message-list']}
+      aria-live='polite'
+      ref={(element) => {
+        listElement = element;
+      }}
+    >
       <Show
         when={props.messages.length > 0}
         fallback={

@@ -11,12 +11,28 @@ const contentConfig = defineConfig([
   { files: ['**/*.jsonc'], language: 'json/jsonc', extends: [json.configs.recommended] },
   { files: ['**/*.json5'], language: 'json/json5', extends: [json.configs.recommended] },
   { files: ['**/*.md'], language: 'markdown/gfm', extends: [markdown.configs.recommended] },
-  { files: ['**/*.css'], language: 'css/css', extends: [css.configs.recommended] }
+  {
+    files: ['**/*.css'],
+    language: 'css/css',
+    extends: [css.configs.recommended],
+    rules: {
+      'css/no-invalid-properties': ['error', { allowUnknownVariables: true }],
+      'css/use-baseline': [
+        'error',
+        {
+          available: 'newly',
+          allowProperties: ['overscroll-behavior', 'overscroll-behavior-x', 'resize'],
+          allowPropertyValues: { 'font-family': ['ui-monospace'] }
+        }
+      ]
+    }
+  }
 ]);
 
 const config = defineConfig([
   globalIgnores([
     '.agents/**',
+    '.github/prompts/**',
     '.github/skills/**',
     '**/coverage/**',
     '**/dist/**',
@@ -54,7 +70,8 @@ const config = defineConfig([
           ignoreRestSiblings: true,
           varsIgnorePattern: '^_'
         }
-      ]
+      ],
+      'no-void': 'error'
     }
   },
   ...contentConfig

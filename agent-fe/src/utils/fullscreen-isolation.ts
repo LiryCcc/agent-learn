@@ -6,15 +6,10 @@ type BackgroundElementState = {
 
 const isolateBackgroundElements = (foregroundElement: HTMLElement) => {
   const backgroundElements: BackgroundElementState[] = [];
-  let currentForegroundElement: HTMLElement | undefined = foregroundElement;
+  let currentForegroundElement = foregroundElement;
+  let parentElement = currentForegroundElement.parentElement;
 
-  while (currentForegroundElement) {
-    const parentElement: HTMLElement | null = currentForegroundElement.parentElement;
-
-    if (!parentElement) {
-      break;
-    }
-
+  while (parentElement) {
     Array.from(parentElement.children).forEach((element) => {
       if (element !== currentForegroundElement && element instanceof HTMLElement) {
         backgroundElements.push({
@@ -27,6 +22,7 @@ const isolateBackgroundElements = (foregroundElement: HTMLElement) => {
       }
     });
     currentForegroundElement = parentElement;
+    parentElement = currentForegroundElement.parentElement;
   }
 
   return backgroundElements;

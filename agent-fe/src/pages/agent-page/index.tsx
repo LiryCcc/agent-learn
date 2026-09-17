@@ -72,7 +72,9 @@ const AgentPage = () => {
 
     if (!recoveredInterruptedConversations) {
       recoveredInterruptedConversations = true;
-      availableConversations.forEach((conversation) => recoverInterruptedConversation(conversation.id));
+      availableConversations.forEach((conversation) => {
+        recoverInterruptedConversation(conversation.id);
+      });
       recordObservabilityEvent({
         details: { conversationCount: availableConversations.length },
         event: 'conversation.interrupted-runs.recovered',
@@ -208,9 +210,15 @@ const AgentPage = () => {
           },
           { print: false }
         ),
-      onReasoning: (reasoning) => updateConversationMessage(conversation.id, assistantMessageId, { reasoning }),
-      onText: (content) => updateConversationMessage(conversation.id, assistantMessageId, { content }),
-      onToolCall: (toolCall) => upsertConversationToolCall(conversation.id, assistantMessageId, toolCall),
+      onReasoning: (reasoning) => {
+        updateConversationMessage(conversation.id, assistantMessageId, { reasoning });
+      },
+      onText: (content) => {
+        updateConversationMessage(conversation.id, assistantMessageId, { content });
+      },
+      onToolCall: (toolCall) => {
+        upsertConversationToolCall(conversation.id, assistantMessageId, toolCall);
+      },
       provider: {
         apiKey: providerSettings.apiKey,
         baseUrl: providerSettings.baseUrl,
@@ -332,7 +340,7 @@ const AgentPage = () => {
     const conversation = activeConversation();
     const traceId = createObservabilityTraceId('clipboard');
 
-    void navigator.clipboard
+    navigator.clipboard
       .writeText(content)
       .then(() =>
         recordObservabilityEvent({
@@ -532,7 +540,12 @@ const AgentPage = () => {
           </section>
         }
       >
-        <section class={chatCardClass()} ref={chatCardElement}>
+        <section
+          class={chatCardClass()}
+          ref={(element) => {
+            chatCardElement = element;
+          }}
+        >
           <Show when={!isFullscreen()}>
             <ConversationList
               activeConversationId={activeConversationId()}

@@ -123,7 +123,7 @@ const checkModuleReference = (sourceFile: string, reference: ModuleReference) =>
   const targetPath = resolve(dirname(sourceFile), reference.specifier);
   const sourcePackageRoot = getPackageRoot(sourceFile);
   const targetPackageRoot = getPackageRoot(targetPath);
-  const location = `${relative(workspaceRoot, sourceFile)}:${reference.line}:${reference.column}`;
+  const location = `${relative(workspaceRoot, sourceFile)}:${String(reference.line)}:${String(reference.column)}`;
 
   if (sourcePackageRoot && !isPathInside(sourcePackageRoot, targetPath)) {
     return `${location}: relative module paths must not leave package ${relative(workspaceRoot, sourcePackageRoot)}`;
@@ -146,7 +146,9 @@ const errors = collectSourceFiles(workspaceRoot).flatMap((sourceFile) => {
 
 if (errors.length > 0) {
   console.error('Workspace package boundary violations:');
-  errors.forEach((error) => console.error(`- ${error}`));
+  errors.forEach((error) => {
+    console.error(`- ${error}`);
+  });
   process.exitCode = 1;
 } else {
   console.log('Workspace package boundaries are valid.');

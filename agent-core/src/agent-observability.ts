@@ -10,7 +10,7 @@ type EmitAgentEventInput = {
 };
 
 export const createAgentTraceId = () => {
-  return `agent-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `agent-${String(Date.now())}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
 export const getAgentErrorDetails = (error: unknown) => {
