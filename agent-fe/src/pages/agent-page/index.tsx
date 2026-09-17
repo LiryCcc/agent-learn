@@ -180,7 +180,9 @@ const AgentPage = () => {
         deepThinking: conversation.deepThinking,
         messageCount: conversationMessages.length,
         model: providerSettings.model,
-        trigger
+        trigger,
+        webSearchEnabled: providerSettings.webSearchEnabled,
+        ...(providerSettings.webSearchEnabled ? { webSearchProvider: providerSettings.webSearchProvider } : {})
       },
       event: 'conversation.agent.dispatched',
       messageId: assistantMessageId,
@@ -210,8 +212,18 @@ const AgentPage = () => {
       onText: (content) => updateConversationMessage(conversation.id, assistantMessageId, { content }),
       onToolCall: (toolCall) => upsertConversationToolCall(conversation.id, assistantMessageId, toolCall),
       provider: {
-        ...providerSettings,
-        deepThinking: conversation.deepThinking
+        apiKey: providerSettings.apiKey,
+        baseUrl: providerSettings.baseUrl,
+        deepThinking: conversation.deepThinking,
+        model: providerSettings.model,
+        streamingEnabled: providerSettings.streamingEnabled,
+        webSearch: providerSettings.webSearchEnabled
+          ? {
+              apiKey: providerSettings.webSearchApiKey,
+              enabled: true,
+              provider: providerSettings.webSearchProvider
+            }
+          : { enabled: false }
       },
       signal: controller.signal,
       traceId

@@ -122,6 +122,9 @@ importers:
       '@langchain/openai':
         specifier: ^1.5.13
         version: 1.5.13(@langchain/core@1.2.11(openai@7.15.0(undici@8.10.2)(zod@4.6.5)))(undici@8.10.2)
+      '@liry-a/web-search-core':
+        specifier: workspace:*
+        version: link:../web-search-core
       langchain:
         specifier: ^1.5.11
         version: 1.5.11(@langchain/core@1.2.11(openai@7.15.0(undici@8.10.2)(zod@4.6.5)))(openai@7.15.0(undici@8.10.2)(zod@4.6.5))
@@ -162,6 +165,9 @@ importers:
       '@liry-a/markdown':
         specifier: workspace:*
         version: link:../markdown
+      '@liry-a/web-search-core':
+        specifier: workspace:*
+        version: link:../web-search-core
       '@tanstack/solid-db':
         specifier: ^0.2.45
         version: 0.2.45(@typescript/typescript6@6.0.2)(solid-js@1.9.15)

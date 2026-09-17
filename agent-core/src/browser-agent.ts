@@ -1,4 +1,5 @@
 import { ChatOpenAI } from '@langchain/openai';
+import type { WebSearchConfig } from '@liry-a/web-search-core';
 import { createAgent } from 'langchain';
 import {
   type AgentLogLevel,
@@ -12,14 +13,32 @@ import { browserAgentConfigSchema, type BrowserAgentConfig } from './browser-age
 import { formatAgentValue } from './format-agent-value.js';
 import { createSystemPrompt } from './prompts/system-prompt.js';
 import { toolCallCompatibilityMiddleware } from './tool-call-compatibility.js';
-import { agentTools } from './tools/agent-tools.js';
+import { createAgentTools } from './tools/agent-tools.js';
 
 export type BrowserAgent = {
   invoke: (messages: BrowserAgentMessage[], options?: BrowserAgentInvokeOptions) => Promise<BrowserAgentResult>;
 };
 
+const getWebSearchConfig = (config: BrowserAgentConfig): WebSearchConfig | undefined => {
+  if (!config.webSearch.enabled) {
+    return undefined;
+  }
+
+  switch (config.webSearch.provider) {
+    case 'tavily':
+      return { provider: 'tavily', apiKey: config.webSearch.apiKey };
+    case 'brave':
+      return { provider: 'brave', apiKey: config.webSearch.apiKey };
+    case 'exa':
+      return { provider: 'exa', apiKey: config.webSearch.apiKey };
+    case 'serpapi':
+      return { provider: 'serpapi', apiKey: config.webSearch.apiKey };
+  }
+};
+
 export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgent => {
   const config = browserAgentConfigSchema.parse(inputConfig);
+  const tools = createAgentTools(getWebSearchConfig(config));
   const model = new ChatOpenAI({
     apiKey: config.apiKey,
     disableStreaming: !config.streamingEnabled,
@@ -33,7 +52,7 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
   const agent = createAgent({
     middleware: [toolCallCompatibilityMiddleware],
     model,
-    tools: agentTools,
+    tools,
     systemPrompt: createSystemPrompt(config.model)
   });
 
@@ -59,7 +78,9 @@ export const createBrowserAgent = (inputConfig: BrowserAgentConfig): BrowserAgen
         inputMessageCount: inputMessages.length,
         model: config.model,
         streamingEnabled: config.streamingEnabled,
-        toolNames: agentTools.map((agentTool) => agentTool.name)
+        toolNames: tools.map((agentTool) => agentTool.name),
+        webSearchEnabled: config.webSearch.enabled,
+        ...(config.webSearch.enabled ? { webSearchProvider: config.webSearch.provider } : {})
       });
 
       const messages = inputMessages

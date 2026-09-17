@@ -1,5 +1,6 @@
 export { WebSearchError, type WebSearchErrorCode } from './web-search-error.js';
 export {
+  webSearchProviderSchema,
   webSearchResponseSchema,
   webSearchResultSchema,
   webSearchSchema,

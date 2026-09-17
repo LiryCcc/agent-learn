@@ -22,6 +22,7 @@
     "@langchain/core": "^1.2.11",
     "@langchain/langgraph": "^1.4.15",
     "@langchain/openai": "^1.5.13",
+    "@liry-a/web-search-core": "workspace:*",
     "langchain": "^1.5.11",
     "zod": "^4.6.5"
   },
