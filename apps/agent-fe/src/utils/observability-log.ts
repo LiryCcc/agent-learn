@@ -1,9 +1,16 @@
 import { buildInfo } from './build-info.js';
 import {
+  formatObservabilityLogsAsJsonl,
+  formatObservabilityLogsAsText,
+  type ObservabilityExportFormat
+} from './observability-log-format.js';
+import {
   observabilityLogEntriesSchema,
   type ObservabilityLogEntry,
   type RecordObservabilityEventInput
 } from './observability-types.js';
+
+export type { ObservabilityExportFormat };
 
 const logStorageKey = 'liry-agent-observability-logs';
 const maximumLogEntries = 1_000;
@@ -194,42 +201,21 @@ export const recordObservabilityEvent = (input: RecordObservabilityEventInput, o
   return entry;
 };
 
-const parseDetails = (details: string): unknown => {
-  try {
-    return JSON.parse(details);
-  } catch {
-    return details;
+const exportFormatOptions = {
+  jsonl: {
+    extension: 'jsonl',
+    mimeType: 'application/jsonl;charset=utf-8',
+    serialize: formatObservabilityLogsAsJsonl
+  },
+  text: {
+    extension: 'log',
+    mimeType: 'text/plain;charset=utf-8',
+    serialize: formatObservabilityLogsAsText
   }
-};
+} as const;
 
-export const readObservabilityLogs = () => {
-  return [...readStoredEntries(), ...pendingEntries].slice(-maximumLogEntries);
-};
-
-export const exportObservabilityLogs = () => {
-  const traceId = createObservabilityTraceId('export');
-
-  recordObservabilityEvent({
-    details: { format: 'json' },
-    event: 'observability.export.requested',
-    scope: 'observability',
-    traceId
-  });
-  flushObservabilityLogs();
-
-  const logs = readObservabilityLogs();
-  const exportedAt = new Date().toISOString();
-  const exportPayload = {
-    build: buildInfo,
-    exportedAt,
-    logs: logs.map((entry) => ({
-      ...entry,
-      details: parseDetails(entry.details)
-    })),
-    schemaVersion: 1
-  };
-  const fileName = `liry-agent-logs-${exportedAt.replace(/:/g, '-')}.json`;
-  const fileUrl = URL.createObjectURL(new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' }));
+const downloadTextFile = (fileName: string, content: string, mimeType: string) => {
+  const fileUrl = URL.createObjectURL(new Blob([content], { type: mimeType }));
   const downloadLink = document.createElement('a');
 
   downloadLink.download = fileName;
@@ -240,8 +226,39 @@ export const exportObservabilityLogs = () => {
   window.setTimeout(() => {
     URL.revokeObjectURL(fileUrl);
   }, 0);
+};
 
-  return { entryCount: logs.length, fileName };
+export const readObservabilityLogs = () => {
+  return [...readStoredEntries(), ...pendingEntries].slice(-maximumLogEntries);
+};
+
+export const exportObservabilityLogs = (format: ObservabilityExportFormat) => {
+  const traceId = createObservabilityTraceId('export');
+
+  recordObservabilityEvent({
+    details: { format },
+    event: 'observability.export.requested',
+    scope: 'observability',
+    traceId
+  });
+  flushObservabilityLogs();
+
+  const logs = readObservabilityLogs();
+  const exportedAt = new Date().toISOString();
+  const formatOptions = exportFormatOptions[format];
+  const fileName = `liry-agent-logs-${exportedAt.replace(/:/g, '-')}.${formatOptions.extension}`;
+
+  downloadTextFile(
+    fileName,
+    formatOptions.serialize({
+      build: buildInfo,
+      exportedAt,
+      logs
+    }),
+    formatOptions.mimeType
+  );
+
+  return { entryCount: logs.length, fileName, format };
 };
 
 if (typeof window !== 'undefined') {

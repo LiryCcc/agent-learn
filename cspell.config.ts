@@ -16,6 +16,7 @@ const cspellConfig = defineConfig({
     'istask',
     'jiti',
     'jsdom',
+    'jsonl',
     'langchain',
     'liryccc',
     'langgraph',
