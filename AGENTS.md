@@ -93,10 +93,10 @@ Use:
 - Use pnpm for workspace and dependency management.
 - Keep shared tooling versions in the root `pnpm-workspace.yaml` catalog and reference them with `catalog:` from package manifests.
 - Run command-line tools through repository `pnpm` scripts instead of download-on-demand package runners.
-- Use Nx for repository checks, package linting, builds, and development task orchestration.
+- Use Turborepo for package linting, builds, tests, and development task orchestration.
 - Run all repository checks with `pnpm check`, checks plus package linting with `pnpm lint`, all unit tests with `pnpm test`, all builds with `pnpm build`, and the frontend development server with `pnpm dev`.
-- Keep `agent-core`, `agent-fe`, `markdown`, and `utils` connected to the Nx Vitest plugin with their own Vitest configuration and at least one unit test; tooling-only `build` and `tsconfig` packages do not need unit tests.
-- Keep individual root checks as Nx targets and invoke them through their existing `pnpm check-*` scripts.
+- Keep `agent-core`, `agent-fe`, `markdown`, `utils`, and `web-search-core` on their own Vitest configuration with at least one unit test; tooling-only `build` and `tsconfig` packages do not need unit tests.
+- Keep individual root checks as `pnpm check-*` scripts that run `node scripts/...` directly; do not put them in Turbo.
 
 ## Dependency direction
 
@@ -116,26 +116,10 @@ Use:
 - Agent core dependencies must flow from `index` to orchestration and then to configuration, prompts, and tools.
 - Run `pnpm check-code` after changing project source, `pnpm check-packages` after changing workspace imports, and `pnpm check-layers` after changing layer imports.
 
-<!-- nx configuration start-->
-<!-- Leave the start & end comments to automatically receive updates. -->
+## General Guidelines for working with Turborepo
 
-## General Guidelines for working with Nx
-
-- For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
-- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `pnpm nx run`, `pnpm nx run-many`, `pnpm nx affected`) instead of using the underlying tooling directly
-- Prefix nx commands with the workspace's package manager (e.g., `pnpm nx build`, `pnpm nx test`) - avoids using globally installed CLI
-- You have access to the Nx MCP server and its tools, use them to help the user
-- For Nx plugin best practices, check `node_modules/@nx/<plugin>/PLUGIN.md`. Not all plugins have this file - proceed without it if unavailable.
-- NEVER guess CLI flags - always check nx_docs or `--help` first when unsure
-
-## Scaffolding & Generators
-
-- For scaffolding tasks (creating apps, libs, project structure, setup), ALWAYS invoke the `nx-generate` skill FIRST before exploring or calling MCP tools
-
-## When to use nx_docs
-
-- USE for: advanced config options, unfamiliar flags, migration guides, plugin configuration, edge cases
-- DON'T USE for: basic generator syntax (`pnpm nx g @nx/react:app`), standard commands, things you already know
-- The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
-
-<!-- nx configuration end-->
+- Run package tasks through `pnpm turbo run <task>` or the existing root `pnpm` scripts (`pnpm build`, `pnpm test`, `pnpm lint`, `pnpm dev`).
+- Do not invoke `nx` or Nx plugins.
+- Prefix turbo commands with the workspace package manager (`pnpm turbo run ...`) so commands never download a package at runtime.
+- Filter tasks with `--filter=@liry-a/<package>` when targeting a single package.
+- Root `check-*` scripts are repository-wide scans; run them with `pnpm check-*`, not Turbo.

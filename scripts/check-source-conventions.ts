@@ -5,7 +5,15 @@ import { basename, extname, relative, resolve, sep } from 'node:path';
 type SourceLanguage = (typeof Lang)[keyof typeof Lang];
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
-const ignoredDirectories = new Set(['.git', '.nx', '.pnpm-store', 'coverage', 'dist', 'node_modules', 'test-results']);
+const ignoredDirectories = new Set([
+  '.git',
+  '.pnpm-store',
+  '.turbo',
+  'coverage',
+  'dist',
+  'node_modules',
+  'test-results'
+]);
 const scriptExtensions = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const sourceExtensions = new Set([...scriptExtensions, '.css']);
 const commandTextExtensions = new Set([...scriptExtensions, '.json', '.md', '.toml', '.yaml', '.yml']);

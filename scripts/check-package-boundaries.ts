@@ -11,7 +11,7 @@ type ModuleReference = {
 type SourceLanguage = (typeof Lang)[keyof typeof Lang];
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
-const ignoredDirectories = new Set(['.git', '.pnpm-store', 'dist', 'node_modules']);
+const ignoredDirectories = new Set(['.git', '.pnpm-store', '.turbo', 'coverage', 'dist', 'node_modules']);
 const sourceExtensions = new Set(['.cjs', '.cts', '.js', '.jsx', '.mjs', '.mts', '.ts', '.tsx']);
 
 const collectSourceFiles = (directory: string): string[] => {

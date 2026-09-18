@@ -31,6 +31,8 @@ const cspellConfig = defineConfig({
     'setext',
     'suff',
     'tavily',
+    'turbo',
+    'turborepo',
     'vite',
     'vitest',
     'xmpp'

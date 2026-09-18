@@ -34,6 +34,7 @@ const config = defineConfig([
     '.agents/**',
     '.github/prompts/**',
     '.github/skills/**',
+    '.turbo/**',
     '**/coverage/**',
     '**/dist/**',
     '**/eslint.config.ts',
@@ -41,15 +42,7 @@ const config = defineConfig([
   ]),
   {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],
-    ignores: [
-      'agent-core/**',
-      'agent-fe/**',
-      'build/**',
-      'markdown/**',
-      'tsconfig/**',
-      'utils/**',
-      'web-search-core/**'
-    ],
+    ignores: ['apps/**', 'packages/**'],
     extends: [js.configs.recommended, tseslint.configs.strictTypeChecked],
     languageOptions: {
       globals: globals.node,

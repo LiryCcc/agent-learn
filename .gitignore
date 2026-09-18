@@ -6,7 +6,7 @@ dist
 coverage
 test-results
 .cspellcache
-.nx
+.turbo
 
 .claude/worktrees
 .claude/settings.local.json

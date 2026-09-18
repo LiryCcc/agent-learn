@@ -12,8 +12,8 @@ type DependencyCheck = {
 };
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
-const frontendRoot = resolve(workspaceRoot, 'agent-fe/src');
-const agentCoreRoot = resolve(workspaceRoot, 'agent-core/src');
+const frontendRoot = resolve(workspaceRoot, 'apps/agent-fe/src');
+const agentCoreRoot = resolve(workspaceRoot, 'packages/agent-core/src');
 const sourceExtensions = new Set(['.ts', '.tsx']);
 
 const frontendDependencies = new Map([
