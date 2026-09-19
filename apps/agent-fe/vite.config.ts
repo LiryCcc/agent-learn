@@ -37,8 +37,8 @@ const config = defineConfig(({ mode }) => {
           sourcemapExcludeSources: false
         }
       },
-      sourcemap: true,
-      target: 'es2020'
+      sourcemap: 'inline',
+      target: 'esnext'
     },
     define: {
       __BUILD_INFO__: JSON.stringify(getBuildInfo(mode))
