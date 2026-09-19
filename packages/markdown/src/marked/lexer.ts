@@ -24,18 +24,18 @@ export class Lexer {
     top: boolean;
   };
 
-  private tokenizer: Tokenizer;
-  private inlineQueue: { src: string; tokens: Token[] }[];
+  #tokenizer: Tokenizer;
+  #inlineQueue: { src: string; tokens: Token[] }[];
 
   constructor(options?: MarkedOptions) {
     // TokenList cannot be created in one go
     this.tokens = Object.assign([], { links: {} });
     this.options = options || getCurrentDefaults();
     this.options.tokenizer = this.options.tokenizer || new Tokenizer();
-    this.tokenizer = this.options.tokenizer;
-    this.tokenizer.options = this.options;
-    this.tokenizer.lexer = this;
-    this.inlineQueue = [];
+    this.#tokenizer = this.options.tokenizer;
+    this.#tokenizer.options = this.options;
+    this.#tokenizer.lexer = this;
+    this.#inlineQueue = [];
     this.state = {
       inLink: false,
       inRawBlock: false,
@@ -58,7 +58,7 @@ export class Lexer {
         rules.inline = inline.gfm;
       }
     }
-    this.tokenizer.rules = rules;
+    this.#tokenizer.rules = rules;
   }
 
   /**
@@ -93,11 +93,11 @@ export class Lexer {
 
     this.blockTokens(src, this.tokens);
 
-    for (let i = 0; i < this.inlineQueue.length; i++) {
-      const next = arrayItem(this.inlineQueue, i);
+    for (let i = 0; i < this.#inlineQueue.length; i++) {
+      const next = arrayItem(this.#inlineQueue, i);
       this.inlineTokens(next.src, next.tokens);
     }
-    this.inlineQueue = [];
+    this.#inlineQueue = [];
 
     return this.tokens;
   };
@@ -120,7 +120,7 @@ export class Lexer {
 
     while (src) {
       // newline
-      if ((token = this.tokenizer.space(src))) {
+      if ((token = this.#tokenizer.space(src))) {
         src = src.slice(token.raw.length);
         if (token.raw.length === 1 && tokens.length > 0) {
           // if there's a single \n as a spacer, it's terminating the last line,
@@ -133,14 +133,14 @@ export class Lexer {
       }
 
       // code
-      if ((token = this.tokenizer.code(src))) {
+      if ((token = this.#tokenizer.code(src))) {
         src = src.slice(token.raw.length);
         lastToken = tokens.at(-1);
         // An indented code block cannot interrupt a paragraph.
         if (lastToken && (lastToken.type === 'paragraph' || lastToken.type === 'text')) {
           lastToken.raw += '\n' + token.raw;
           lastToken.text += '\n' + token.text;
-          arrayItem(this.inlineQueue, this.inlineQueue.length - 1).src = lastToken.text;
+          arrayItem(this.#inlineQueue, this.#inlineQueue.length - 1).src = lastToken.text;
         } else {
           tokens.push(token);
         }
@@ -148,55 +148,55 @@ export class Lexer {
       }
 
       // fences
-      if ((token = this.tokenizer.fences(src))) {
+      if ((token = this.#tokenizer.fences(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // heading
-      if ((token = this.tokenizer.heading(src))) {
+      if ((token = this.#tokenizer.heading(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // hr
-      if ((token = this.tokenizer.hr(src))) {
+      if ((token = this.#tokenizer.hr(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // blockquote
-      if ((token = this.tokenizer.blockquote(src))) {
+      if ((token = this.#tokenizer.blockquote(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // list
-      if ((token = this.tokenizer.list(src))) {
+      if ((token = this.#tokenizer.list(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // html
-      if ((token = this.tokenizer.html(src))) {
+      if ((token = this.#tokenizer.html(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // def
-      if ((token = this.tokenizer.def(src))) {
+      if ((token = this.#tokenizer.def(src))) {
         src = src.slice(token.raw.length);
         lastToken = tokens.at(-1);
         if (lastToken && (lastToken.type === 'paragraph' || lastToken.type === 'text')) {
           lastToken.raw += '\n' + token.raw;
           lastToken.text += '\n' + token.raw;
-          arrayItem(this.inlineQueue, this.inlineQueue.length - 1).src = lastToken.text;
+          arrayItem(this.#inlineQueue, this.#inlineQueue.length - 1).src = lastToken.text;
         } else if (!this.tokens.links[token.tag]) {
           this.tokens.links[token.tag] = {
             href: token.href,
@@ -207,14 +207,14 @@ export class Lexer {
       }
 
       // table (gfm)
-      if ((token = this.tokenizer.table(src))) {
+      if ((token = this.#tokenizer.table(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // lheading
-      if ((token = this.tokenizer.lheading(src))) {
+      if ((token = this.#tokenizer.lheading(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
@@ -222,13 +222,13 @@ export class Lexer {
 
       // top-level paragraph
       cutSrc = src;
-      if (this.state.top && (token = this.tokenizer.paragraph(cutSrc))) {
+      if (this.state.top && (token = this.#tokenizer.paragraph(cutSrc))) {
         lastToken = tokens.at(-1);
         if (lastParagraphClipped && lastToken?.type === 'paragraph') {
           lastToken.raw += '\n' + token.raw;
           lastToken.text += '\n' + token.text;
-          this.inlineQueue.pop();
-          arrayItem(this.inlineQueue, this.inlineQueue.length - 1).src = lastToken.text;
+          this.#inlineQueue.pop();
+          arrayItem(this.#inlineQueue, this.#inlineQueue.length - 1).src = lastToken.text;
         } else {
           tokens.push(token);
         }
@@ -238,14 +238,14 @@ export class Lexer {
       }
 
       // text
-      if ((token = this.tokenizer.text(src))) {
+      if ((token = this.#tokenizer.text(src))) {
         src = src.slice(token.raw.length);
         lastToken = tokens.at(-1);
         if (lastToken && lastToken.type === 'text') {
           lastToken.raw += '\n' + token.raw;
           lastToken.text += '\n' + token.text;
-          this.inlineQueue.pop();
-          arrayItem(this.inlineQueue, this.inlineQueue.length - 1).src = lastToken.text;
+          this.#inlineQueue.pop();
+          arrayItem(this.#inlineQueue, this.#inlineQueue.length - 1).src = lastToken.text;
         } else {
           tokens.push(token);
         }
@@ -267,7 +267,7 @@ export class Lexer {
   };
 
   inline = (src: string, tokens: Token[] = []) => {
-    this.inlineQueue.push({ src, tokens });
+    this.#inlineQueue.push({ src, tokens });
     return tokens;
   };
 
@@ -289,32 +289,32 @@ export class Lexer {
     if (this.tokens.links) {
       const links = Object.keys(this.tokens.links);
       if (links.length > 0) {
-        while ((match = this.tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
+        while ((match = this.#tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
           if (links.includes(match[0].slice(match[0].lastIndexOf('[') + 1, -1))) {
             maskedSrc =
               maskedSrc.slice(0, match.index) +
               '[' +
               'a'.repeat(match[0].length - 2) +
               ']' +
-              maskedSrc.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex);
+              maskedSrc.slice(this.#tokenizer.rules.inline.reflinkSearch.lastIndex);
           }
         }
       }
     }
     // Mask out other blocks
-    while ((match = this.tokenizer.rules.inline.blockSkip.exec(maskedSrc)) != null) {
+    while ((match = this.#tokenizer.rules.inline.blockSkip.exec(maskedSrc)) != null) {
       maskedSrc =
         maskedSrc.slice(0, match.index) +
         '[' +
         'a'.repeat(match[0].length - 2) +
         ']' +
-        maskedSrc.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);
+        maskedSrc.slice(this.#tokenizer.rules.inline.blockSkip.lastIndex);
     }
 
     // Mask out escaped characters
-    while ((match = this.tokenizer.rules.inline.anyPunctuation.exec(maskedSrc)) != null) {
+    while ((match = this.#tokenizer.rules.inline.anyPunctuation.exec(maskedSrc)) != null) {
       maskedSrc =
-        maskedSrc.slice(0, match.index) + '++' + maskedSrc.slice(this.tokenizer.rules.inline.anyPunctuation.lastIndex);
+        maskedSrc.slice(0, match.index) + '++' + maskedSrc.slice(this.#tokenizer.rules.inline.anyPunctuation.lastIndex);
     }
 
     while (src) {
@@ -324,14 +324,14 @@ export class Lexer {
       keepPrevChar = false;
 
       // escape
-      if ((token = this.tokenizer.escape(src))) {
+      if ((token = this.#tokenizer.escape(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // tag
-      if ((token = this.tokenizer.tag(src))) {
+      if ((token = this.#tokenizer.tag(src))) {
         src = src.slice(token.raw.length);
         lastToken = tokens.at(-1);
         if (lastToken && token.type === 'text' && lastToken.type === 'text') {
@@ -344,14 +344,14 @@ export class Lexer {
       }
 
       // link
-      if ((token = this.tokenizer.link(src))) {
+      if ((token = this.#tokenizer.link(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // reflink, nolink
-      if ((token = this.tokenizer.reflink(src, this.tokens.links))) {
+      if ((token = this.#tokenizer.reflink(src, this.tokens.links))) {
         src = src.slice(token.raw.length);
         lastToken = tokens.at(-1);
         if (lastToken && token.type === 'text' && lastToken.type === 'text') {
@@ -364,42 +364,42 @@ export class Lexer {
       }
 
       // em & strong
-      if ((token = this.tokenizer.emStrong(src, maskedSrc, prevChar))) {
+      if ((token = this.#tokenizer.emStrong(src, maskedSrc, prevChar))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // code
-      if ((token = this.tokenizer.codespan(src))) {
+      if ((token = this.#tokenizer.codespan(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // br
-      if ((token = this.tokenizer.br(src))) {
+      if ((token = this.#tokenizer.br(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // del (gfm)
-      if ((token = this.tokenizer.del(src))) {
+      if ((token = this.#tokenizer.del(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // autolink
-      if ((token = this.tokenizer.autolink(src))) {
+      if ((token = this.#tokenizer.autolink(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
       }
 
       // url (gfm)
-      if (!this.state.inLink && (token = this.tokenizer.url(src))) {
+      if (!this.state.inLink && (token = this.#tokenizer.url(src))) {
         src = src.slice(token.raw.length);
         tokens.push(token);
         continue;
@@ -407,7 +407,7 @@ export class Lexer {
 
       // text
       cutSrc = src;
-      if ((token = this.tokenizer.inlineText(cutSrc))) {
+      if ((token = this.#tokenizer.inlineText(cutSrc))) {
         src = src.slice(token.raw.length);
         if (token.raw.slice(-1) !== '_') {
           // Track prevChar before string of ____ started
