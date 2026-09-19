@@ -4,5 +4,5 @@
     "tsBuildInfoFile": "./node_modules/.cache/root.tsbuildinfo",
     "types": ["node"]
   },
-  "include": ["./*.ts", "scripts/**/*.ts"]
+  "include": ["./*.ts", "./*.js", "scripts/**/*.ts", "scripts/**/*.js"]
 }
