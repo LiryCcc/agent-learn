@@ -16,6 +16,7 @@ const defaultConfig = defineConfig({
   target: false,
   format: 'es',
   outDir: resolve(c, 'dist'),
+  sourcemap: true,
   alias: {
     dayjs: resolve(c, 'node_modules/dayjs/esm/index.js')
   }
