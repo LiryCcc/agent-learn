@@ -15,6 +15,7 @@
     "graph": "turbo run build --graph",
     "lint": "pnpm check && turbo run typecheck lint",
     "lint-packages": "turbo run lint --filter=@liry-a/agent-core --filter=@liry-a/agent-fe",
+    "prepare": "pnpm build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
