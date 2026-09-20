@@ -45,24 +45,42 @@ export type Options = {
 };
 export type HooksOptions = Options & { fallback?: ReactNode | null | undefined };
 
-type RenderContext = {
+type MarkdownNodeProps = {
+  index: number;
   options: Readonly<Options>;
   parent?: Token | undefined;
 };
 
-const renderTokens = (tokens: readonly Token[], context: RenderContext): ReactNode[] =>
-  tokens.map((token, index) => renderToken(token, index, context));
+type MarkdownElementProps = MarkdownNodeProps & {
+  children?: ReactNode;
+  properties?: Record<string, unknown>;
+  tagName: string;
+  token: Token;
+};
 
-const renderElement = (
+type MarkdownTokensProps = {
+  options: Readonly<Options>;
+  parent?: Token | undefined;
+  tokens: readonly Token[];
+};
+
+type MarkdownTokenProps = MarkdownNodeProps & {
+  token: Token;
+};
+
+type MarkdownTableCellProps = MarkdownNodeProps & {
+  cell: TableCellToken;
+  parent: Token;
+};
+
+const isElementAllowed = (
   tagName: string,
   token: Token,
   index: number,
-  context: RenderContext,
-  properties: Record<string, unknown>,
-  children: ReactNode[]
-): ReactNode => {
-  const { options } = context;
-  const isAllowed =
+  parent: Token | undefined,
+  options: Readonly<Options>
+) => {
+  return (
     (options.allowedElements === null ||
       options.allowedElements === undefined ||
       options.allowedElements.includes(tagName)) &&
@@ -71,35 +89,56 @@ const renderElement = (
       !options.disallowedElements.includes(tagName)) &&
     (options.allowElement === null ||
       options.allowElement === undefined ||
-      options.allowElement(token, index, context.parent) !== false);
-
-  if (!isAllowed) {
-    return options.unwrapDisallowed === true ? children : null;
-  }
-
-  const customComponent = options.components?.[tagName];
-  const Component = (customComponent ?? tagName) as ElementType;
-  const componentProperties = customComponent === undefined ? properties : { ...properties, node: token };
-
-  if (children.length === 0) {
-    return <Component key={index} {...componentProperties} />;
-  }
-
-  return (
-    <Component key={index} {...componentProperties}>
-      {children}
-    </Component>
+      options.allowElement(token, index, parent) !== false)
   );
 };
 
-const renderTableCell = (cell: TableCellToken, index: number, context: RenderContext, parent: Token): ReactNode => {
-  const tagName = cell.header ? 'th' : 'td';
-  const properties = cell.align === null ? {} : { style: { textAlign: cell.align } satisfies CSSProperties };
-  return renderElement(tagName, parent, index, context, properties, renderTokens(cell.tokens, { ...context, parent }));
+const MarkdownElement = (props: MarkdownElementProps) => {
+  const properties = props.properties ?? {};
+
+  if (!isElementAllowed(props.tagName, props.token, props.index, props.parent, props.options)) {
+    return props.options.unwrapDisallowed === true ? props.children : null;
+  }
+
+  const customComponent = props.options.components?.[props.tagName];
+  const Component = (customComponent ?? props.tagName) as ElementType;
+  const componentProperties = customComponent === undefined ? properties : { ...properties, node: props.token };
+
+  return <Component {...componentProperties}>{props.children}</Component>;
 };
 
-const renderToken = (token: Token, index: number, context: RenderContext): ReactNode => {
-  const childContext = { ...context, parent: token };
+const MarkdownTokens = (props: MarkdownTokensProps) => {
+  return (
+    <>
+      {props.tokens.map((token, index) => (
+        <MarkdownToken key={index} index={index} options={props.options} parent={props.parent} token={token} />
+      ))}
+    </>
+  );
+};
+
+const MarkdownTableCell = (props: MarkdownTableCellProps) => {
+  const tagName = props.cell.header ? 'th' : 'td';
+  const properties = props.cell.align === null ? {} : { style: { textAlign: props.cell.align } satisfies CSSProperties };
+
+  return (
+    <MarkdownElement
+      index={props.index}
+      options={props.options}
+      parent={props.parent}
+      properties={properties}
+      tagName={tagName}
+      token={props.parent}
+    >
+      <MarkdownTokens options={props.options} parent={props.parent} tokens={props.cell.tokens} />
+    </MarkdownElement>
+  );
+};
+
+const MarkdownToken = (props: MarkdownTokenProps) => {
+  const { index, options, parent, token } = props;
+  const childParent = token;
+
   switch (token.type) {
     case 'space': {
       return token.raw;
@@ -107,66 +146,129 @@ const renderToken = (token: Token, index: number, context: RenderContext): React
     case 'code': {
       const language = token.lang?.split(/\s+/u, 1)[0];
       const properties = language ? { className: `language-${language}` } : {};
-      const code = renderElement('code', token, 0, childContext, properties, [`${token.text}\n`]);
-      return renderElement('pre', token, index, context, {}, [code]);
+
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='pre' token={token}>
+          <MarkdownElement
+            index={0}
+            options={options}
+            parent={token}
+            properties={properties}
+            tagName='code'
+            token={token}
+          >
+            {`${token.text}\n`}
+          </MarkdownElement>
+        </MarkdownElement>
+      );
     }
     case 'heading': {
-      return renderElement(`h${token.depth}`, token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName={`h${token.depth}`} token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'table': {
-      const headerCells = token.header.map((cell, cellIndex) => renderTableCell(cell, cellIndex, childContext, token));
-      const header = renderElement('thead', token, 0, childContext, {}, [
-        renderElement('tr', token, 0, childContext, {}, headerCells)
-      ]);
-      const rows = token.rows.map((row, rowIndex) =>
-        renderElement(
-          'tr',
-          token,
-          rowIndex,
-          childContext,
-          {},
-          row.map((cell, cellIndex) => renderTableCell(cell, cellIndex, childContext, token))
-        )
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='table' token={token}>
+          <MarkdownElement index={0} options={options} parent={token} tagName='thead' token={token}>
+            <MarkdownElement index={0} options={options} parent={token} tagName='tr' token={token}>
+              {token.header.map((cell, cellIndex) => (
+                <MarkdownTableCell
+                  cell={cell}
+                  index={cellIndex}
+                  key={cellIndex}
+                  options={options}
+                  parent={token}
+                />
+              ))}
+            </MarkdownElement>
+          </MarkdownElement>
+          <MarkdownElement index={1} options={options} parent={token} tagName='tbody' token={token}>
+            {token.rows.map((row, rowIndex) => (
+              <MarkdownElement
+                index={rowIndex}
+                key={rowIndex}
+                options={options}
+                parent={token}
+                tagName='tr'
+                token={token}
+              >
+                {row.map((cell, cellIndex) => (
+                  <MarkdownTableCell
+                    cell={cell}
+                    index={cellIndex}
+                    key={cellIndex}
+                    options={options}
+                    parent={token}
+                  />
+                ))}
+              </MarkdownElement>
+            ))}
+          </MarkdownElement>
+        </MarkdownElement>
       );
-      return renderElement('table', token, index, context, {}, [
-        header,
-        renderElement('tbody', token, 1, childContext, {}, rows)
-      ]);
     }
     case 'hr': {
-      return renderElement('hr', token, index, context, {}, []);
+      return <MarkdownElement index={index} options={options} parent={parent} tagName='hr' token={token} />;
     }
     case 'blockquote': {
-      return renderElement('blockquote', token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='blockquote' token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'list': {
       const properties = token.ordered && token.start !== 1 ? { start: token.start } : {};
-      return renderElement(
-        token.ordered ? 'ol' : 'ul',
-        token,
-        index,
-        context,
-        properties,
-        renderTokens(token.items, childContext)
+
+      return (
+        <MarkdownElement
+          index={index}
+          options={options}
+          parent={parent}
+          properties={properties}
+          tagName={token.ordered ? 'ol' : 'ul'}
+          token={token}
+        >
+          <MarkdownTokens options={options} parent={childParent} tokens={token.items} />
+        </MarkdownElement>
       );
     }
     case 'list_item': {
-      const children = renderTokens(token.tokens, childContext);
-      if (token.task) {
-        children.unshift(
-          <input checked={token.checked === true} disabled={true} key='task' readOnly={true} type='checkbox' />
-        );
-      }
-      return renderElement('li', token, index, context, token.task ? { className: 'task-list-item' } : {}, children);
+      return (
+        <MarkdownElement
+          index={index}
+          options={options}
+          parent={parent}
+          properties={token.task ? { className: 'task-list-item' } : {}}
+          tagName='li'
+          token={token}
+        >
+          {token.task ? (
+            <input checked={token.checked === true} disabled={true} readOnly={true} type='checkbox' />
+          ) : null}
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'paragraph': {
-      return renderElement('p', token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='p' token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'html': {
-      return context.options.skipHtml === true ? null : token.text;
+      return options.skipHtml === true ? null : token.text;
     }
     case 'text': {
-      return 'tokens' in token && token.tokens ? renderTokens(token.tokens, childContext) : token.text;
+      return 'tokens' in token && token.tokens ? (
+        <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+      ) : (
+        token.text
+      );
     }
     case 'def': {
       return null;
@@ -175,41 +277,79 @@ const renderToken = (token: Token, index: number, context: RenderContext): React
       return token.text;
     }
     case 'link': {
-      const transform = context.options.urlTransform ?? defaultUrlTransform;
+      const transform = options.urlTransform ?? defaultUrlTransform;
       const href = transform(token.href, 'href', token);
       const properties = token.title ? { href, title: token.title } : { href };
-      return renderElement('a', token, index, context, properties, renderTokens(token.tokens, childContext));
+
+      return (
+        <MarkdownElement
+          index={index}
+          options={options}
+          parent={parent}
+          properties={properties}
+          tagName='a'
+          token={token}
+        >
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'image': {
-      const transform = context.options.urlTransform ?? defaultUrlTransform;
+      const transform = options.urlTransform ?? defaultUrlTransform;
       const src = transform(token.href, 'src', token);
       const properties = token.title ? { alt: token.text, src, title: token.title } : { alt: token.text, src };
-      return renderElement('img', token, index, context, properties, []);
+
+      return (
+        <MarkdownElement
+          index={index}
+          options={options}
+          parent={parent}
+          properties={properties}
+          tagName='img'
+          token={token}
+        />
+      );
     }
     case 'strong': {
-      return renderElement('strong', token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='strong' token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'em': {
-      return renderElement('em', token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='em' token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
     case 'codespan': {
-      return renderElement('code', token, index, context, {}, [token.text]);
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='code' token={token}>
+          {token.text}
+        </MarkdownElement>
+      );
     }
     case 'br': {
-      return renderElement('br', token, index, context, {}, []);
+      return <MarkdownElement index={index} options={options} parent={parent} tagName='br' token={token} />;
     }
     case 'del': {
-      return renderElement('del', token, index, context, {}, renderTokens(token.tokens, childContext));
+      return (
+        <MarkdownElement index={index} options={options} parent={parent} tagName='del' token={token}>
+          <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+        </MarkdownElement>
+      );
     }
   }
 };
 
-export const Markdown = (options: Readonly<Options>): ReactNode => {
+export const Markdown = (options: Readonly<Options>) => {
   if (options.allowedElements && options.disallowedElements) {
     throw new Error('Only one of allowedElements and disallowedElements may be provided.');
   }
 
-  return <>{renderTokens(Lexer.lex(options.children ?? '', { gfm: true }), { options })}</>;
+  return <MarkdownTokens options={options} tokens={Lexer.lex(options.children ?? '', { gfm: true })} />;
 };
 
 export const MarkdownAsync = async (options: Readonly<Options>): Promise<ReactNode> => Markdown(options);
