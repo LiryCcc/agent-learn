@@ -17,14 +17,14 @@ import {
   updateConversationMessage,
   upsertConversationToolCall
 } from '@/utils/conversation-collection.js';
-import { conversationStore, selectConversation } from '@/utils/conversation-store.js';
+import { selectConversation } from '@/utils/conversation-store.js';
 import { isolateFullscreenElement } from '@/utils/fullscreen-isolation.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { providerSettingsCollection } from '@/utils/provider-settings.js';
+import { useAppSelector } from '@/utils/store.js';
 import { useLiveQuery } from '@tanstack/react-db';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useSelector } from '@tanstack/react-store';
 import { useCallback, useRef, useState } from 'react';
 import styles from './index.module.css';
 
@@ -48,7 +48,7 @@ const AgentPage = () => {
   const [activeController, setActiveController] = useState<AbortController>();
   const [activeTraceId, setActiveTraceId] = useState<string>();
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const activeConversationId = useSelector(conversationStore, (state) => state.activeConversationId);
+  const activeConversationId = useAppSelector((state) => state.conversation.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
   const fullscreenSession = useRef<{

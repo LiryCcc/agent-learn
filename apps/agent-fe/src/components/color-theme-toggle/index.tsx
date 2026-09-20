@@ -1,10 +1,10 @@
-import { colorThemeStore, toggleColorTheme } from '@/utils/color-theme.js';
+import { toggleColorTheme } from '@/utils/color-theme.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
-import { useSelector } from '@tanstack/react-store';
+import { useAppSelector } from '@/utils/store.js';
 import styles from './index.module.css';
 
 const ColorThemeToggle = () => {
-  const theme = useSelector(colorThemeStore);
+  const theme = useAppSelector((state) => state.colorTheme);
 
   const handleToggle = () => {
     const nextTheme = toggleColorTheme();

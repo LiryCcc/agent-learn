@@ -1,4 +1,3 @@
-import { createStore } from '@tanstack/react-store';
 import type { ChatConversation } from './chat-types.js';
 import {
   conversationCollection,
@@ -6,17 +5,10 @@ import {
   recoverInterruptedConversation
 } from './conversation-collection.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from './observability-log.js';
-
-type ConversationState = {
-  activeConversationId: string | null;
-};
-
-export const conversationStore = createStore<ConversationState>({
-  activeConversationId: null
-});
+import { conversationSelected, store } from './store.js';
 
 export const selectConversation = (conversationId: string | null) => {
-  conversationStore.setState((state) => ({ ...state, activeConversationId: conversationId }));
+  store.dispatch(conversationSelected(conversationId));
 };
 
 const sortConversations = (conversations: ChatConversation[]) => {
@@ -37,7 +29,7 @@ export const initializeConversationSession = () => {
       traceId: createObservabilityTraceId('conversation')
     });
 
-    const activeConversationId = conversationStore.state.activeConversationId;
+    const activeConversationId = store.getState().conversation.activeConversationId;
 
     if (conversations.some((conversation) => conversation.id === activeConversationId)) {
       return;

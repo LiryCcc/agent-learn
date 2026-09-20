@@ -1,4 +1,4 @@
-import { createStore } from '@tanstack/react-store';
+import { colorThemeSet, store } from './store.js';
 
 export type ColorTheme = 'dark' | 'light';
 
@@ -30,8 +30,6 @@ const readInitialColorTheme = (): ColorTheme => {
   return resolveColorTheme(storedTheme, prefersDark);
 };
 
-export const colorThemeStore = createStore<ColorTheme>(readInitialColorTheme());
-
 const applyColorTheme = (theme: ColorTheme) => {
   if (typeof document === 'undefined') {
     return;
@@ -42,11 +40,14 @@ const applyColorTheme = (theme: ColorTheme) => {
 };
 
 export const initializeColorTheme = () => {
-  applyColorTheme(colorThemeStore.state);
+  const theme = readInitialColorTheme();
+
+  store.dispatch(colorThemeSet(theme));
+  applyColorTheme(theme);
 };
 
 export const setColorTheme = (theme: ColorTheme) => {
-  colorThemeStore.setState(() => theme);
+  store.dispatch(colorThemeSet(theme));
   applyColorTheme(theme);
 
   try {
@@ -57,7 +58,8 @@ export const setColorTheme = (theme: ColorTheme) => {
 };
 
 export const toggleColorTheme = () => {
-  const nextTheme = colorThemeStore.state === 'dark' ? 'light' : 'dark';
+  const nextTheme = store.getState().colorTheme === 'dark' ? 'light' : 'dark';
+
   setColorTheme(nextTheme);
   return nextTheme;
 };
