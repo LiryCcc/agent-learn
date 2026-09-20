@@ -2,6 +2,7 @@ import styles from './index.module.css';
 
 type TokenStreamingSettingProps = {
   checked: boolean;
+  name?: string;
   onChange: (checked: boolean) => void;
 };
 
@@ -15,6 +16,7 @@ const TokenStreamingSetting = (props: TokenStreamingSettingProps) => {
       <span className={styles['control']}>
         <input
           checked={props.checked}
+          name={props.name}
           onChange={(event) => {
             props.onChange(event.currentTarget.checked);
           }}

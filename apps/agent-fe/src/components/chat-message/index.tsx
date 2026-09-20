@@ -114,11 +114,12 @@ const ChatMessage = (props: ChatMessageProps) => {
       <span className={styles['label']}>{props.message.role === 'user' ? '你' : 'Agent'}</span>
       <div className={styles['content']}>
         {editing ? (
-          <div className={styles['editor']}>
+          <form action={save} className={styles['editor']}>
             <textarea
               aria-label='编辑消息'
               autoFocus={true}
               disabled={props.pending}
+              name='content'
               onChange={(event) => {
                 setDraft(event.currentTarget.value);
               }}
@@ -136,14 +137,14 @@ const ChatMessage = (props: ChatMessageProps) => {
               >
                 {'取消'}
               </button>
-              <button disabled={!canSubmitEdit} onClick={save} type='button'>
+              <button disabled={!canSubmitEdit} type='submit'>
                 {'保存'}
               </button>
-              <button disabled={!canSubmitEdit} onClick={resend} type='button'>
+              <button disabled={!canSubmitEdit} formAction={resend} type='submit'>
                 {'保存并重发'}
               </button>
             </div>
-          </div>
+          </form>
         ) : (
           <>
             {props.message.reasoning ? (

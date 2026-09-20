@@ -25,7 +25,7 @@ import { useAppSelector } from '@/utils/store.js';
 import { useLiveQuery } from '@tanstack/react-db';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useCallback, useRef, useState } from 'react';
+import { Activity, startTransition, useCallback, useRef, useState, ViewTransition } from 'react';
 import styles from './index.module.css';
 
 type AgentMutationInput = SendAgentMessageInput & {
@@ -474,7 +474,9 @@ const AgentPage = () => {
 
     fullscreenSession.current.restore?.();
     fullscreenSession.current.restore = undefined;
-    setIsFullscreen(enabled);
+    startTransition(() => {
+      setIsFullscreen(enabled);
+    });
     recordObservabilityEvent({
       ...(conversation ? { conversationId: conversation.id } : {}),
       details: { enabled },
@@ -509,6 +511,7 @@ const AgentPage = () => {
 
   return (
     <main className={styles['page']}>
+      <title>{'Agent 对话 · Liry Agent'}</title>
       <section className={styles['hero']}>
         <div>
           <p className={styles['eyebrow']}>{'LANGGRAPH · BROWSER RUNTIME'}</p>
@@ -518,70 +521,72 @@ const AgentPage = () => {
       </section>
 
       {isConfigured ? (
-        <section className={chatCardClass} ref={attachChatCard}>
-          {isFullscreen ? null : (
-            <ConversationList
-              activeConversationId={activeConversationId}
-              conversations={conversations}
-              disabled={sendMessage.isPending}
-              onCreate={handleCreateConversation}
-              onDelete={handleDeleteConversation}
-              onSelect={handleSelectConversation}
-            />
-          )}
+        <ViewTransition>
+          <section className={chatCardClass} ref={attachChatCard}>
+            <Activity mode={isFullscreen ? 'hidden' : 'visible'}>
+              <ConversationList
+                activeConversationId={activeConversationId}
+                conversations={conversations}
+                disabled={sendMessage.isPending}
+                onCreate={handleCreateConversation}
+                onDelete={handleDeleteConversation}
+                onSelect={handleSelectConversation}
+              />
+            </Activity>
 
-          <div className={styles['chat-workspace']}>
-            <div className={styles['toolbar']}>
-              {isFullscreen ? null : (
-                <div className={styles['model-summary']}>
-                  <span className={styles['status-dot']} />
-                  <strong>{settings?.model}</strong>
-                  <small>{settings?.baseUrl}</small>
-                </div>
-              )}
-              <div className={styles['toolbar-actions']}>
-                <DeepThinkingToggle
-                  checked={activeConversation?.deepThinking ?? false}
-                  disabled={!activeConversation || sendMessage.isPending}
-                  onChange={handleDeepThinkingChange}
-                />
+            <div className={styles['chat-workspace']}>
+              <div className={styles['toolbar']}>
                 {isFullscreen ? null : (
-                  <button
-                    className={styles['text-button']}
-                    disabled={sendMessage.isPending || messages.length === 0}
-                    onClick={handleClearMessages}
-                    type='button'
-                  >
-                    {'清空当前对话'}
-                  </button>
+                  <div className={styles['model-summary']}>
+                    <span className={styles['status-dot']} />
+                    <strong>{settings?.model}</strong>
+                    <small>{settings?.baseUrl}</small>
+                  </div>
                 )}
-                <ConversationFullscreenToggle active={isFullscreen} onChange={handleFullscreenChange} />
+                <div className={styles['toolbar-actions']}>
+                  <DeepThinkingToggle
+                    checked={activeConversation?.deepThinking ?? false}
+                    disabled={!activeConversation || sendMessage.isPending}
+                    onChange={handleDeepThinkingChange}
+                  />
+                  {isFullscreen ? null : (
+                    <button
+                      className={styles['text-button']}
+                      disabled={sendMessage.isPending || messages.length === 0}
+                      onClick={handleClearMessages}
+                      type='button'
+                    >
+                      {'清空当前对话'}
+                    </button>
+                  )}
+                  <ConversationFullscreenToggle active={isFullscreen} onChange={handleFullscreenChange} />
+                </div>
               </div>
-            </div>
 
-            <MessageList
-              messages={messages}
-              onCopy={handleCopy}
-              onDelete={handleDeleteMessage}
-              onRegenerate={handleRegenerate}
-              onResend={handleResend}
-              onSave={handleSave}
-              onStop={handleStop}
-              pending={sendMessage.isPending}
-            />
-
-            <div className={styles['composer-shell']}>
-              <ChatComposer
-                disabled={!activeConversation}
-                onChange={setPrompt}
-                onSend={handleSend}
+              <MessageList
+                messages={messages}
+                onCopy={handleCopy}
+                onDelete={handleDeleteMessage}
+                onRegenerate={handleRegenerate}
+                onResend={handleResend}
+                onSave={handleSave}
                 onStop={handleStop}
                 pending={sendMessage.isPending}
-                value={prompt}
               />
+
+              <div className={styles['composer-shell']}>
+                <ChatComposer
+                  disabled={!activeConversation}
+                  onChange={setPrompt}
+                  onSend={handleSend}
+                  onStop={handleStop}
+                  pending={sendMessage.isPending}
+                  value={prompt}
+                />
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </ViewTransition>
       ) : (
         <section className={styles['notice-card']}>
           <div>

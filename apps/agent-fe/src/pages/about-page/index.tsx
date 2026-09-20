@@ -26,6 +26,7 @@ const AboutPage = () => {
 
   return (
     <main className={styles['page']}>
+      <title>{'关于 · Liry Agent'}</title>
       <section className={styles['introduction']}>
         <p className={styles['eyebrow']}>{'ABOUT · BUILD'}</p>
         <h1>{'关于 Liry Agent'}</h1>

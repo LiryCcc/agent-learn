@@ -4,6 +4,7 @@ import styles from './index.module.css';
 const HomePage = () => {
   return (
     <main className={styles['page']}>
+      <title>{'Liry Agent'}</title>
       <section className={styles['hero']}>
         <p className={styles['eyebrow']}>{'LOCAL-FIRST · LANGGRAPH'}</p>
         <h1>{'把 Agent 留在浏览器里'}</h1>

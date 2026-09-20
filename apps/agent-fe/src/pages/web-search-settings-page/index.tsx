@@ -1,5 +1,7 @@
 import { getWebSearchValidationErrorMessage, validateWebSearchConnection } from '@/api/web-search.js';
 import ControlledInput from '@/components/controlled-input/index.jsx';
+import FormSubmitButton from '@/components/form-submit-button/index.jsx';
+import { readFormString } from '@/utils/form-data.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import {
   clearProviderSettings,
@@ -10,10 +12,20 @@ import {
   webSearchSettingsSchema
 } from '@/utils/provider-settings.js';
 import { useLiveQuery } from '@tanstack/react-db';
-import { useState } from 'react';
+import { useActionState, useState, useTransition } from 'react';
 import styles from '../settings-page/index.module.css';
 
-type ValidationStatus = 'error' | 'idle' | 'success' | 'validating';
+type ValidationStatus = 'error' | 'idle' | 'success';
+
+type WebSearchActionState = {
+  error: string;
+  saved: boolean;
+};
+
+const initialWebSearchActionState: WebSearchActionState = {
+  error: '',
+  saved: false
+};
 
 const WebSearchSettingsPage = () => {
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
@@ -25,8 +37,7 @@ const WebSearchSettingsPage = () => {
   >();
   const [validationMessage, setValidationMessage] = useState('');
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>('idle');
-  const [error, setError] = useState('');
-  const [saved, setSaved] = useState(false);
+  const [isValidating, startValidation] = useTransition();
   const webSearchApiKey =
     draftWebSearchApiKey ?? savedSettings?.webSearchApiKey ?? defaultProviderSettings.webSearchApiKey;
   const webSearchEnabled =
@@ -60,7 +71,67 @@ const WebSearchSettingsPage = () => {
     }
   };
 
-  const handleWebSearchValidation = async () => {
+  const [actionState, submitSettings] = useActionState(
+    (_previous: WebSearchActionState, formData: FormData): WebSearchActionState => {
+      if (readFormString(formData, 'intent', 'save') === 'clear') {
+        clearProviderSettings();
+        setDraftWebSearchApiKey(undefined);
+        setDraftWebSearchEnabled(undefined);
+        setDraftWebSearchProvider(undefined);
+        resetWebSearchValidation();
+        recordObservabilityEvent({
+          event: 'settings.cleared',
+          scope: 'settings',
+          traceId: createObservabilityTraceId('settings')
+        });
+        return initialWebSearchActionState;
+      }
+
+      const result = webSearchSettingsSchema.safeParse({
+        webSearchApiKey: readFormString(formData, 'web-search-api-key'),
+        webSearchEnabled: formData.get('web-search-enabled') === 'on',
+        webSearchProvider: readFormString(formData, 'web-search-provider', defaultProviderSettings.webSearchProvider)
+      });
+
+      if (!result.success) {
+        recordObservabilityEvent({
+          details: {
+            issueCount: result.error.issues.length,
+            issues: result.error.issues.map((issue) => ({ code: issue.code, path: issue.path }))
+          },
+          event: 'settings.web-search.validation.failed',
+          level: 'warn',
+          scope: 'settings',
+          traceId: createObservabilityTraceId('settings')
+        });
+        return {
+          error: result.error.issues[0]?.message ?? '配置无效。',
+          saved: false
+        };
+      }
+
+      const currentSettings = settingsQuery.data[0] ?? defaultProviderSettings;
+
+      saveProviderSettings({ ...currentSettings, ...result.data });
+      recordObservabilityEvent({
+        details: {
+          hasWebSearchApiKey: result.data.webSearchApiKey.length > 0,
+          webSearchEnabled: result.data.webSearchEnabled,
+          webSearchProvider: result.data.webSearchProvider
+        },
+        event: 'settings.web-search.saved',
+        scope: 'settings',
+        traceId: createObservabilityTraceId('settings')
+      });
+      return {
+        error: '',
+        saved: true
+      };
+    },
+    initialWebSearchActionState
+  );
+
+  const handleWebSearchValidationClick = () => {
     const apiKeyValue = webSearchApiKey.trim();
     const providerValue = webSearchProvider;
     const traceId = createObservabilityTraceId('settings');
@@ -71,124 +142,50 @@ const WebSearchSettingsPage = () => {
       return;
     }
 
-    setValidationStatus('validating');
-    setValidationMessage('正在向搜索供应商发送校验请求…');
-    recordObservabilityEvent({
-      details: { provider: providerValue },
-      event: 'settings.web-search.validation.started',
-      scope: 'settings',
-      traceId
-    });
-
-    try {
-      const result = await validateWebSearchConnection({
-        apiKey: apiKeyValue,
-        provider: providerValue
-      });
-
-      setValidationStatus('success');
-      setValidationMessage(`校验成功，搜索服务返回 ${String(result.resultCount)} 条结果。`);
+    startValidation(async () => {
       recordObservabilityEvent({
-        details: { provider: providerValue, resultCount: result.resultCount },
-        event: 'settings.web-search.validation.completed',
+        details: { provider: providerValue },
+        event: 'settings.web-search.validation.started',
         scope: 'settings',
         traceId
       });
-    } catch (validationError) {
-      const validationErrorMessage = getWebSearchValidationErrorMessage(validationError);
 
-      setValidationStatus('error');
-      setValidationMessage(validationErrorMessage);
-      recordObservabilityEvent({
-        details: {
-          error: validationErrorMessage,
+      try {
+        const result = await validateWebSearchConnection({
+          apiKey: apiKeyValue,
           provider: providerValue
-        },
-        event: 'settings.web-search.validation.failed',
-        level: 'warn',
-        scope: 'settings',
-        traceId
-      });
-    }
-  };
+        });
 
-  const handleWebSearchValidationClick = () => {
-    handleWebSearchValidation().catch((validationError: unknown) => {
-      const validationErrorMessage = getWebSearchValidationErrorMessage(validationError);
+        setValidationStatus('success');
+        setValidationMessage(`校验成功，搜索服务返回 ${String(result.resultCount)} 条结果。`);
+        recordObservabilityEvent({
+          details: { provider: providerValue, resultCount: result.resultCount },
+          event: 'settings.web-search.validation.completed',
+          scope: 'settings',
+          traceId
+        });
+      } catch (validationError) {
+        const validationErrorMessage = getWebSearchValidationErrorMessage(validationError);
 
-      setValidationStatus('error');
-      setValidationMessage(validationErrorMessage);
-      recordObservabilityEvent({
-        details: {
-          error: validationErrorMessage,
-          provider: webSearchProvider
-        },
-        event: 'settings.web-search.validation.failed',
-        level: 'error',
-        scope: 'settings',
-        traceId: createObservabilityTraceId('settings')
-      });
-    });
-  };
-
-  const handleSave = () => {
-    setError('');
-    setSaved(false);
-
-    const result = webSearchSettingsSchema.safeParse({
-      webSearchApiKey,
-      webSearchEnabled,
-      webSearchProvider
-    });
-
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? '配置无效。');
-      recordObservabilityEvent({
-        details: {
-          issueCount: result.error.issues.length,
-          issues: result.error.issues.map((issue) => ({ code: issue.code, path: issue.path }))
-        },
-        event: 'settings.web-search.validation.failed',
-        level: 'warn',
-        scope: 'settings',
-        traceId: createObservabilityTraceId('settings')
-      });
-      return;
-    }
-
-    const currentSettings = settingsQuery.data[0] ?? defaultProviderSettings;
-
-    saveProviderSettings({ ...currentSettings, ...result.data });
-    setSaved(true);
-    recordObservabilityEvent({
-      details: {
-        hasWebSearchApiKey: result.data.webSearchApiKey.length > 0,
-        webSearchEnabled: result.data.webSearchEnabled,
-        webSearchProvider: result.data.webSearchProvider
-      },
-      event: 'settings.web-search.saved',
-      scope: 'settings',
-      traceId: createObservabilityTraceId('settings')
-    });
-  };
-
-  const handleClear = () => {
-    clearProviderSettings();
-    setDraftWebSearchApiKey(undefined);
-    setDraftWebSearchEnabled(undefined);
-    setDraftWebSearchProvider(undefined);
-    resetWebSearchValidation();
-    setError('');
-    setSaved(false);
-    recordObservabilityEvent({
-      event: 'settings.cleared',
-      scope: 'settings',
-      traceId: createObservabilityTraceId('settings')
+        setValidationStatus('error');
+        setValidationMessage(validationErrorMessage);
+        recordObservabilityEvent({
+          details: {
+            error: validationErrorMessage,
+            provider: providerValue
+          },
+          event: 'settings.web-search.validation.failed',
+          level: 'warn',
+          scope: 'settings',
+          traceId
+        });
+      }
     });
   };
 
   return (
-    <div className={styles['settings-fields']}>
+    <form action={submitSettings} className={styles['settings-fields']}>
+      <title>{'联网搜索设置 · Liry Agent'}</title>
       <section className={styles['settings-group']}>
         <div className={styles['group-heading']}>
           <strong>{'联网搜索'}</strong>
@@ -203,6 +200,7 @@ const WebSearchSettingsPage = () => {
           <span className={styles['toggle-control']}>
             <input
               checked={webSearchEnabled}
+              name='web-search-enabled'
               onChange={(event) => {
                 handleWebSearchEnabledChange(event.currentTarget.checked);
               }}
@@ -257,39 +255,46 @@ const WebSearchSettingsPage = () => {
             <div className={styles['validation-row']}>
               <button
                 className={styles['secondary-button']}
-                disabled={validationStatus === 'validating'}
+                disabled={isValidating}
                 onClick={handleWebSearchValidationClick}
                 type='button'
               >
-                {validationStatus === 'validating' ? '正在校验…' : '校验联网搜索'}
+                {isValidating ? '正在校验…' : '校验联网搜索'}
               </button>
-              {validationMessage ? (
+              {isValidating || validationMessage ? (
                 <p
                   className={
-                    validationStatus === 'success' ? styles['validation-success'] : styles['validation-message']
+                    !isValidating && validationStatus === 'success'
+                      ? styles['validation-success']
+                      : styles['validation-message']
                   }
                   aria-live='polite'
                 >
-                  {validationMessage}
+                  {isValidating ? '正在向搜索供应商发送校验请求…' : validationMessage}
                 </p>
               ) : null}
             </div>
           </>
-        ) : null}
+        ) : (
+          <>
+            <input name='web-search-api-key' type='hidden' value={webSearchApiKey} />
+            <input name='web-search-provider' type='hidden' value={webSearchProvider} />
+          </>
+        )}
       </section>
 
-      {error ? <p className={styles['error']}>{error}</p> : null}
-      {saved ? <p className={styles['success']}>{'联网搜索设置已保存。'}</p> : null}
+      {actionState.error ? <p className={styles['error']}>{actionState.error}</p> : null}
+      {actionState.saved ? <p className={styles['success']}>{'联网搜索设置已保存。'}</p> : null}
 
       <div className={styles['actions']}>
-        <button className={styles['primary-button']} type='button' onClick={handleSave}>
+        <FormSubmitButton className={styles['primary-button'] ?? ''} name='intent' value='save'>
           {'保存联网搜索设置'}
-        </button>
-        <button className={styles['danger-button']} type='button' onClick={handleClear}>
+        </FormSubmitButton>
+        <FormSubmitButton className={styles['danger-button'] ?? ''} name='intent' value='clear'>
           {'删除全部本地设置'}
-        </button>
+        </FormSubmitButton>
       </div>
-    </div>
+    </form>
   );
 };
 
