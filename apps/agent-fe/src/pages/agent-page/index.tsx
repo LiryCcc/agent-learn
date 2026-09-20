@@ -25,7 +25,7 @@ import { useAppSelector } from '@/utils/store.js';
 import { useLiveQuery } from '@tanstack/react-db';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Activity, startTransition, useState, ViewTransition } from 'react';
+import { Activity, startTransition, useCallback, useRef, useState, ViewTransition } from 'react';
 import styles from './index.module.css';
 
 type AgentMutationInput = SendAgentMessageInput & {
@@ -43,34 +43,6 @@ const sortConversations = (conversations: ChatConversation[]) => {
   return [...conversations].sort((left, right) => right.updatedAt - left.updatedAt);
 };
 
-const chatCardSession = {
-  element: null as HTMLElement | null,
-  restore: undefined as (() => void) | undefined
-};
-
-const attachChatCard = (element: HTMLElement | null) => {
-  chatCardSession.element = element;
-
-  if (element) {
-    return;
-  }
-
-  restoreChatCardSession();
-};
-
-const getChatCardElement = () => {
-  return chatCardSession.element;
-};
-
-const restoreChatCardSession = () => {
-  chatCardSession.restore?.();
-  chatCardSession.restore = undefined;
-};
-
-const setChatCardRestore = (restore: (() => void) | undefined) => {
-  chatCardSession.restore = restore;
-};
-
 const AgentPage = () => {
   const [prompt, setPrompt] = useState('');
   const [activeController, setActiveController] = useState<AbortController>();
@@ -79,6 +51,23 @@ const AgentPage = () => {
   const activeConversationId = useAppSelector((state) => state.conversation.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
+  const fullscreenSession = useRef<{
+    element: HTMLElement | null;
+    restore: (() => void) | undefined;
+  }>({
+    element: null,
+    restore: undefined
+  });
+  const attachChatCard = useCallback((element: HTMLElement | null) => {
+    fullscreenSession.current.element = element;
+
+    if (element) {
+      return;
+    }
+
+    fullscreenSession.current.restore?.();
+    fullscreenSession.current.restore = undefined;
+  }, []);
 
   const conversations = sortConversations(conversationsQuery.data);
   const activeConversation = conversationsQuery.data.find((conversation) => conversation.id === activeConversationId);
@@ -483,7 +472,8 @@ const AgentPage = () => {
   const handleFullscreenChange = (enabled: boolean) => {
     const conversation = activeConversation;
 
-    restoreChatCardSession();
+    fullscreenSession.current.restore?.();
+    fullscreenSession.current.restore = undefined;
     startTransition(() => {
       setIsFullscreen(enabled);
     });
@@ -499,7 +489,7 @@ const AgentPage = () => {
       return;
     }
 
-    const element = getChatCardElement();
+    const element = fullscreenSession.current.element;
 
     if (!element) {
       return;
@@ -513,10 +503,10 @@ const AgentPage = () => {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    setChatCardRestore(() => {
+    fullscreenSession.current.restore = () => {
       window.removeEventListener('keydown', handleKeyDown);
       restoreIsolation();
-    });
+    };
   };
 
   return (
