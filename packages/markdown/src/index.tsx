@@ -165,7 +165,13 @@ const MarkdownToken = (props: MarkdownTokenProps) => {
     }
     case 'heading': {
       return (
-        <MarkdownElement index={index} options={options} parent={parent} tagName={`h${token.depth}`} token={token}>
+        <MarkdownElement
+          index={index}
+          options={options}
+          parent={parent}
+          tagName={`h${String(token.depth)}`}
+          token={token}
+        >
           <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
         </MarkdownElement>
       );
@@ -253,8 +259,8 @@ const MarkdownToken = (props: MarkdownTokenProps) => {
       return options.skipHtml === true ? null : token.text;
     }
     case 'text': {
-      return 'tokens' in token && token.tokens ? (
-        <MarkdownTokens options={options} parent={childParent} tokens={token.tokens} />
+      return 'tokens' in token ? (
+        <MarkdownTokens options={options} parent={childParent} tokens={token.tokens ?? []} />
       ) : (
         token.text
       );
@@ -341,7 +347,7 @@ export const Markdown = (options: Readonly<Options>) => {
   return <MarkdownTokens options={options} tokens={Lexer.lex(options.children ?? '', { gfm: true })} />;
 };
 
-export const MarkdownAsync = async (options: Readonly<Options>): Promise<ReactNode> => Markdown(options);
+export const MarkdownAsync = (options: Readonly<Options>): Promise<ReactNode> => Promise.resolve(Markdown(options));
 
 export const MarkdownHooks = (options: Readonly<HooksOptions>): ReactNode => Markdown(options);
 

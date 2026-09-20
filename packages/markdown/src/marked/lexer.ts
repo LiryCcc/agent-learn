@@ -7,7 +7,7 @@ import type { Token, TokensList } from './tokens.js';
 const arrayItem = <Value>(values: readonly Value[], index: number): Value => {
   const value = values[index];
   if (value === undefined) {
-    throw new Error(`Missing parser value at index ${index}.`);
+    throw new Error(`Missing parser value at index ${String(index)}.`);
   }
   return value;
 };
@@ -253,7 +253,7 @@ export class Lexer {
       }
 
       if (src) {
-        const errMsg = 'Infinite loop on byte: ' + src.charCodeAt(0);
+        const errMsg = `Infinite loop on byte: ${String(src.charCodeAt(0))}`;
         if (this.options.silent) {
           console.error(errMsg);
           break;
@@ -286,18 +286,16 @@ export class Lexer {
     let prevChar = '';
 
     // Mask out reflinks
-    if (this.tokens.links) {
-      const links = Object.keys(this.tokens.links);
-      if (links.length > 0) {
-        while ((match = this.#tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
-          if (links.includes(match[0].slice(match[0].lastIndexOf('[') + 1, -1))) {
-            maskedSrc =
-              maskedSrc.slice(0, match.index) +
-              '[' +
-              'a'.repeat(match[0].length - 2) +
-              ']' +
-              maskedSrc.slice(this.#tokenizer.rules.inline.reflinkSearch.lastIndex);
-          }
+    const links = Object.keys(this.tokens.links);
+    if (links.length > 0) {
+      while ((match = this.#tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
+        if (links.includes(match[0].slice(match[0].lastIndexOf('[') + 1, -1))) {
+          maskedSrc =
+            maskedSrc.slice(0, match.index) +
+            '[' +
+            'a'.repeat(match[0].length - 2) +
+            ']' +
+            maskedSrc.slice(this.#tokenizer.rules.inline.reflinkSearch.lastIndex);
         }
       }
     }
@@ -425,7 +423,7 @@ export class Lexer {
       }
 
       if (src) {
-        const errMsg = 'Infinite loop on byte: ' + src.charCodeAt(0);
+        const errMsg = `Infinite loop on byte: ${String(src.charCodeAt(0))}`;
         if (this.options.silent) {
           console.error(errMsg);
           break;

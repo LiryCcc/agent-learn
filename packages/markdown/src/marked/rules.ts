@@ -23,7 +23,7 @@ const lheading = edit(
   .getRegex();
 const _paragraph = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/;
 const blockText = /^[^\n]+/;
-const _blockLabel = /(?!\s*\])(?:\\.|[^\[\]\\])+/;
+const _blockLabel = /(?!\s*\])(?:\\.|[^[\]\\])+/;
 const def = edit(/^ {0,3}\[(label)\]: *(?:\n *)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n *)?| *\n *)(title))? *(?:\n+|$)/)
   .replace('label', _blockLabel)
   .replace('title', /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/)
@@ -173,10 +173,10 @@ const blockPedantic: Record<BlockKeys, RegExp> = {
  * Inline-Level Grammar
  */
 
-const escape = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/;
+const escape = /^\\([!"#$%&'()*+,./:;<=>?@[\]\\^_`{|}~-])/;
 const inlineCode = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/;
 const br = /^( {2,}|\\)\n(?!\s*$)/;
-const inlineText = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/;
+const inlineText = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<![`*_]|\b_|$)|[^ ](?= {2,}\n)))/;
 
 // list of unicode punctuation marks, plus any missing characters from CommonMark spec
 const _punctuation = '\\p{P}\\p{S}';
@@ -185,7 +185,7 @@ const punctuation = edit(/^((?![*_])[\spunctuation])/, 'u')
   .getRegex();
 
 // sequences em should skip over [title](link), `code`, <html>
-const blockSkip = /\[[^[\]]*?\]\([^\(\)]*?\)|`[^`]*?`|<[^<>]*?>/g;
+const blockSkip = /\[[^[\]]*?\]\([^()]*?\)|`[^`]*?`|<[^<>]*?>/g;
 
 const emStrongLDelim = edit(/^(?:\*+(?:((?!\*)[punct])|[^\s*]))|^_+(?:((?!_)[punct])|([^\s_]))/, 'u')
   .replace('punct', _punctuation)
@@ -223,6 +223,8 @@ const anyPunctuation = edit(/\\([punct])/, 'gu')
   .replace('punct', _punctuation)
   .getRegex();
 
+// CommonMark disallows ASCII control characters in autolink scheme/email targets.
+// eslint-disable-next-line no-control-regex -- matches U+0000–U+001F by spec
 const autolink = edit(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/)
   .replace('scheme', /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/)
   .replace(
@@ -244,10 +246,12 @@ const tag = edit(
   .replace('attribute', /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/)
   .getRegex();
 
-const _inlineLabel = /(?:\[(?:\\.|[^\[\]\\])*\]|\\.|`[^`]*`|[^\[\]\\`])*?/;
+const _inlineLabel = /(?:\[(?:\\.|[^[\]\\])*\]|\\.|`[^`]*`|[^[\]\\`])*?/;
 
 const link = edit(/^!?\[(label)\]\(\s*(href)(?:\s+(title))?\s*\)/)
   .replace('label', _inlineLabel)
+  // CommonMark disallows ASCII control characters in link destinations.
+  // eslint-disable-next-line no-control-regex -- matches U+0000–U+001F by spec
   .replace('href', /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/)
   .replace('title', /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/)
   .getRegex();
@@ -315,12 +319,12 @@ const inlinePedantic: Record<InlineKeys, RegExp> = {
 const inlineGfm: Record<InlineKeys, RegExp> = {
   ...inlineNormal,
   escape: edit(escape).replace('])', '~|])').getRegex(),
-  url: edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/, 'i')
+  url: edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9-]+\.?)+[^\s<]*|^email/, 'i')
     .replace('email', /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/)
     .getRegex(),
   _backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,
   del: /^(~~?)(?=[^\s~])([\s\S]*?[^\s~])\1(?=[^~]|$)/,
-  text: /^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/
+  text: /^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+/=?_`{|}~-]+@)|[\s\S]*?(?:(?=[\\<![`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+/=?_`{|}~-](?=[a-zA-Z0-9.!#$%&'*+/=?_`{|}~-]+@)))/
 };
 
 /**

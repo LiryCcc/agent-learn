@@ -44,7 +44,7 @@ export const unescape = (html: string) => {
   });
 };
 
-const caret = /(^|[^\[])\^/g;
+const caret = /(^|[^[])\^/g;
 
 export const edit = (regex: string | RegExp, opt?: string) => {
   let source = typeof regex === 'string' ? regex : regex.source;
@@ -73,6 +73,8 @@ export const cleanUrl = (href: string) => {
 };
 
 export const noopTest = /a^/;
+
+export const codePoints = (value: string) => Array.from(value);
 
 export const splitCells = (tableRow: string, count?: number) => {
   // ensure that every cell-delimiting pipe has a space

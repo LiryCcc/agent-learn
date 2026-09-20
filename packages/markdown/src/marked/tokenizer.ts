@@ -1,5 +1,5 @@
 import { getCurrentDefaults } from './defaults.js';
-import { findClosingBracket, rtrim, splitCells } from './helpers.js';
+import { codePoints, findClosingBracket, rtrim, splitCells } from './helpers.js';
 import type { Lexer } from './lexer.js';
 import type { MarkedOptions } from './marked-options.js';
 import type { Captures, Rules } from './rules.js';
@@ -33,7 +33,7 @@ const capture = (captures: readonly (string | undefined)[], index: number): stri
 const arrayItem = <Value>(values: readonly Value[], index: number): Value => {
   const value = values[index];
   if (value === undefined) {
-    throw new Error(`Missing parser value at index ${index}.`);
+    throw new Error(`Missing parser value at index ${String(index)}.`);
   }
   return value;
 };
@@ -46,7 +46,7 @@ const outputLink = (
 ): LinkToken | ImageToken => {
   const href = link.href;
   const title = link.title || null;
-  const text = capture(cap, 1).replaceAll(/\\([\[\]])/g, '$1');
+  const text = capture(cap, 1).replaceAll(/\\([[\]])/g, '$1');
 
   if (capture(cap, 0).charAt(0) !== '!') {
     lexer.state.inLink = true;
@@ -77,7 +77,7 @@ const indentCodeCompensation = (raw: string, text: string) => {
     return text;
   }
 
-  const indentToCode = capture(matchIndentToCode, 1) ?? '';
+  const indentToCode = capture(matchIndentToCode, 1);
 
   return text
     .split('\n')
@@ -251,24 +251,30 @@ export class Tokenizer {
         }
         if (lastToken?.type === 'blockquote') {
           // include continuation in nested blockquote
-          const oldToken = lastToken as BlockquoteToken;
-          const newText = oldToken.raw + '\n' + lines.join('\n');
-          const newToken = this.blockquote(newText)!;
+          const newText = lastToken.raw + '\n' + lines.join('\n');
+          const newToken = this.blockquote(newText);
+          if (newToken === undefined) {
+            break;
+          }
+
           tokens[tokens.length - 1] = newToken;
 
-          raw = raw.slice(0, Math.max(0, raw.length - oldToken.raw.length)) + newToken.raw;
-          text = text.slice(0, Math.max(0, text.length - oldToken.text.length)) + newToken.text;
+          raw = raw.slice(0, Math.max(0, raw.length - lastToken.raw.length)) + newToken.raw;
+          text = text.slice(0, Math.max(0, text.length - lastToken.text.length)) + newToken.text;
           break;
         }
         if (lastToken?.type === 'list') {
           // include continuation in nested list
-          const oldToken = lastToken as ListToken;
-          const newText = oldToken.raw + '\n' + lines.join('\n');
-          const newToken = this.list(newText)!;
+          const newText = lastToken.raw + '\n' + lines.join('\n');
+          const newToken = this.list(newText);
+          if (newToken === undefined) {
+            break;
+          }
+
           tokens[tokens.length - 1] = newToken;
 
           raw = raw.slice(0, Math.max(0, raw.length - lastToken.raw.length)) + newToken.raw;
-          text = text.slice(0, Math.max(0, text.length - oldToken.raw.length)) + newToken.raw;
+          text = text.slice(0, Math.max(0, text.length - lastToken.raw.length)) + newToken.raw;
           lines = newText.slice(arrayItem(tokens, tokens.length - 1).raw.length).split('\n');
         }
       }
@@ -311,7 +317,6 @@ export class Tokenizer {
       // Check if current bullet point can start a new List Item
       while (src) {
         let endEarly = false;
-        let raw = '';
         let itemContents = '';
         if (!(cap = itemRegex.exec(src))) {
           break;
@@ -322,7 +327,7 @@ export class Tokenizer {
           break;
         }
 
-        raw = capture(cap, 0);
+        let raw = capture(cap, 0);
         src = src.slice(raw.length);
 
         let line = arrayItem(capture(cap, 2).split('\n', 1), 0).replace(/^\t+/, (t: string) =>
@@ -331,7 +336,7 @@ export class Tokenizer {
         let nextLine = arrayItem(src.split('\n', 1), 0);
         let blankLine = !line.trim();
 
-        let indent = 0;
+        let indent: number;
         if (this.options.pedantic) {
           indent = 2;
           itemContents = line.trimStart();
@@ -352,14 +357,11 @@ export class Tokenizer {
         }
 
         if (!endEarly) {
-          const nextBulletRegex = new RegExp(
-            `^ {0,${Math.min(3, indent - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`
-          );
-          const hrRegex = new RegExp(
-            `^ {0,${Math.min(3, indent - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`
-          );
-          const fencesBeginRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:\`\`\`|~~~)`);
-          const headingBeginRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}#`);
+          const nestIndent = String(Math.min(3, indent - 1));
+          const nextBulletRegex = new RegExp(`^ {0,${nestIndent}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`);
+          const hrRegex = new RegExp(`^ {0,${nestIndent}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`);
+          const fencesBeginRegex = new RegExp(`^ {0,${nestIndent}}(?:\`\`\`|~~~)`);
+          const headingBeginRegex = new RegExp(`^ {0,${nestIndent}}#`);
 
           // Check if following lines should be included in List Item
           while (src) {
@@ -788,7 +790,7 @@ export class Tokenizer {
 
     if (!nextChar || !prevChar || this.rules.inline.punctuation.exec(prevChar)) {
       // unicode Regex counts emoji as 1 char; spread into array for proper count (used multiple times below)
-      const lLength = [...capture(match, 0)].length - 1;
+      const lLength = codePoints(capture(match, 0)).length - 1;
       let rDelim: string;
       let rLength: number;
       let delimTotal = lLength,
@@ -812,7 +814,7 @@ export class Tokenizer {
 
         if (!rDelim) continue; // skip single * in __abc*abc__
 
-        rLength = [...rDelim].length;
+        rLength = codePoints(rDelim).length;
 
         if (capture(match, 3) || capture(match, 4)) {
           // found another Left Delim
@@ -834,7 +836,7 @@ export class Tokenizer {
         // Remove extra characters. *a*** -> *a*
         rLength = Math.min(rLength, rLength + delimTotal + midDelimTotal);
         // char length can be >1 for unicode characters;
-        const lastCharLength = arrayItem([...capture(match, 0)], 0).length;
+        const lastCharLength = arrayItem(codePoints(capture(match, 0)), 0).length;
         const raw = src.slice(0, lLength + match.index + lastCharLength + rLength);
 
         // Create `em` if smallest delimiter has odd char count. *a***

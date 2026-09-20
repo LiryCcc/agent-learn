@@ -45,7 +45,13 @@ const config = defineConfig([
           varsIgnorePattern: '^_'
         }
       ],
-      'no-void': 'error'
+      'no-void': 'error',
+      'react-refresh/only-export-components': [
+        'error',
+        {
+          allowExportNames: ['defaultUrlTransform', 'remarkGfm']
+        }
+      ]
     }
   }
 ]);
