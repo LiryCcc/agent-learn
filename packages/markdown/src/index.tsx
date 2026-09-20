@@ -119,7 +119,8 @@ const MarkdownTokens = (props: MarkdownTokensProps) => {
 
 const MarkdownTableCell = (props: MarkdownTableCellProps) => {
   const tagName = props.cell.header ? 'th' : 'td';
-  const properties = props.cell.align === null ? {} : { style: { textAlign: props.cell.align } satisfies CSSProperties };
+  const properties =
+    props.cell.align === null ? {} : { style: { textAlign: props.cell.align } satisfies CSSProperties };
 
   return (
     <MarkdownElement
@@ -175,13 +176,7 @@ const MarkdownToken = (props: MarkdownTokenProps) => {
           <MarkdownElement index={0} options={options} parent={token} tagName='thead' token={token}>
             <MarkdownElement index={0} options={options} parent={token} tagName='tr' token={token}>
               {token.header.map((cell, cellIndex) => (
-                <MarkdownTableCell
-                  cell={cell}
-                  index={cellIndex}
-                  key={cellIndex}
-                  options={options}
-                  parent={token}
-                />
+                <MarkdownTableCell cell={cell} index={cellIndex} key={cellIndex} options={options} parent={token} />
               ))}
             </MarkdownElement>
           </MarkdownElement>
@@ -196,13 +191,7 @@ const MarkdownToken = (props: MarkdownTokenProps) => {
                 token={token}
               >
                 {row.map((cell, cellIndex) => (
-                  <MarkdownTableCell
-                    cell={cell}
-                    index={cellIndex}
-                    key={cellIndex}
-                    options={options}
-                    parent={token}
-                  />
+                  <MarkdownTableCell cell={cell} index={cellIndex} key={cellIndex} options={options} parent={token} />
                 ))}
               </MarkdownElement>
             ))}

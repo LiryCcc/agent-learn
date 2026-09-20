@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite",
-    "lint": "eslint --config eslint.config.ts .",
+    "dev": "vite dev",
+    "lint": "eslint . --cache",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc -b"
