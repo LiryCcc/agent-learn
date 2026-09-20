@@ -25,6 +25,20 @@ const functionKinds = new Set([
   'method_definition'
 ]);
 const kebabCasePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const allowedModuleStatementKinds = new Set([
+  'ambient_declaration',
+  'class_declaration',
+  'comment',
+  'enum_declaration',
+  'export_statement',
+  'function_declaration',
+  'generator_function_declaration',
+  'import_statement',
+  'interface_declaration',
+  'lexical_declaration',
+  'type_alias_declaration',
+  'variable_declaration'
+]);
 
 const collectFiles = (directory: string, extensions: Set<string>): string[] => {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -84,6 +98,24 @@ const checkPathNaming = (filePath: string) => {
   return [`${relativePath}: project source file and directory names must use kebab-case`];
 };
 
+const toPosixPath = (filePath: string) => {
+  return relative(workspaceRoot, filePath).split(sep).join('/');
+};
+
+const isPackageRuntimeSource = (filePath: string) => {
+  const relativePath = toPosixPath(filePath);
+
+  return (
+    /^(?:apps|packages)\/[^/]+\/src\//.test(relativePath) &&
+    !/\.test\.(?:ts|tsx)$/.test(relativePath) &&
+    !relativePath.endsWith('/src/test-setup.ts')
+  );
+};
+
+const isSourceEntryFile = (filePath: string) => {
+  return toPosixPath(filePath).endsWith('/src/index.tsx');
+};
+
 const checkScriptConventions = (filePath: string, language: SourceLanguage) => {
   const rootNode = parse(language, readFileSync(filePath, 'utf8')).root();
   const errors: string[] = [];
@@ -98,6 +130,53 @@ const checkScriptConventions = (filePath: string, language: SourceLanguage) => {
     rootNode.findAll({ rule: { kind: 'jsx_text' } }).forEach((node) => {
       if (node.text().trim().length > 0) {
         errors.push(`${formatLocation(filePath, node)}: JSX visible text must use an expression`);
+      }
+    });
+  }
+
+  rootNode
+    .findAll({
+      rule: {
+        any: [
+          { pattern: 'useEffect($CALLBACK)' },
+          { pattern: 'useLayoutEffect($CALLBACK)' },
+          { pattern: 'React.useEffect($CALLBACK)' },
+          { pattern: 'React.useLayoutEffect($CALLBACK)' },
+          {
+            all: [
+              {
+                any: [
+                  { pattern: 'useEffect($CALLBACK, $DEPS)' },
+                  { pattern: 'useLayoutEffect($CALLBACK, $DEPS)' },
+                  { pattern: 'React.useEffect($CALLBACK, $DEPS)' },
+                  { pattern: 'React.useLayoutEffect($CALLBACK, $DEPS)' }
+                ]
+              },
+              {
+                not: {
+                  any: [
+                    { pattern: 'useEffect($CALLBACK, [])' },
+                    { pattern: 'useLayoutEffect($CALLBACK, [])' },
+                    { pattern: 'React.useEffect($CALLBACK, [])' },
+                    { pattern: 'React.useLayoutEffect($CALLBACK, [])' }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    })
+    .forEach((node) => {
+      errors.push(`${formatLocation(filePath, node)}: do not use useEffect as a change listener`);
+    });
+
+  if (isPackageRuntimeSource(filePath) && !isSourceEntryFile(filePath)) {
+    rootNode.children().forEach((node) => {
+      const statementKind = node.kind();
+
+      if (typeof statementKind !== 'string' || !allowedModuleStatementKinds.has(statementKind)) {
+        errors.push(`${formatLocation(filePath, node)}: module-level effects are only allowed in src/index.tsx`);
       }
     });
   }

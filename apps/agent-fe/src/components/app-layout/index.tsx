@@ -1,26 +1,9 @@
 import ColorThemeToggle from '@/components/color-theme-toggle/index.jsx';
-import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
-import { Link, Outlet, useLocation } from '@tanstack/react-router';
+import { Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { useEffect } from 'react';
 import styles from './index.module.css';
 
 const AppLayout = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    recordObservabilityEvent({
-      details: {
-        hash: location.hash,
-        path: location.pathname,
-        search: location.searchStr
-      },
-      event: 'navigation.changed',
-      scope: 'navigation',
-      traceId: createObservabilityTraceId('navigation')
-    });
-  }, [location.hash, location.pathname, location.searchStr]);
-
   return (
     <div className={styles['layout']}>
       <header className={styles['header']}>

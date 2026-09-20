@@ -50,6 +50,13 @@ Use:
 <div>{'123abc'}</div>
 ```
 
+## React effects
+
+- Do not use `useEffect` or `useLayoutEffect` to listen for value changes.
+- Derive values during render, handle side effects in event handlers, subscribe to external systems from `src/index.tsx`, or attach listeners with ref callbacks.
+- Module-level effects are allowed only in `src/index.tsx`. Other modules export initialize functions for the entry to call.
+- Mount-only `useEffect(..., [])` is allowed only to synchronize with an external system that has no entry-file or ref-callback alternative.
+
 ## Naming
 
 - Use kebab-case for project-authored source file and directory names.

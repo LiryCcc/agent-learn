@@ -5,11 +5,18 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  gap: 0.8rem;
   padding: 1.4rem clamp(1rem, 3vw, 2rem);
   overscroll-behavior: contain;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+}
+
+.message-list-content {
+  display: flex;
+  min-height: 100%;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .empty-state {

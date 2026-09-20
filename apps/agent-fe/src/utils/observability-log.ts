@@ -261,6 +261,6 @@ export const exportObservabilityLogs = (format: ObservabilityExportFormat) => {
   return { entryCount: logs.length, fileName, format };
 };
 
-if (typeof window !== 'undefined') {
+export const initializeObservabilityLogging = () => {
   window.addEventListener('pagehide', flushObservabilityLogs);
-}
+};

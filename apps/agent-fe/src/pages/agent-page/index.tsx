@@ -11,7 +11,6 @@ import {
   conversationCollection,
   createConversation,
   deleteConversation,
-  recoverInterruptedConversation,
   removeConversationMessagesAfter,
   removeConversationMessagesFrom,
   setConversationDeepThinking,
@@ -26,7 +25,7 @@ import { useLiveQuery } from '@tanstack/react-db';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useSelector } from '@tanstack/react-store';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import styles from './index.module.css';
 
 type AgentMutationInput = SendAgentMessageInput & {
@@ -52,8 +51,23 @@ const AgentPage = () => {
   const activeConversationId = useSelector(conversationStore, (state) => state.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  const chatCardElement = useRef<HTMLElement>(null);
-  const recoveredInterruptedConversations = useRef(false);
+  const fullscreenSession = useRef<{
+    element: HTMLElement | null;
+    restore: (() => void) | undefined;
+  }>({
+    element: null,
+    restore: undefined
+  });
+  const attachChatCard = useCallback((element: HTMLElement | null) => {
+    fullscreenSession.current.element = element;
+
+    if (element) {
+      return;
+    }
+
+    fullscreenSession.current.restore?.();
+    fullscreenSession.current.restore = undefined;
+  }, []);
 
   const conversations = sortConversations(conversationsQuery.data);
   const activeConversation = conversationsQuery.data.find((conversation) => conversation.id === activeConversationId);
@@ -61,45 +75,6 @@ const AgentPage = () => {
     .filter(Boolean)
     .join(' ');
   const messages = activeConversation?.messages ?? [];
-
-  useEffect(() => {
-    if (!conversationsQuery.isReady) {
-      return;
-    }
-
-    const availableConversations = sortConversations(conversationsQuery.data);
-
-    if (!recoveredInterruptedConversations.current) {
-      recoveredInterruptedConversations.current = true;
-      availableConversations.forEach((conversation) => {
-        recoverInterruptedConversation(conversation.id);
-      });
-      recordObservabilityEvent({
-        details: { conversationCount: availableConversations.length },
-        event: 'conversation.interrupted-runs.recovered',
-        scope: 'conversation',
-        traceId: createObservabilityTraceId('conversation')
-      });
-    }
-
-    if (availableConversations.some((conversation) => conversation.id === activeConversationId)) {
-      return;
-    }
-
-    const nextConversation = availableConversations[0] ?? createConversation();
-
-    selectConversation(nextConversation.id);
-
-    if (availableConversations.length === 0) {
-      recordObservabilityEvent({
-        conversationId: nextConversation.id,
-        details: { source: 'initialization' },
-        event: 'conversation.created',
-        scope: 'conversation',
-        traceId: createObservabilityTraceId('conversation')
-      });
-    }
-  }, [activeConversationId, conversationsQuery.data, conversationsQuery.isReady]);
 
   const sendMessage = useMutation<SendAgentMessageResult, Error, AgentMutationInput>({
     mutationFn: ({ assistantMessageId: _assistantMessageId, conversationId: _conversationId, ...input }) =>
@@ -298,7 +273,19 @@ const AgentPage = () => {
     });
 
     if (activeConversationId === conversationId) {
-      selectConversation(remainingConversations[0]?.id ?? null);
+      const nextConversation = remainingConversations[0] ?? createConversation();
+
+      selectConversation(nextConversation.id);
+
+      if (!remainingConversations[0]) {
+        recordObservabilityEvent({
+          conversationId: nextConversation.id,
+          details: { source: 'initialization' },
+          event: 'conversation.created',
+          scope: 'conversation',
+          traceId: createObservabilityTraceId('conversation')
+        });
+      }
     }
   };
 
@@ -485,6 +472,8 @@ const AgentPage = () => {
   const handleFullscreenChange = (enabled: boolean) => {
     const conversation = activeConversation;
 
+    fullscreenSession.current.restore?.();
+    fullscreenSession.current.restore = undefined;
     setIsFullscreen(enabled);
     recordObservabilityEvent({
       ...(conversation ? { conversationId: conversation.id } : {}),
@@ -493,29 +482,30 @@ const AgentPage = () => {
       scope: 'conversation',
       traceId: createObservabilityTraceId('conversation')
     });
-  };
 
-  useEffect(() => {
-    if (!isFullscreen) {
+    if (!enabled) {
       return;
     }
 
+    const element = fullscreenSession.current.element;
+
+    if (!element) {
+      return;
+    }
+
+    const restoreIsolation = isolateFullscreenElement(element);
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         handleFullscreenChange(false);
       }
     };
-    const restoreFullscreenIsolation = chatCardElement.current
-      ? isolateFullscreenElement(chatCardElement.current)
-      : undefined;
 
     window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
+    fullscreenSession.current.restore = () => {
       window.removeEventListener('keydown', handleKeyDown);
-      restoreFullscreenIsolation?.();
+      restoreIsolation();
     };
-  }, [isFullscreen]);
+  };
 
   return (
     <main className={styles['page']}>
@@ -528,7 +518,7 @@ const AgentPage = () => {
       </section>
 
       {isConfigured ? (
-        <section className={chatCardClass} ref={chatCardElement}>
+        <section className={chatCardClass} ref={attachChatCard}>
           {isFullscreen ? null : (
             <ConversationList
               activeConversationId={activeConversationId}

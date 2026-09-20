@@ -10,36 +10,31 @@ import {
   webSearchSettingsSchema
 } from '@/utils/provider-settings.js';
 import { useLiveQuery } from '@tanstack/react-db';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import styles from '../settings-page/index.module.css';
 
 type ValidationStatus = 'error' | 'idle' | 'success' | 'validating';
 
 const WebSearchSettingsPage = () => {
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  const [webSearchApiKey, setWebSearchApiKey] = useState(defaultProviderSettings.webSearchApiKey);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(defaultProviderSettings.webSearchEnabled);
-  const [webSearchProvider, setWebSearchProvider] = useState(defaultProviderSettings.webSearchProvider);
+  const savedSettings = settingsQuery.data[0];
+  const [draftWebSearchApiKey, setDraftWebSearchApiKey] = useState<string>();
+  const [draftWebSearchEnabled, setDraftWebSearchEnabled] = useState<boolean>();
+  const [draftWebSearchProvider, setDraftWebSearchProvider] = useState<
+    typeof defaultProviderSettings.webSearchProvider | undefined
+  >();
   const [validationMessage, setValidationMessage] = useState('');
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>('idle');
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
-  const loadedSavedSettings = useRef(false);
+  const webSearchApiKey =
+    draftWebSearchApiKey ?? savedSettings?.webSearchApiKey ?? defaultProviderSettings.webSearchApiKey;
+  const webSearchEnabled =
+    draftWebSearchEnabled ?? savedSettings?.webSearchEnabled ?? defaultProviderSettings.webSearchEnabled;
+  const webSearchProvider =
+    draftWebSearchProvider ?? savedSettings?.webSearchProvider ?? defaultProviderSettings.webSearchProvider;
 
   const selectedWebSearchProvider = webSearchProviderOptions.find((option) => option.value === webSearchProvider);
-
-  useEffect(() => {
-    const currentSettings = settingsQuery.data[0];
-
-    if (!currentSettings || loadedSavedSettings.current) {
-      return;
-    }
-
-    setWebSearchApiKey(currentSettings.webSearchApiKey);
-    setWebSearchEnabled(currentSettings.webSearchEnabled);
-    setWebSearchProvider(currentSettings.webSearchProvider);
-    loadedSavedSettings.current = true;
-  }, [settingsQuery.data]);
 
   const resetWebSearchValidation = () => {
     setValidationMessage('');
@@ -47,12 +42,12 @@ const WebSearchSettingsPage = () => {
   };
 
   const handleWebSearchApiKeyChange = (value: string) => {
-    setWebSearchApiKey(value);
+    setDraftWebSearchApiKey(value);
     resetWebSearchValidation();
   };
 
   const handleWebSearchEnabledChange = (enabled: boolean) => {
-    setWebSearchEnabled(enabled);
+    setDraftWebSearchEnabled(enabled);
     resetWebSearchValidation();
   };
 
@@ -60,7 +55,7 @@ const WebSearchSettingsPage = () => {
     const option = webSearchProviderOptions.find((candidate) => candidate.value === value);
 
     if (option) {
-      setWebSearchProvider(option.value);
+      setDraftWebSearchProvider(option.value);
       resetWebSearchValidation();
     }
   };
@@ -179,13 +174,12 @@ const WebSearchSettingsPage = () => {
 
   const handleClear = () => {
     clearProviderSettings();
-    setWebSearchApiKey(defaultProviderSettings.webSearchApiKey);
-    setWebSearchEnabled(defaultProviderSettings.webSearchEnabled);
-    setWebSearchProvider(defaultProviderSettings.webSearchProvider);
+    setDraftWebSearchApiKey(undefined);
+    setDraftWebSearchEnabled(undefined);
+    setDraftWebSearchProvider(undefined);
     resetWebSearchValidation();
     setError('');
     setSaved(false);
-    loadedSavedSettings.current = false;
     recordObservabilityEvent({
       event: 'settings.cleared',
       scope: 'settings',

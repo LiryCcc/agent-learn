@@ -1,6 +1,5 @@
 import ChatMessage from '@/components/chat-message/index.jsx';
 import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
-import { useEffect, useRef } from 'react';
 import styles from './index.module.css';
 
 type MessageListProps = {
@@ -14,52 +13,61 @@ type MessageListProps = {
   onStop: () => void;
 };
 
-const MessageList = (props: MessageListProps) => {
-  const listElement = useRef<HTMLDivElement>(null);
+const attachMessageListContent = (element: HTMLDivElement | null) => {
+  if (!element) {
+    return;
+  }
 
-  useEffect(() => {
-    const contentSnapshot = props.messages
-      .map((message) => {
-        const toolCallSnapshot = message.toolCalls
-          ?.map((toolCall) => `${toolCall.id}:${toolCall.status}:${toolCall.output ?? ''}`)
-          .join(',');
+  const listElement = element.parentElement;
 
-        return `${message.content}:${message.reasoning ?? ''}:${message.status}:${toolCallSnapshot ?? ''}`;
-      })
-      .join('|');
+  if (!(listElement instanceof HTMLElement)) {
+    return;
+  }
 
-    const currentListElement = listElement.current;
-
-    if (contentSnapshot && currentListElement) {
-      queueMicrotask(() => {
-        currentListElement.scrollTo({ behavior: 'smooth', top: currentListElement.scrollHeight });
-      });
+  const observer = new ResizeObserver(() => {
+    if (element.scrollHeight <= listElement.clientHeight) {
+      return;
     }
-  }, [props.messages]);
 
+    listElement.scrollTo({
+      behavior: 'smooth',
+      top: listElement.scrollHeight
+    });
+  });
+
+  observer.observe(element);
+
+  return () => {
+    observer.disconnect();
+  };
+};
+
+const MessageList = (props: MessageListProps) => {
   return (
-    <div className={styles['message-list']} aria-live='polite' ref={listElement}>
-      {props.messages.length > 0 ? (
-        props.messages.map((message) => (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            onCopy={props.onCopy}
-            onDelete={props.onDelete}
-            onRegenerate={props.onRegenerate}
-            onResend={props.onResend}
-            onSave={props.onSave}
-            onStop={props.onStop}
-            pending={props.pending}
-          />
-        ))
-      ) : (
-        <div className={styles['empty-state']}>
-          <span>{'✦'}</span>
-          <strong>{'开始一段新对话'}</strong>
-          <p>{'可以试试：“123 加 456 等于多少？”并查看工具调用记录。'}</p>
-        </div>
-      )}
+    <div className={styles['message-list']} aria-live='polite'>
+      <div className={styles['message-list-content']} ref={attachMessageListContent}>
+        {props.messages.length > 0 ? (
+          props.messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              onCopy={props.onCopy}
+              onDelete={props.onDelete}
+              onRegenerate={props.onRegenerate}
+              onResend={props.onResend}
+              onSave={props.onSave}
+              onStop={props.onStop}
+              pending={props.pending}
+            />
+          ))
+        ) : (
+          <div className={styles['empty-state']}>
+            <span>{'✦'}</span>
+            <strong>{'开始一段新对话'}</strong>
+            <p>{'可以试试：“123 加 456 等于多少？”并查看工具调用记录。'}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

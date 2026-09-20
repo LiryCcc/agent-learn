@@ -9,32 +9,23 @@ import {
   saveProviderSettings
 } from '@/utils/provider-settings.js';
 import { useLiveQuery } from '@tanstack/react-db';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import styles from '../settings-page/index.module.css';
 
 const ModelSettingsPage = () => {
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  const [apiKey, setApiKey] = useState(defaultProviderSettings.apiKey);
-  const [baseUrl, setBaseUrl] = useState(defaultProviderSettings.baseUrl);
-  const [model, setModel] = useState(defaultProviderSettings.model);
-  const [streamingEnabled, setStreamingEnabled] = useState(defaultProviderSettings.streamingEnabled);
+  const savedSettings = settingsQuery.data[0];
+  const [draftApiKey, setDraftApiKey] = useState<string>();
+  const [draftBaseUrl, setDraftBaseUrl] = useState<string>();
+  const [draftModel, setDraftModel] = useState<string>();
+  const [draftStreamingEnabled, setDraftStreamingEnabled] = useState<boolean>();
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
-  const loadedSavedSettings = useRef(false);
-
-  useEffect(() => {
-    const currentSettings = settingsQuery.data[0];
-
-    if (!currentSettings || loadedSavedSettings.current) {
-      return;
-    }
-
-    setApiKey(currentSettings.apiKey);
-    setBaseUrl(currentSettings.baseUrl);
-    setModel(currentSettings.model);
-    setStreamingEnabled(currentSettings.streamingEnabled);
-    loadedSavedSettings.current = true;
-  }, [settingsQuery.data]);
+  const apiKey = draftApiKey ?? savedSettings?.apiKey ?? defaultProviderSettings.apiKey;
+  const baseUrl = draftBaseUrl ?? savedSettings?.baseUrl ?? defaultProviderSettings.baseUrl;
+  const model = draftModel ?? savedSettings?.model ?? defaultProviderSettings.model;
+  const streamingEnabled =
+    draftStreamingEnabled ?? savedSettings?.streamingEnabled ?? defaultProviderSettings.streamingEnabled;
 
   const handleSave = () => {
     setError('');
@@ -81,13 +72,12 @@ const ModelSettingsPage = () => {
 
   const handleClear = () => {
     clearProviderSettings();
-    setApiKey(defaultProviderSettings.apiKey);
-    setBaseUrl(defaultProviderSettings.baseUrl);
-    setModel(defaultProviderSettings.model);
-    setStreamingEnabled(defaultProviderSettings.streamingEnabled);
+    setDraftApiKey(undefined);
+    setDraftBaseUrl(undefined);
+    setDraftModel(undefined);
+    setDraftStreamingEnabled(undefined);
     setError('');
     setSaved(false);
-    loadedSavedSettings.current = false;
     recordObservabilityEvent({
       event: 'settings.cleared',
       scope: 'settings',
@@ -107,7 +97,7 @@ const ModelSettingsPage = () => {
           autoComplete='off'
           label='API Key'
           name='api-key'
-          onValueChange={setApiKey}
+          onValueChange={setDraftApiKey}
           placeholder='sk-...'
           type='password'
           value={apiKey}
@@ -118,7 +108,7 @@ const ModelSettingsPage = () => {
           inputMode='url'
           label='Base URL'
           name='base-url'
-          onValueChange={setBaseUrl}
+          onValueChange={setDraftBaseUrl}
           placeholder='https://api.openai.com/v1'
           type='url'
           value={baseUrl}
@@ -128,13 +118,13 @@ const ModelSettingsPage = () => {
           autoComplete='off'
           label='模型名'
           name='model'
-          onValueChange={setModel}
+          onValueChange={setDraftModel}
           placeholder='gpt-4o-mini'
           type='text'
           value={model}
         />
 
-        <TokenStreamingSetting checked={streamingEnabled} onChange={setStreamingEnabled} />
+        <TokenStreamingSetting checked={streamingEnabled} onChange={setDraftStreamingEnabled} />
       </section>
 
       {error ? <p className={styles['error']}>{error}</p> : null}
