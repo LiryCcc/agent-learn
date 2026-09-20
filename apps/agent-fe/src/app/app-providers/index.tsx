@@ -3,15 +3,15 @@ import { buildInfo } from '@/utils/build-info.js';
 import { initializeColorTheme } from '@/utils/color-theme.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { queryClient } from '@/utils/query-client.js';
-import { QueryClientProvider } from '@tanstack/solid-query';
-import { SolidQueryDevtools } from '@tanstack/solid-query-devtools';
-import { onMount } from 'solid-js';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useEffect } from 'react';
 import styles from './index.module.css';
 
 initializeColorTheme();
 
 const AppProviders = () => {
-  onMount(() => {
+  useEffect(() => {
     recordObservabilityEvent({
       details: {
         branch: buildInfo.branch,
@@ -22,14 +22,14 @@ const AppProviders = () => {
       scope: 'application',
       traceId: createObservabilityTraceId('application')
     });
-  });
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div class={styles['root']}>
+      <div className={styles['root']}>
         <AppRoot />
       </div>
-      <SolidQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };

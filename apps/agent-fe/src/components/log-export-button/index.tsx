@@ -1,9 +1,9 @@
 import { exportObservabilityLogs, type ObservabilityExportFormat } from '@/utils/observability-log.js';
-import { createSignal } from 'solid-js';
+import { useState } from 'react';
 import styles from './index.module.css';
 
 const LogExportButton = () => {
-  const [lastExport, setLastExport] = createSignal<{
+  const [lastExport, setLastExport] = useState<{
     count: number;
     format: ObservabilityExportFormat;
   }>();
@@ -17,24 +17,22 @@ const LogExportButton = () => {
     });
   };
   const exportDescription = () => {
-    const result = lastExport();
-
-    if (result === undefined) {
+    if (lastExport === undefined) {
       return '导出本地日志与构建信息，可选 JSONL 或文本。';
     }
 
-    const formatLabel = result.format === 'jsonl' ? 'JSONL' : '文本';
+    const formatLabel = lastExport.format === 'jsonl' ? 'JSONL' : '文本';
 
-    return `已导出 ${String(result.count)} 条日志（${formatLabel}）。`;
+    return `已导出 ${String(lastExport.count)} 条日志（${formatLabel}）。`;
   };
 
   return (
-    <div class={styles['export-control']}>
-      <div class={styles['export-copy']}>
+    <div className={styles['export-control']}>
+      <div className={styles['export-copy']}>
         <strong>{'可观测性日志'}</strong>
         <span>{exportDescription()}</span>
       </div>
-      <div class={styles['export-actions']}>
+      <div className={styles['export-actions']}>
         <button
           onClick={() => {
             handleExport('jsonl');

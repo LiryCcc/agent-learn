@@ -8,24 +8,24 @@ import {
   providerSettingsCollection,
   saveProviderSettings
 } from '@/utils/provider-settings.js';
-import { useLiveQuery } from '@tanstack/solid-db';
-import { Show, createEffect, createSignal } from 'solid-js';
+import { useLiveQuery } from '@tanstack/react-db';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../settings-page/index.module.css';
 
 const ModelSettingsPage = () => {
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  const [apiKey, setApiKey] = createSignal(defaultProviderSettings.apiKey);
-  const [baseUrl, setBaseUrl] = createSignal(defaultProviderSettings.baseUrl);
-  const [model, setModel] = createSignal(defaultProviderSettings.model);
-  const [streamingEnabled, setStreamingEnabled] = createSignal(defaultProviderSettings.streamingEnabled);
-  const [error, setError] = createSignal('');
-  const [saved, setSaved] = createSignal(false);
-  let loadedSavedSettings = false;
+  const [apiKey, setApiKey] = useState(defaultProviderSettings.apiKey);
+  const [baseUrl, setBaseUrl] = useState(defaultProviderSettings.baseUrl);
+  const [model, setModel] = useState(defaultProviderSettings.model);
+  const [streamingEnabled, setStreamingEnabled] = useState(defaultProviderSettings.streamingEnabled);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+  const loadedSavedSettings = useRef(false);
 
-  createEffect(() => {
-    const currentSettings = settingsQuery()[0];
+  useEffect(() => {
+    const currentSettings = settingsQuery.data[0];
 
-    if (!currentSettings || loadedSavedSettings) {
+    if (!currentSettings || loadedSavedSettings.current) {
       return;
     }
 
@@ -33,18 +33,18 @@ const ModelSettingsPage = () => {
     setBaseUrl(currentSettings.baseUrl);
     setModel(currentSettings.model);
     setStreamingEnabled(currentSettings.streamingEnabled);
-    loadedSavedSettings = true;
-  });
+    loadedSavedSettings.current = true;
+  }, [settingsQuery.data]);
 
   const handleSave = () => {
     setError('');
     setSaved(false);
 
     const result = modelSettingsSchema.safeParse({
-      apiKey: apiKey(),
-      baseUrl: baseUrl(),
-      model: model(),
-      streamingEnabled: streamingEnabled()
+      apiKey,
+      baseUrl,
+      model,
+      streamingEnabled
     });
 
     if (!result.success) {
@@ -62,7 +62,7 @@ const ModelSettingsPage = () => {
       return;
     }
 
-    const currentSettings = settingsQuery()[0] ?? defaultProviderSettings;
+    const currentSettings = settingsQuery.data[0] ?? defaultProviderSettings;
 
     saveProviderSettings({ ...currentSettings, ...result.data });
     setSaved(true);
@@ -87,7 +87,7 @@ const ModelSettingsPage = () => {
     setStreamingEnabled(defaultProviderSettings.streamingEnabled);
     setError('');
     setSaved(false);
-    loadedSavedSettings = false;
+    loadedSavedSettings.current = false;
     recordObservabilityEvent({
       event: 'settings.cleared',
       scope: 'settings',
@@ -96,59 +96,55 @@ const ModelSettingsPage = () => {
   };
 
   return (
-    <div class={styles['settings-fields']}>
-      <section class={styles['settings-group']}>
-        <div class={styles['group-heading']}>
+    <div className={styles['settings-fields']}>
+      <section className={styles['settings-group']}>
+        <div className={styles['group-heading']}>
           <strong>{'模型服务'}</strong>
           <span>{'配置 OpenAI 兼容的模型接口与输出方式。'}</span>
         </div>
 
         <ControlledInput
-          autocomplete='off'
+          autoComplete='off'
           label='API Key'
           name='api-key'
           onValueChange={setApiKey}
           placeholder='sk-...'
           type='password'
-          value={apiKey()}
+          value={apiKey}
         />
 
         <ControlledInput
-          autocomplete='url'
-          inputmode='url'
+          autoComplete='url'
+          inputMode='url'
           label='Base URL'
           name='base-url'
           onValueChange={setBaseUrl}
           placeholder='https://api.openai.com/v1'
           type='url'
-          value={baseUrl()}
+          value={baseUrl}
         />
 
         <ControlledInput
-          autocomplete='off'
+          autoComplete='off'
           label='模型名'
           name='model'
           onValueChange={setModel}
           placeholder='gpt-4o-mini'
           type='text'
-          value={model()}
+          value={model}
         />
 
-        <TokenStreamingSetting checked={streamingEnabled()} onChange={setStreamingEnabled} />
+        <TokenStreamingSetting checked={streamingEnabled} onChange={setStreamingEnabled} />
       </section>
 
-      <Show when={error()}>
-        <p class={styles['error']}>{error()}</p>
-      </Show>
-      <Show when={saved()}>
-        <p class={styles['success']}>{'模型设置已保存。'}</p>
-      </Show>
+      {error ? <p className={styles['error']}>{error}</p> : null}
+      {saved ? <p className={styles['success']}>{'模型设置已保存。'}</p> : null}
 
-      <div class={styles['actions']}>
-        <button class={styles['primary-button']} type='button' onClick={handleSave}>
+      <div className={styles['actions']}>
+        <button className={styles['primary-button']} type='button' onClick={handleSave}>
           {'保存模型设置'}
         </button>
-        <button class={styles['danger-button']} type='button' onClick={handleClear}>
+        <button className={styles['danger-button']} type='button' onClick={handleClear}>
           {'删除全部本地设置'}
         </button>
       </div>

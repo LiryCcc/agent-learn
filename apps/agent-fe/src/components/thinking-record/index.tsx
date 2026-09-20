@@ -7,7 +7,7 @@ type ThinkingRecordProps = {
 
 const ThinkingRecord = (props: ThinkingRecordProps) => {
   return (
-    <details class={styles['record']} open={props.streaming}>
+    <details className={styles['record']} open={props.streaming}>
       <summary>
         <span>{'✦'}</span>
         <strong>{props.streaming ? '正在深度思考' : '思考过程'}</strong>

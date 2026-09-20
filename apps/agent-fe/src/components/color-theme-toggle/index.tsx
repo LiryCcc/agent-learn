@@ -1,13 +1,16 @@
-import { colorTheme, toggleColorTheme } from '@/utils/color-theme.js';
+import { colorThemeStore, toggleColorTheme } from '@/utils/color-theme.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
+import { useSelector } from '@tanstack/react-store';
 import styles from './index.module.css';
 
 const ColorThemeToggle = () => {
+  const theme = useSelector(colorThemeStore);
+
   const handleToggle = () => {
-    const theme = toggleColorTheme();
+    const nextTheme = toggleColorTheme();
 
     recordObservabilityEvent({
-      details: { theme },
+      details: { theme: nextTheme },
       event: 'color-theme.changed',
       scope: 'application',
       traceId: createObservabilityTraceId('color-theme')
@@ -16,16 +19,16 @@ const ColorThemeToggle = () => {
 
   return (
     <button
-      aria-label={colorTheme() === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
-      class={styles['toggle-button']}
+      aria-label={theme === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
+      className={styles['toggle-button']}
       onClick={handleToggle}
-      title={colorTheme() === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
+      title={theme === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
       type='button'
     >
-      <span aria-hidden='true' class={styles['icon']}>
-        {colorTheme() === 'dark' ? '☀' : '☾'}
+      <span aria-hidden='true' className={styles['icon']}>
+        {theme === 'dark' ? '☀' : '☾'}
       </span>
-      <span class={styles['label']}>{colorTheme() === 'dark' ? '浅色' : '深色'}</span>
+      <span className={styles['label']}>{theme === 'dark' ? '浅色' : '深色'}</span>
     </button>
   );
 };

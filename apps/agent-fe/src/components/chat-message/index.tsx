@@ -3,7 +3,7 @@ import ThinkingRecord from '@/components/thinking-record/index.jsx';
 import ToolCallRecord from '@/components/tool-call-record/index.jsx';
 import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
 import { Markdown } from '@liry-a/markdown';
-import { For, Show, createSignal, type JSX } from 'solid-js';
+import { useState, type KeyboardEvent } from 'react';
 import styles from './index.module.css';
 
 type ChatMessageProps = {
@@ -18,10 +18,10 @@ type ChatMessageProps = {
 };
 
 const ChatMessage = (props: ChatMessageProps) => {
-  const [editing, setEditing] = createSignal(false);
-  const [draft, setDraft] = createSignal(props.message.content);
-  const canSubmitEdit = () => !props.pending && draft().trim().length > 0;
-  const copyText = () => props.message.content || props.message.error || '';
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(props.message.content);
+  const canSubmitEdit = !props.pending && draft.trim().length > 0;
+  const copyText = props.message.content || props.message.error || '';
 
   const startEditing = () => {
     setDraft(props.message.content);
@@ -29,24 +29,24 @@ const ChatMessage = (props: ChatMessageProps) => {
   };
 
   const save = () => {
-    if (!canSubmitEdit()) {
+    if (!canSubmitEdit) {
       return;
     }
 
-    props.onSave(props.message.id, draft().trim());
+    props.onSave(props.message.id, draft.trim());
     setEditing(false);
   };
 
   const resend = () => {
-    if (!canSubmitEdit()) {
+    if (!canSubmitEdit) {
       return;
     }
 
-    props.onResend(props.message.id, draft().trim());
+    props.onResend(props.message.id, draft.trim());
     setEditing(false);
   };
 
-  const handleEditKeyDown: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent> = (event) => {
+  const handleEditKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Escape') {
       event.preventDefault();
       setEditing(false);
@@ -70,13 +70,13 @@ const ChatMessage = (props: ChatMessageProps) => {
       return [{ label: '停止', onClick: props.onStop, tone: 'danger' }];
     }
 
-    const copyAction: MessageAction[] = copyText()
+    const copyAction: MessageAction[] = copyText
       ? [
           {
             label: '复制',
             disabled: props.pending,
             onClick: () => {
-              props.onCopy(copyText());
+              props.onCopy(copyText);
             }
           }
         ]
@@ -110,72 +110,71 @@ const ChatMessage = (props: ChatMessageProps) => {
   };
 
   return (
-    <article class={styles[props.message.role]}>
-      <span class={styles['label']}>{props.message.role === 'user' ? '你' : 'Agent'}</span>
-      <div class={styles['content']}>
-        <Show
-          when={!editing()}
-          fallback={
-            <div class={styles['editor']}>
-              <textarea
-                aria-label='编辑消息'
-                autofocus
+    <article className={styles[props.message.role]}>
+      <span className={styles['label']}>{props.message.role === 'user' ? '你' : 'Agent'}</span>
+      <div className={styles['content']}>
+        {editing ? (
+          <div className={styles['editor']}>
+            <textarea
+              aria-label='编辑消息'
+              autoFocus={true}
+              disabled={props.pending}
+              onChange={(event) => {
+                setDraft(event.currentTarget.value);
+              }}
+              onKeyDown={handleEditKeyDown}
+              rows={4}
+              value={draft}
+            />
+            <div className={styles['editor-actions']}>
+              <button
                 disabled={props.pending}
-                onInput={(event) => setDraft(event.currentTarget.value)}
-                onKeyDown={handleEditKeyDown}
-                rows='4'
-                value={draft()}
-              />
-              <div class={styles['editor-actions']}>
-                <button disabled={props.pending} onClick={() => setEditing(false)} type='button'>
-                  {'取消'}
-                </button>
-                <button disabled={!canSubmitEdit()} onClick={save} type='button'>
-                  {'保存'}
-                </button>
-                <button disabled={!canSubmitEdit()} onClick={resend} type='button'>
-                  {'保存并重发'}
-                </button>
-              </div>
+                onClick={() => {
+                  setEditing(false);
+                }}
+                type='button'
+              >
+                {'取消'}
+              </button>
+              <button disabled={!canSubmitEdit} onClick={save} type='button'>
+                {'保存'}
+              </button>
+              <button disabled={!canSubmitEdit} onClick={resend} type='button'>
+                {'保存并重发'}
+              </button>
             </div>
-          }
-        >
-          <Show when={props.message.reasoning}>
-            {(reasoning) => <ThinkingRecord content={reasoning()} streaming={props.message.status === 'streaming'} />}
-          </Show>
-          <For each={props.message.toolCalls}>{(toolCall) => <ToolCallRecord toolCall={toolCall} />}</For>
-          <Show
-            when={props.message.status !== 'failed'}
-            fallback={<p class={styles['error']}>{`回复失败：${props.message.error ?? '未知错误'}`}</p>}
-          >
-            <Show
-              when={props.message.content.length > 0}
-              fallback={
-                <p class={styles['status-text']}>
-                  {props.message.status === 'stopped' ? '已停止生成' : '正在思考'}
-                  <Show when={props.message.status === 'streaming'}>
-                    <span class={styles['caret']} aria-hidden='true' />
-                  </Show>
-                </p>
-              }
-            >
-              <div class={styles['markdown']}>
+          </div>
+        ) : (
+          <>
+            {props.message.reasoning ? (
+              <ThinkingRecord content={props.message.reasoning} streaming={props.message.status === 'streaming'} />
+            ) : null}
+            {props.message.toolCalls?.map((toolCall) => (
+              <ToolCallRecord key={toolCall.id} toolCall={toolCall} />
+            ))}
+            {props.message.status === 'failed' ? (
+              <p className={styles['error']}>{`回复失败：${props.message.error ?? '未知错误'}`}</p>
+            ) : props.message.content.length > 0 ? (
+              <div className={styles['markdown']}>
                 <Markdown>{props.message.content}</Markdown>
-                <Show when={props.message.status === 'streaming'}>
-                  <span class={styles['caret']} aria-hidden='true' />
-                </Show>
+                {props.message.status === 'streaming' ? <span className={styles['caret']} aria-hidden='true' /> : null}
               </div>
-            </Show>
-          </Show>
-        </Show>
+            ) : (
+              <p className={styles['status-text']}>
+                {props.message.status === 'stopped' ? '已停止生成' : '正在思考'}
+                {props.message.status === 'streaming' ? <span className={styles['caret']} aria-hidden='true' /> : null}
+              </p>
+            )}
+          </>
+        )}
       </div>
-      <Show when={!editing()}>
+      {editing ? null : (
         <MessageActions
           actions={actions()}
           align={props.message.role === 'user' ? 'end' : 'start'}
           visible={props.message.status !== 'complete'}
         />
-      </Show>
+      )}
     </article>
   );
 };

@@ -1,4 +1,4 @@
-import { createHashHistory, createRouter } from '@tanstack/solid-router';
+import { createHashHistory, createRouter } from '@tanstack/react-router';
 import { routeTree } from './route-tree.js';
 
 const useHashRouting = import.meta.env['VITE_USE_HASH_ROUTING'] === 'true';
@@ -9,7 +9,7 @@ export const router = createRouter({
   defaultPreload: 'intent'
 });
 
-declare module '@tanstack/solid-router' {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }

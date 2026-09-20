@@ -1,5 +1,5 @@
 import { webSearchProviderSchema, type WebSearchProvider } from '@liry-a/web-search-core';
-import { createCollection, localStorageCollectionOptions } from '@tanstack/solid-db';
+import { createCollection, localStorageCollectionOptions } from '@tanstack/react-db';
 import { z } from 'zod';
 
 export const PROVIDER_SETTINGS_ID = 'default';

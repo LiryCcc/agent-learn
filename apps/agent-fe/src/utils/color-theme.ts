@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createStore } from '@tanstack/react-store';
 
 export type ColorTheme = 'dark' | 'light';
 
@@ -30,7 +30,7 @@ const readInitialColorTheme = (): ColorTheme => {
   return resolveColorTheme(storedTheme, prefersDark);
 };
 
-const [colorTheme, setColorThemeSignal] = createSignal<ColorTheme>(readInitialColorTheme());
+export const colorThemeStore = createStore<ColorTheme>(readInitialColorTheme());
 
 const applyColorTheme = (theme: ColorTheme) => {
   if (typeof document === 'undefined') {
@@ -42,11 +42,11 @@ const applyColorTheme = (theme: ColorTheme) => {
 };
 
 export const initializeColorTheme = () => {
-  applyColorTheme(colorTheme());
+  applyColorTheme(colorThemeStore.state);
 };
 
 export const setColorTheme = (theme: ColorTheme) => {
-  setColorThemeSignal(theme);
+  colorThemeStore.setState(() => theme);
   applyColorTheme(theme);
 
   try {
@@ -57,9 +57,7 @@ export const setColorTheme = (theme: ColorTheme) => {
 };
 
 export const toggleColorTheme = () => {
-  const nextTheme = colorTheme() === 'dark' ? 'light' : 'dark';
+  const nextTheme = colorThemeStore.state === 'dark' ? 'light' : 'dark';
   setColorTheme(nextTheme);
   return nextTheme;
 };
-
-export { colorTheme };

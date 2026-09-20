@@ -1,5 +1,4 @@
 import type { ChatToolCall } from '@/utils/chat-types.js';
-import { Show } from 'solid-js';
 import styles from './index.module.css';
 
 type ToolCallRecordProps = {
@@ -20,26 +19,24 @@ const getStatusLabel = (status: ChatToolCall['status']) => {
 
 const ToolCallRecord = (props: ToolCallRecordProps) => {
   return (
-    <details class={styles['record']} open={props.toolCall.status !== 'finished'}>
-      <summary class={styles['summary']}>
-        <span class={styles['tool-icon']}>{'⌘'}</span>
+    <details className={styles['record']} open={props.toolCall.status !== 'finished'}>
+      <summary className={styles['summary']}>
+        <span className={styles['tool-icon']}>{'⌘'}</span>
         <strong>{props.toolCall.name}</strong>
-        <span class={styles[`status-${props.toolCall.status}`]}>{getStatusLabel(props.toolCall.status)}</span>
+        <span className={styles[`status-${props.toolCall.status}`]}>{getStatusLabel(props.toolCall.status)}</span>
       </summary>
-      <div class={styles['details']}>
+      <div className={styles['details']}>
         <div>
-          <span class={styles['field-label']}>{'输入'}</span>
+          <span className={styles['field-label']}>{'输入'}</span>
           <pre>{props.toolCall.input}</pre>
         </div>
-        <Show when={props.toolCall.output}>
-          {(output) => (
-            <div>
-              <span class={styles['field-label']}>{'输出'}</span>
-              <pre>{output()}</pre>
-            </div>
-          )}
-        </Show>
-        <Show when={props.toolCall.error}>{(error) => <p class={styles['error']}>{error()}</p>}</Show>
+        {props.toolCall.output ? (
+          <div>
+            <span className={styles['field-label']}>{'输出'}</span>
+            <pre>{props.toolCall.output}</pre>
+          </div>
+        ) : null}
+        {props.toolCall.error ? <p className={styles['error']}>{props.toolCall.error}</p> : null}
       </div>
     </details>
   );

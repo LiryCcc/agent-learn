@@ -1,5 +1,4 @@
-import type { JSX, ValidComponent } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 import { Lexer } from './marked/lexer.js';
 import type { TableCellToken, Token } from './marked/tokens.js';
 
@@ -24,7 +23,7 @@ export const defaultUrlTransform = (value: string): string => {
 };
 
 export type ExtraProps = { node?: Token | undefined };
-export type Components = Record<string, ValidComponent>;
+export type Components = Record<string, ElementType>;
 export type UrlTransform = (url: string, key: string, node: Readonly<Token>) => string;
 export type AllowElement = (
   node: Readonly<Token>,
@@ -44,14 +43,14 @@ export type Options = {
   unwrapDisallowed?: boolean | null | undefined;
   urlTransform?: UrlTransform | null | undefined;
 };
-export type HooksOptions = Options & { fallback?: JSX.Element | null | undefined };
+export type HooksOptions = Options & { fallback?: ReactNode | null | undefined };
 
 type RenderContext = {
   options: Readonly<Options>;
   parent?: Token | undefined;
 };
 
-const renderTokens = (tokens: readonly Token[], context: RenderContext): JSX.Element[] =>
+const renderTokens = (tokens: readonly Token[], context: RenderContext): ReactNode[] =>
   tokens.map((token, index) => renderToken(token, index, context));
 
 const renderElement = (
@@ -60,8 +59,8 @@ const renderElement = (
   index: number,
   context: RenderContext,
   properties: Record<string, unknown>,
-  children: JSX.Element[]
-): JSX.Element => {
+  children: ReactNode[]
+): ReactNode => {
   const { options } = context;
   const isAllowed =
     (options.allowedElements === null ||
@@ -75,27 +74,31 @@ const renderElement = (
       options.allowElement(token, index, context.parent) !== false);
 
   if (!isAllowed) {
-    return options.unwrapDisallowed === true ? <>{children}</> : null;
+    return options.unwrapDisallowed === true ? children : null;
   }
 
   const customComponent = options.components?.[tagName];
-  const component = customComponent ?? tagName;
+  const Component = (customComponent ?? tagName) as ElementType;
   const componentProperties = customComponent === undefined ? properties : { ...properties, node: token };
 
+  if (children.length === 0) {
+    return <Component key={index} {...componentProperties} />;
+  }
+
   return (
-    <Dynamic component={component} {...componentProperties}>
+    <Component key={index} {...componentProperties}>
       {children}
-    </Dynamic>
+    </Component>
   );
 };
 
-const renderTableCell = (cell: TableCellToken, index: number, context: RenderContext, parent: Token): JSX.Element => {
+const renderTableCell = (cell: TableCellToken, index: number, context: RenderContext, parent: Token): ReactNode => {
   const tagName = cell.header ? 'th' : 'td';
-  const properties = cell.align === null ? {} : { style: { 'text-align': cell.align } };
+  const properties = cell.align === null ? {} : { style: { textAlign: cell.align } satisfies CSSProperties };
   return renderElement(tagName, parent, index, context, properties, renderTokens(cell.tokens, { ...context, parent }));
 };
 
-const renderToken = (token: Token, index: number, context: RenderContext): JSX.Element => {
+const renderToken = (token: Token, index: number, context: RenderContext): ReactNode => {
   const childContext = { ...context, parent: token };
   switch (token.type) {
     case 'space': {
@@ -103,7 +106,7 @@ const renderToken = (token: Token, index: number, context: RenderContext): JSX.E
     }
     case 'code': {
       const language = token.lang?.split(/\s+/u, 1)[0];
-      const properties = language ? { class: `language-${language}` } : {};
+      const properties = language ? { className: `language-${language}` } : {};
       const code = renderElement('code', token, 0, childContext, properties, [`${token.text}\n`]);
       return renderElement('pre', token, index, context, {}, [code]);
     }
@@ -150,9 +153,11 @@ const renderToken = (token: Token, index: number, context: RenderContext): JSX.E
     case 'list_item': {
       const children = renderTokens(token.tokens, childContext);
       if (token.task) {
-        children.unshift(<input checked={token.checked === true} disabled={true} readOnly={true} type='checkbox' />);
+        children.unshift(
+          <input checked={token.checked === true} disabled={true} key='task' readOnly={true} type='checkbox' />
+        );
       }
-      return renderElement('li', token, index, context, token.task ? { class: 'task-list-item' } : {}, children);
+      return renderElement('li', token, index, context, token.task ? { className: 'task-list-item' } : {}, children);
     }
     case 'paragraph': {
       return renderElement('p', token, index, context, {}, renderTokens(token.tokens, childContext));
@@ -199,7 +204,7 @@ const renderToken = (token: Token, index: number, context: RenderContext): JSX.E
   }
 };
 
-export const Markdown = (options: Readonly<Options>): JSX.Element => {
+export const Markdown = (options: Readonly<Options>): ReactNode => {
   if (options.allowedElements && options.disallowedElements) {
     throw new Error('Only one of allowedElements and disallowedElements may be provided.');
   }
@@ -207,9 +212,9 @@ export const Markdown = (options: Readonly<Options>): JSX.Element => {
   return <>{renderTokens(Lexer.lex(options.children ?? '', { gfm: true }), { options })}</>;
 };
 
-export const MarkdownAsync = async (options: Readonly<Options>): Promise<JSX.Element> => Markdown(options);
+export const MarkdownAsync = async (options: Readonly<Options>): Promise<ReactNode> => Markdown(options);
 
-export const MarkdownHooks = (options: Readonly<HooksOptions>): JSX.Element => Markdown(options);
+export const MarkdownHooks = (options: Readonly<HooksOptions>): ReactNode => Markdown(options);
 
 export type RemarkGfmOptions = {
   singleTilde?: boolean | null | undefined;

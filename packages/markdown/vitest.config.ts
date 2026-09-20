@@ -1,10 +1,8 @@
-import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
 const isCi = process.env['CI'] === 'true';
 
 const config = defineConfig({
-  plugins: [solid()],
   test: {
     coverage: {
       enabled: isCi,

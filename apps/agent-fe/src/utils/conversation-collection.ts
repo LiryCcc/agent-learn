@@ -1,4 +1,4 @@
-import { createCollection, localStorageCollectionOptions } from '@tanstack/solid-db';
+import { createCollection, localStorageCollectionOptions } from '@tanstack/react-db';
 import {
   chatConversationSchema,
   type ChatConversation,

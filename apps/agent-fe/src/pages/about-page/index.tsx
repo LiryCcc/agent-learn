@@ -25,27 +25,27 @@ const AboutPage = () => {
   ];
 
   return (
-    <main class={styles['page']}>
-      <section class={styles['introduction']}>
-        <p class={styles['eyebrow']}>{'ABOUT · BUILD'}</p>
+    <main className={styles['page']}>
+      <section className={styles['introduction']}>
+        <p className={styles['eyebrow']}>{'ABOUT · BUILD'}</p>
         <h1>{'关于 Liry Agent'}</h1>
-        <p class={styles['summary']}>
-          {'一个在浏览器中运行的本地优先 Agent 工作区，由 Solid、TanStack 与 LangGraph 共同驱动。'}
+        <p className={styles['summary']}>
+          {'一个在浏览器中运行的本地优先 Agent 工作区，由 React、TanStack 与 LangGraph 共同驱动。'}
         </p>
       </section>
 
-      <section aria-labelledby='build-heading' class={styles['build-section']}>
-        <div class={styles['section-heading']}>
-          <span class={styles['status-dot']} aria-hidden='true' />
+      <section aria-labelledby='build-heading' className={styles['build-section']}>
+        <div className={styles['section-heading']}>
+          <span className={styles['status-dot']} aria-hidden='true' />
           <div>
             <p>{'当前版本'}</p>
             <h2 id='build-heading'>{'构建信息'}</h2>
           </div>
         </div>
 
-        <dl class={styles['build-grid']}>
+        <dl className={styles['build-grid']}>
           {buildDetails.map((detail) => (
-            <div class={styles['build-card']}>
+            <div className={styles['build-card']} key={detail.label}>
               <dt>{detail.label}</dt>
               <dd title={detail.title}>{detail.value}</dd>
             </div>

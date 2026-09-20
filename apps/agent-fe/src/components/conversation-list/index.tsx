@@ -1,5 +1,4 @@
 import type { ChatConversation } from '@/utils/chat-types.js';
-import { For } from 'solid-js';
 import styles from './index.module.css';
 
 type ConversationListProps = {
@@ -22,45 +21,44 @@ const formatUpdatedAt = (timestamp: number) => {
 
 const ConversationList = (props: ConversationListProps) => {
   return (
-    <aside class={styles['sidebar']} aria-label='对话列表'>
-      <div class={styles['header']}>
+    <aside className={styles['sidebar']} aria-label='对话列表'>
+      <div className={styles['header']}>
         <strong>{'对话'}</strong>
         <button disabled={props.disabled} onClick={props.onCreate} type='button'>
           {'新建'}
         </button>
       </div>
-      <div class={styles['list']}>
-        <For each={props.conversations}>
-          {(conversation) => (
-            <article
-              class={`${styles['item'] ?? ''} ${props.activeConversationId === conversation.id ? (styles['active-item'] ?? '') : ''}`}
+      <div className={styles['list']}>
+        {props.conversations.map((conversation) => (
+          <article
+            className={`${styles['item'] ?? ''} ${props.activeConversationId === conversation.id ? (styles['active-item'] ?? '') : ''}`}
+            key={conversation.id}
+          >
+            <button
+              className={styles['select-button']}
+              disabled={props.disabled}
+              onClick={() => {
+                props.onSelect(conversation.id);
+              }}
+              type='button'
             >
-              <button
-                class={styles['select-button']}
-                disabled={props.disabled}
-                onClick={() => {
-                  props.onSelect(conversation.id);
-                }}
-                type='button'
-              >
-                <strong>{conversation.title}</strong>
-                <span>{`${String(conversation.messages.length)} 条消息 · ${formatUpdatedAt(conversation.updatedAt)}`}</span>
-              </button>
-              <button
-                aria-label={`删除对话：${conversation.title}`}
-                class={styles['delete-button']}
-                disabled={props.disabled}
-                onClick={() => {
-                  props.onDelete(conversation.id);
-                }}
-                title='删除对话'
-                type='button'
-              >
-                {'×'}
-              </button>
-            </article>
-          )}
-        </For>
+              <strong>{conversation.title}</strong>
+              <span>{`${String(conversation.messages.length)} 条消息 · ${formatUpdatedAt(conversation.updatedAt)}`}</span>
+            </button>
+            <button
+              aria-label={`删除对话：${conversation.title}`}
+              className={styles['delete-button']}
+              disabled={props.disabled}
+              onClick={() => {
+                props.onDelete(conversation.id);
+              }}
+              title='删除对话'
+              type='button'
+            >
+              {'×'}
+            </button>
+          </article>
+        ))}
       </div>
     </aside>
   );

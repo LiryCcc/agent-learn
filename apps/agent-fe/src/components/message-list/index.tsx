@@ -1,6 +1,6 @@
 import ChatMessage from '@/components/chat-message/index.jsx';
 import type { ChatMessage as ChatMessageValue } from '@/utils/chat-types.js';
-import { Index, Show, createEffect } from 'solid-js';
+import { useEffect, useRef } from 'react';
 import styles from './index.module.css';
 
 type MessageListProps = {
@@ -15,9 +15,9 @@ type MessageListProps = {
 };
 
 const MessageList = (props: MessageListProps) => {
-  let listElement: HTMLDivElement | undefined;
+  const listElement = useRef<HTMLDivElement>(null);
 
-  createEffect(() => {
+  useEffect(() => {
     const contentSnapshot = props.messages
       .map((message) => {
         const toolCallSnapshot = message.toolCalls
@@ -28,48 +28,38 @@ const MessageList = (props: MessageListProps) => {
       })
       .join('|');
 
-    const currentListElement = listElement;
+    const currentListElement = listElement.current;
 
     if (contentSnapshot && currentListElement) {
       queueMicrotask(() => {
         currentListElement.scrollTo({ behavior: 'smooth', top: currentListElement.scrollHeight });
       });
     }
-  });
+  }, [props.messages]);
 
   return (
-    <div
-      class={styles['message-list']}
-      aria-live='polite'
-      ref={(element) => {
-        listElement = element;
-      }}
-    >
-      <Show
-        when={props.messages.length > 0}
-        fallback={
-          <div class={styles['empty-state']}>
-            <span>{'✦'}</span>
-            <strong>{'开始一段新对话'}</strong>
-            <p>{'可以试试：“123 加 456 等于多少？”并查看工具调用记录。'}</p>
-          </div>
-        }
-      >
-        <Index each={props.messages}>
-          {(message) => (
-            <ChatMessage
-              message={message()}
-              onCopy={props.onCopy}
-              onDelete={props.onDelete}
-              onRegenerate={props.onRegenerate}
-              onResend={props.onResend}
-              onSave={props.onSave}
-              onStop={props.onStop}
-              pending={props.pending}
-            />
-          )}
-        </Index>
-      </Show>
+    <div className={styles['message-list']} aria-live='polite' ref={listElement}>
+      {props.messages.length > 0 ? (
+        props.messages.map((message) => (
+          <ChatMessage
+            key={message.id}
+            message={message}
+            onCopy={props.onCopy}
+            onDelete={props.onDelete}
+            onRegenerate={props.onRegenerate}
+            onResend={props.onResend}
+            onSave={props.onSave}
+            onStop={props.onStop}
+            pending={props.pending}
+          />
+        ))
+      ) : (
+        <div className={styles['empty-state']}>
+          <span>{'✦'}</span>
+          <strong>{'开始一段新对话'}</strong>
+          <p>{'可以试试：“123 加 456 等于多少？”并查看工具调用记录。'}</p>
+        </div>
+      )}
     </div>
   );
 };

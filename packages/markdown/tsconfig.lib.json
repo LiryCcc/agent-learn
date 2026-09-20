@@ -1,8 +1,7 @@
 {
   "extends": "@liry-a/tsconfig",
   "compilerOptions": {
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    "jsx": "react-jsx",
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.lib.tsbuildinfo",
     "lib": ["ESNext", "DOM"],
     "types": ["node"]

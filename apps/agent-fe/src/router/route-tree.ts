@@ -5,7 +5,7 @@ import HomePage from '@/pages/home-page/index.jsx';
 import ModelSettingsPage from '@/pages/model-settings-page/index.jsx';
 import SettingsPage from '@/pages/settings-page/index.jsx';
 import WebSearchSettingsPage from '@/pages/web-search-settings-page/index.jsx';
-import { createRootRoute, createRoute, redirect } from '@tanstack/solid-router';
+import { createRootRoute, createRoute, redirect } from '@tanstack/react-router';
 
 const rootRoute = createRootRoute({ component: AppLayout });
 

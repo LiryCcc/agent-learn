@@ -1,5 +1,4 @@
 import { defineConfig } from 'tsdown';
-import solid from 'vite-plugin-solid';
 
 const config = defineConfig({
   entry: 'src/index.tsx',
@@ -13,9 +12,8 @@ const config = defineConfig({
   sourcemap: true,
   minify: false,
   clean: true,
-  plugins: [solid({ dev: false, hot: false })],
   deps: {
-    neverBundle: ['solid-js', 'solid-js/web']
+    neverBundle: ['react', 'react/jsx-runtime']
   },
   outputOptions: {
     comments: {

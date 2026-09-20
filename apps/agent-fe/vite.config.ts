@@ -1,7 +1,6 @@
+import react from '@vitejs/plugin-react';
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import devtools from 'solid-devtools/vite';
-import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
 const workspaceRoot = resolve(import.meta.dirname, '../..');
@@ -43,12 +42,7 @@ const config = defineConfig(({ mode }) => {
     define: {
       __BUILD_INFO__: JSON.stringify(getBuildInfo(mode))
     },
-    plugins: [
-      devtools({
-        autoname: true
-      }),
-      solid()
-    ],
+    plugins: [react()],
     resolve: {
       alias: {
         '@': resolve(import.meta.dirname, 'src'),

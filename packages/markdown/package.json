@@ -20,9 +20,13 @@
     "test": "vitest run",
     "typecheck": "tsc -b"
   },
+  "dependencies": {
+    "react": "^19.3.0"
+  },
   "devDependencies": {
     "@liry-a/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@types/react": "^19.3.0",
     "@vitest/coverage-v8": "catalog:",
     "jsdom": "catalog:",
     "solid-js": "^1.9.15",

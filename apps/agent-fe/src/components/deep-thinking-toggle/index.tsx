@@ -8,7 +8,7 @@ type DeepThinkingToggleProps = {
 
 const DeepThinkingToggle = (props: DeepThinkingToggleProps) => {
   return (
-    <label class={styles['toggle']}>
+    <label className={styles['toggle']}>
       <input
         checked={props.checked}
         disabled={props.disabled}
@@ -17,10 +17,10 @@ const DeepThinkingToggle = (props: DeepThinkingToggleProps) => {
         }}
         type='checkbox'
       />
-      <span class={styles['track']} aria-hidden='true'>
-        <span class={styles['thumb']} />
+      <span className={styles['track']} aria-hidden='true'>
+        <span className={styles['thumb']} />
       </span>
-      <span class={styles['label']}>{'深度思考'}</span>
+      <span className={styles['label']}>{'深度思考'}</span>
     </label>
   );
 };

@@ -1,27 +1,27 @@
-import type { JSX } from 'solid-js';
+import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 import styles from './index.module.css';
 
 type ControlledInputProps = {
-  autocomplete?: JSX.InputHTMLAttributes<HTMLInputElement>['autocomplete'];
-  inputmode?: JSX.InputHTMLAttributes<HTMLInputElement>['inputmode'];
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
   label: string;
   name: string;
   onValueChange: (value: string) => void;
   placeholder: string;
-  type: JSX.InputHTMLAttributes<HTMLInputElement>['type'];
+  type: HTMLInputTypeAttribute;
   value: string;
 };
 
 const ControlledInput = (props: ControlledInputProps) => {
   return (
-    <label class={styles['field']}>
-      <span class={styles['label']}>{props.label}</span>
+    <label className={styles['field']}>
+      <span className={styles['label']}>{props.label}</span>
       <input
-        autocomplete={props.autocomplete}
-        class={styles['input']}
-        inputmode={props.inputmode}
+        autoComplete={props.autoComplete}
+        className={styles['input']}
+        inputMode={props.inputMode}
         name={props.name}
-        onInput={(event) => {
+        onChange={(event) => {
           props.onValueChange(event.currentTarget.value);
         }}
         placeholder={props.placeholder}

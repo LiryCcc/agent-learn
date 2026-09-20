@@ -6,21 +6,21 @@ type ConversationFullscreenToggleProps = {
 };
 
 const ConversationFullscreenToggle = (props: ConversationFullscreenToggleProps) => {
-  const label = () => (props.active ? '退出全屏' : '全屏');
+  const label = props.active ? '退出全屏' : '全屏';
 
   return (
     <button
-      aria-label={label()}
+      aria-label={label}
       aria-pressed={props.active}
-      class={styles['toggle-button']}
+      className={styles['toggle-button']}
       onClick={() => {
         props.onChange(!props.active);
       }}
-      title={label()}
+      title={label}
       type='button'
     >
       <span aria-hidden='true'>{props.active ? '↙' : '↗'}</span>
-      <span>{label()}</span>
+      <span>{label}</span>
     </button>
   );
 };

@@ -1,53 +1,53 @@
 import ColorThemeToggle from '@/components/color-theme-toggle/index.jsx';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
-import { Link, Outlet, useLocation } from '@tanstack/solid-router';
-import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools';
-import { createEffect } from 'solid-js';
+import { Link, Outlet, useLocation } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { useEffect } from 'react';
 import styles from './index.module.css';
 
 const AppLayout = () => {
   const location = useLocation();
 
-  createEffect(() => {
+  useEffect(() => {
     recordObservabilityEvent({
       details: {
-        hash: location().hash,
-        path: location().pathname,
-        search: location().searchStr
+        hash: location.hash,
+        path: location.pathname,
+        search: location.searchStr
       },
       event: 'navigation.changed',
       scope: 'navigation',
       traceId: createObservabilityTraceId('navigation')
     });
-  });
+  }, [location.hash, location.pathname, location.searchStr]);
 
   return (
-    <div class={styles['layout']}>
-      <header class={styles['header']}>
-        <Link class={styles['brand']} to='/'>
-          <span class={styles['brand-mark']}>{'L'}</span>
+    <div className={styles['layout']}>
+      <header className={styles['header']}>
+        <Link className={styles['brand']} to='/'>
+          <span className={styles['brand-mark']}>{'L'}</span>
           <span>
             {'Liry Agent'}
             <small>{'Browser workspace'}</small>
           </span>
         </Link>
-        <div class={styles['header-actions']}>
-          <nav aria-label='主导航' class={styles['navigation']}>
+        <div className={styles['header-actions']}>
+          <nav aria-label='主导航' className={styles['navigation']}>
             <Link
               activeOptions={{ exact: true }}
               activeProps={{ 'aria-current': 'page' }}
-              class={styles['nav-link']}
+              className={styles['nav-link']}
               to='/'
             >
               {'首页'}
             </Link>
-            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/agent'>
+            <Link activeProps={{ 'aria-current': 'page' }} className={styles['nav-link']} to='/agent'>
               {'Agent'}
             </Link>
-            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/settings'>
+            <Link activeProps={{ 'aria-current': 'page' }} className={styles['nav-link']} to='/settings'>
               {'设置'}
             </Link>
-            <Link activeProps={{ 'aria-current': 'page' }} class={styles['nav-link']} to='/about'>
+            <Link activeProps={{ 'aria-current': 'page' }} className={styles['nav-link']} to='/about'>
               {'关于'}
             </Link>
           </nav>

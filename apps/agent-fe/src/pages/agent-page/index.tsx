@@ -22,11 +22,11 @@ import { conversationStore, selectConversation } from '@/utils/conversation-stor
 import { isolateFullscreenElement } from '@/utils/fullscreen-isolation.js';
 import { createObservabilityTraceId, recordObservabilityEvent } from '@/utils/observability-log.js';
 import { providerSettingsCollection } from '@/utils/provider-settings.js';
-import { useLiveQuery } from '@tanstack/solid-db';
-import { createMutation } from '@tanstack/solid-query';
-import { Link } from '@tanstack/solid-router';
-import { useSelector } from '@tanstack/solid-store';
-import { Show, createEffect, createSignal, onCleanup } from 'solid-js';
+import { useLiveQuery } from '@tanstack/react-db';
+import { useMutation } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
+import { useSelector } from '@tanstack/react-store';
+import { useEffect, useRef, useState } from 'react';
 import styles from './index.module.css';
 
 type AgentMutationInput = SendAgentMessageInput & {
@@ -45,33 +45,32 @@ const sortConversations = (conversations: ChatConversation[]) => {
 };
 
 const AgentPage = () => {
-  const [prompt, setPrompt] = createSignal('');
-  const [activeController, setActiveController] = createSignal<AbortController>();
-  const [activeTraceId, setActiveTraceId] = createSignal<string>();
-  const [isFullscreen, setIsFullscreen] = createSignal(false);
+  const [prompt, setPrompt] = useState('');
+  const [activeController, setActiveController] = useState<AbortController>();
+  const [activeTraceId, setActiveTraceId] = useState<string>();
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const activeConversationId = useSelector(conversationStore, (state) => state.activeConversationId);
   const conversationsQuery = useLiveQuery((query) => query.from({ conversations: conversationCollection }));
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  let chatCardElement: HTMLElement | undefined;
-  let recoveredInterruptedConversations = false;
+  const chatCardElement = useRef<HTMLElement>(null);
+  const recoveredInterruptedConversations = useRef(false);
 
-  const conversations = () => sortConversations(conversationsQuery());
-  const activeConversation = () => {
-    return conversationsQuery().find((conversation) => conversation.id === activeConversationId());
-  };
-  const chatCardClass = () =>
-    [styles['chat-card'], isFullscreen() ? styles['chat-card-fullscreen'] : undefined].filter(Boolean).join(' ');
-  const messages = () => activeConversation()?.messages ?? [];
+  const conversations = sortConversations(conversationsQuery.data);
+  const activeConversation = conversationsQuery.data.find((conversation) => conversation.id === activeConversationId);
+  const chatCardClass = [styles['chat-card'], isFullscreen ? styles['chat-card-fullscreen'] : undefined]
+    .filter(Boolean)
+    .join(' ');
+  const messages = activeConversation?.messages ?? [];
 
-  createEffect(() => {
+  useEffect(() => {
     if (!conversationsQuery.isReady) {
       return;
     }
 
-    const availableConversations = conversations();
+    const availableConversations = sortConversations(conversationsQuery.data);
 
-    if (!recoveredInterruptedConversations) {
-      recoveredInterruptedConversations = true;
+    if (!recoveredInterruptedConversations.current) {
+      recoveredInterruptedConversations.current = true;
       availableConversations.forEach((conversation) => {
         recoverInterruptedConversation(conversation.id);
       });
@@ -83,7 +82,7 @@ const AgentPage = () => {
       });
     }
 
-    if (availableConversations.some((conversation) => conversation.id === activeConversationId())) {
+    if (availableConversations.some((conversation) => conversation.id === activeConversationId)) {
       return;
     }
 
@@ -100,9 +99,9 @@ const AgentPage = () => {
         traceId: createObservabilityTraceId('conversation')
       });
     }
-  });
+  }, [activeConversationId, conversationsQuery.data, conversationsQuery.isReady]);
 
-  const sendMessage = createMutation<SendAgentMessageResult, Error, AgentMutationInput>(() => ({
+  const sendMessage = useMutation<SendAgentMessageResult, Error, AgentMutationInput>({
     mutationFn: ({ assistantMessageId: _assistantMessageId, conversationId: _conversationId, ...input }) =>
       sendAgentMessage(input),
     onSuccess: (result, input) => {
@@ -153,10 +152,10 @@ const AgentPage = () => {
       setActiveController(undefined);
       setActiveTraceId(undefined);
     }
-  }));
+  });
 
-  const settings = () => settingsQuery()[0];
-  const isConfigured = () => Boolean(settings()?.apiKey);
+  const settings = settingsQuery.data[0];
+  const isConfigured = Boolean(settings?.apiKey);
 
   const runAssistant = (
     conversation: ChatConversation,
@@ -165,7 +164,7 @@ const AgentPage = () => {
     trigger: 'regenerate' | 'resend' | 'send',
     requestedTraceId?: string
   ) => {
-    const providerSettings = settings();
+    const providerSettings = settingsQuery.data[0];
 
     if (!providerSettings || !providerSettings.apiKey || sendMessage.isPending) {
       return;
@@ -283,31 +282,31 @@ const AgentPage = () => {
       return;
     }
 
-    const remainingConversations = conversations().filter((conversation) => conversation.id !== conversationId);
-    const deletedConversation = conversationsQuery().find((conversation) => conversation.id === conversationId);
+    const remainingConversations = conversations.filter((conversation) => conversation.id !== conversationId);
+    const deletedConversation = conversationsQuery.data.find((conversation) => conversation.id === conversationId);
 
     deleteConversation(conversationId);
     recordObservabilityEvent({
       conversationId,
       details: {
         messageCount: deletedConversation?.messages.length ?? 0,
-        wasActive: activeConversationId() === conversationId
+        wasActive: activeConversationId === conversationId
       },
       event: 'conversation.deleted',
       scope: 'conversation',
       traceId: createObservabilityTraceId('conversation')
     });
 
-    if (activeConversationId() === conversationId) {
+    if (activeConversationId === conversationId) {
       selectConversation(remainingConversations[0]?.id ?? null);
     }
   };
 
   const handleSend = () => {
-    const content = prompt().trim();
-    const conversation = activeConversation();
+    const content = prompt.trim();
+    const conversation = activeConversation;
 
-    if (!content || !conversation || !isConfigured() || sendMessage.isPending) {
+    if (!content || !conversation || !isConfigured || sendMessage.isPending) {
       return;
     }
 
@@ -321,7 +320,7 @@ const AgentPage = () => {
   };
 
   const handleStop = () => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     if (conversation) {
       recordObservabilityEvent({
@@ -329,15 +328,15 @@ const AgentPage = () => {
         event: 'conversation.agent.stop-requested',
         level: 'warn',
         scope: 'conversation',
-        traceId: activeTraceId() ?? createObservabilityTraceId('agent')
+        traceId: activeTraceId ?? createObservabilityTraceId('agent')
       });
     }
 
-    activeController()?.abort();
+    activeController?.abort();
   };
 
   const handleCopy = (content: string) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
     const traceId = createObservabilityTraceId('clipboard');
 
     navigator.clipboard
@@ -364,7 +363,7 @@ const AgentPage = () => {
   };
 
   const handleSave = (messageId: string, content: string) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     if (conversation) {
       updateConversationMessage(conversation.id, messageId, { content });
@@ -380,7 +379,7 @@ const AgentPage = () => {
   };
 
   const handleResend = (messageId: string, content: string) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
     const messageIndex = conversation?.messages.findIndex((message) => message.id === messageId) ?? -1;
 
     if (!conversation || messageIndex === -1 || sendMessage.isPending) {
@@ -409,7 +408,7 @@ const AgentPage = () => {
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     if (conversation && !sendMessage.isPending) {
       removeConversationMessagesFrom(conversation.id, messageId);
@@ -424,7 +423,7 @@ const AgentPage = () => {
   };
 
   const handleRegenerate = (messageId: string) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
     const messageIndex = conversation?.messages.findIndex((message) => message.id === messageId) ?? -1;
 
     if (!conversation || messageIndex === -1 || sendMessage.isPending) {
@@ -452,7 +451,7 @@ const AgentPage = () => {
   };
 
   const handleClearMessages = () => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     if (conversation && !sendMessage.isPending) {
       const messageCount = conversation.messages.length;
@@ -469,7 +468,7 @@ const AgentPage = () => {
   };
 
   const handleDeepThinkingChange = (enabled: boolean) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     if (conversation && !sendMessage.isPending) {
       setConversationDeepThinking(conversation.id, enabled);
@@ -484,7 +483,7 @@ const AgentPage = () => {
   };
 
   const handleFullscreenChange = (enabled: boolean) => {
-    const conversation = activeConversation();
+    const conversation = activeConversation;
 
     setIsFullscreen(enabled);
     recordObservabilityEvent({
@@ -496,8 +495,8 @@ const AgentPage = () => {
     });
   };
 
-  createEffect(() => {
-    if (!isFullscreen()) {
+  useEffect(() => {
+    if (!isFullscreen) {
       return;
     }
 
@@ -506,88 +505,72 @@ const AgentPage = () => {
         handleFullscreenChange(false);
       }
     };
-    const restoreFullscreenIsolation = chatCardElement ? isolateFullscreenElement(chatCardElement) : undefined;
+    const restoreFullscreenIsolation = chatCardElement.current
+      ? isolateFullscreenElement(chatCardElement.current)
+      : undefined;
 
     window.addEventListener('keydown', handleKeyDown);
 
-    onCleanup(() => {
+    return () => {
       window.removeEventListener('keydown', handleKeyDown);
       restoreFullscreenIsolation?.();
-    });
-  });
+    };
+  }, [isFullscreen]);
 
   return (
-    <main class={styles['page']}>
-      <section class={styles['hero']}>
+    <main className={styles['page']}>
+      <section className={styles['hero']}>
         <div>
-          <p class={styles['eyebrow']}>{'LANGGRAPH · BROWSER RUNTIME'}</p>
+          <p className={styles['eyebrow']}>{'LANGGRAPH · BROWSER RUNTIME'}</p>
           <h1>{'Agent 对话'}</h1>
         </div>
         <p>{'多会话本地持久化，支持深度思考、流式回复和工具调用记录。'}</p>
       </section>
 
-      <Show
-        when={isConfigured()}
-        fallback={
-          <section class={styles['notice-card']}>
-            <div>
-              <strong>{'还没有模型配置'}</strong>
-              <p>{'先填写 API Key、Base URL 和模型名，再回来发送消息。'}</p>
-            </div>
-            <Link class={styles['secondary-button']} to='/settings'>
-              {'前往设置'}
-            </Link>
-          </section>
-        }
-      >
-        <section
-          class={chatCardClass()}
-          ref={(element) => {
-            chatCardElement = element;
-          }}
-        >
-          <Show when={!isFullscreen()}>
+      {isConfigured ? (
+        <section className={chatCardClass} ref={chatCardElement}>
+          {isFullscreen ? null : (
             <ConversationList
-              activeConversationId={activeConversationId()}
-              conversations={conversations()}
+              activeConversationId={activeConversationId}
+              conversations={conversations}
               disabled={sendMessage.isPending}
               onCreate={handleCreateConversation}
               onDelete={handleDeleteConversation}
               onSelect={handleSelectConversation}
             />
-          </Show>
+          )}
 
-          <div class={styles['chat-workspace']}>
-            <div class={styles['toolbar']}>
-              <Show when={!isFullscreen()}>
-                <div class={styles['model-summary']}>
-                  <span class={styles['status-dot']} />
-                  <strong>{settings()?.model}</strong>
-                  <small>{settings()?.baseUrl}</small>
+          <div className={styles['chat-workspace']}>
+            <div className={styles['toolbar']}>
+              {isFullscreen ? null : (
+                <div className={styles['model-summary']}>
+                  <span className={styles['status-dot']} />
+                  <strong>{settings?.model}</strong>
+                  <small>{settings?.baseUrl}</small>
                 </div>
-              </Show>
-              <div class={styles['toolbar-actions']}>
+              )}
+              <div className={styles['toolbar-actions']}>
                 <DeepThinkingToggle
-                  checked={activeConversation()?.deepThinking ?? false}
-                  disabled={!activeConversation() || sendMessage.isPending}
+                  checked={activeConversation?.deepThinking ?? false}
+                  disabled={!activeConversation || sendMessage.isPending}
                   onChange={handleDeepThinkingChange}
                 />
-                <Show when={!isFullscreen()}>
+                {isFullscreen ? null : (
                   <button
-                    class={styles['text-button']}
-                    disabled={sendMessage.isPending || messages().length === 0}
+                    className={styles['text-button']}
+                    disabled={sendMessage.isPending || messages.length === 0}
                     onClick={handleClearMessages}
                     type='button'
                   >
                     {'清空当前对话'}
                   </button>
-                </Show>
-                <ConversationFullscreenToggle active={isFullscreen()} onChange={handleFullscreenChange} />
+                )}
+                <ConversationFullscreenToggle active={isFullscreen} onChange={handleFullscreenChange} />
               </div>
             </div>
 
             <MessageList
-              messages={messages()}
+              messages={messages}
               onCopy={handleCopy}
               onDelete={handleDeleteMessage}
               onRegenerate={handleRegenerate}
@@ -597,19 +580,29 @@ const AgentPage = () => {
               pending={sendMessage.isPending}
             />
 
-            <div class={styles['composer-shell']}>
+            <div className={styles['composer-shell']}>
               <ChatComposer
-                disabled={!isConfigured() || !activeConversation()}
+                disabled={!activeConversation}
                 onChange={setPrompt}
                 onSend={handleSend}
                 onStop={handleStop}
                 pending={sendMessage.isPending}
-                value={prompt()}
+                value={prompt}
               />
             </div>
           </div>
         </section>
-      </Show>
+      ) : (
+        <section className={styles['notice-card']}>
+          <div>
+            <strong>{'还没有模型配置'}</strong>
+            <p>{'先填写 API Key、Base URL 和模型名，再回来发送消息。'}</p>
+          </div>
+          <Link className={styles['secondary-button']} to='/settings'>
+            {'前往设置'}
+          </Link>
+        </section>
+      )}
     </main>
   );
 };

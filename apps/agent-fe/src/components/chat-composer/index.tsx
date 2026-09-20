@@ -1,4 +1,4 @@
-import type { JSX } from 'solid-js';
+import type { KeyboardEvent } from 'react';
 import styles from './index.module.css';
 
 type ChatComposerProps = {
@@ -11,16 +11,16 @@ type ChatComposerProps = {
 };
 
 const ChatComposer = (props: ChatComposerProps) => {
-  const canSend = () => !props.disabled && !props.pending && props.value.trim().length > 0;
+  const canSend = !props.disabled && !props.pending && props.value.trim().length > 0;
 
-  const handleKeyDown: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent> = (event) => {
-    if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) {
       return;
     }
 
     event.preventDefault();
 
-    if (canSend()) {
+    if (canSend) {
       props.onSend();
     }
   };
@@ -31,30 +31,30 @@ const ChatComposer = (props: ChatComposerProps) => {
       return;
     }
 
-    if (canSend()) {
+    if (canSend) {
       props.onSend();
     }
   };
 
   return (
-    <div class={styles['composer']}>
+    <div className={styles['composer']}>
       <textarea
         aria-label='对话输入'
-        class={styles['input']}
+        className={styles['input']}
         disabled={props.disabled}
-        onInput={(event) => {
+        onChange={(event) => {
           props.onChange(event.currentTarget.value);
         }}
         onKeyDown={handleKeyDown}
         placeholder='输入消息，Enter 发送，Shift+Enter 换行'
-        rows='3'
+        rows={3}
         value={props.value}
       />
-      <div class={styles['footer']}>
+      <div className={styles['footer']}>
         <span>{'Enter 发送 · Shift+Enter 换行'}</span>
         <button
-          class={`${styles['send-button'] ?? ''} ${props.pending ? (styles['stop-button'] ?? '') : ''}`}
-          disabled={!props.pending && !canSend()}
+          className={`${styles['send-button'] ?? ''} ${props.pending ? (styles['stop-button'] ?? '') : ''}`}
+          disabled={!props.pending && !canSend}
           onClick={handleAction}
           type='button'
         >

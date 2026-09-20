@@ -1,4 +1,4 @@
-import { createStore } from '@tanstack/solid-store';
+import { createStore } from '@tanstack/react-store';
 
 type ConversationState = {
   activeConversationId: string | null;

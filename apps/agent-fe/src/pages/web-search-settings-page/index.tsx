@@ -9,39 +9,37 @@ import {
   webSearchProviderOptions,
   webSearchSettingsSchema
 } from '@/utils/provider-settings.js';
-import { useLiveQuery } from '@tanstack/solid-db';
-import { For, Show, createEffect, createSignal } from 'solid-js';
+import { useLiveQuery } from '@tanstack/react-db';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../settings-page/index.module.css';
 
 type ValidationStatus = 'error' | 'idle' | 'success' | 'validating';
 
 const WebSearchSettingsPage = () => {
   const settingsQuery = useLiveQuery((query) => query.from({ settings: providerSettingsCollection }));
-  const [webSearchApiKey, setWebSearchApiKey] = createSignal(defaultProviderSettings.webSearchApiKey);
-  const [webSearchEnabled, setWebSearchEnabled] = createSignal(defaultProviderSettings.webSearchEnabled);
-  const [webSearchProvider, setWebSearchProvider] = createSignal(defaultProviderSettings.webSearchProvider);
-  const [validationMessage, setValidationMessage] = createSignal('');
-  const [validationStatus, setValidationStatus] = createSignal<ValidationStatus>('idle');
-  const [error, setError] = createSignal('');
-  const [saved, setSaved] = createSignal(false);
-  let loadedSavedSettings = false;
+  const [webSearchApiKey, setWebSearchApiKey] = useState(defaultProviderSettings.webSearchApiKey);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(defaultProviderSettings.webSearchEnabled);
+  const [webSearchProvider, setWebSearchProvider] = useState(defaultProviderSettings.webSearchProvider);
+  const [validationMessage, setValidationMessage] = useState('');
+  const [validationStatus, setValidationStatus] = useState<ValidationStatus>('idle');
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+  const loadedSavedSettings = useRef(false);
 
-  const selectedWebSearchProvider = () => {
-    return webSearchProviderOptions.find((option) => option.value === webSearchProvider());
-  };
+  const selectedWebSearchProvider = webSearchProviderOptions.find((option) => option.value === webSearchProvider);
 
-  createEffect(() => {
-    const currentSettings = settingsQuery()[0];
+  useEffect(() => {
+    const currentSettings = settingsQuery.data[0];
 
-    if (!currentSettings || loadedSavedSettings) {
+    if (!currentSettings || loadedSavedSettings.current) {
       return;
     }
 
     setWebSearchApiKey(currentSettings.webSearchApiKey);
     setWebSearchEnabled(currentSettings.webSearchEnabled);
     setWebSearchProvider(currentSettings.webSearchProvider);
-    loadedSavedSettings = true;
-  });
+    loadedSavedSettings.current = true;
+  }, [settingsQuery.data]);
 
   const resetWebSearchValidation = () => {
     setValidationMessage('');
@@ -68,8 +66,8 @@ const WebSearchSettingsPage = () => {
   };
 
   const handleWebSearchValidation = async () => {
-    const apiKeyValue = webSearchApiKey().trim();
-    const providerValue = webSearchProvider();
+    const apiKeyValue = webSearchApiKey.trim();
+    const providerValue = webSearchProvider;
     const traceId = createObservabilityTraceId('settings');
 
     if (!apiKeyValue) {
@@ -128,7 +126,7 @@ const WebSearchSettingsPage = () => {
       recordObservabilityEvent({
         details: {
           error: validationErrorMessage,
-          provider: webSearchProvider()
+          provider: webSearchProvider
         },
         event: 'settings.web-search.validation.failed',
         level: 'error',
@@ -143,9 +141,9 @@ const WebSearchSettingsPage = () => {
     setSaved(false);
 
     const result = webSearchSettingsSchema.safeParse({
-      webSearchApiKey: webSearchApiKey(),
-      webSearchEnabled: webSearchEnabled(),
-      webSearchProvider: webSearchProvider()
+      webSearchApiKey,
+      webSearchEnabled,
+      webSearchProvider
     });
 
     if (!result.success) {
@@ -163,7 +161,7 @@ const WebSearchSettingsPage = () => {
       return;
     }
 
-    const currentSettings = settingsQuery()[0] ?? defaultProviderSettings;
+    const currentSettings = settingsQuery.data[0] ?? defaultProviderSettings;
 
     saveProviderSettings({ ...currentSettings, ...result.data });
     setSaved(true);
@@ -187,7 +185,7 @@ const WebSearchSettingsPage = () => {
     resetWebSearchValidation();
     setError('');
     setSaved(false);
-    loadedSavedSettings = false;
+    loadedSavedSettings.current = false;
     recordObservabilityEvent({
       event: 'settings.cleared',
       scope: 'settings',
@@ -196,99 +194,104 @@ const WebSearchSettingsPage = () => {
   };
 
   return (
-    <div class={styles['settings-fields']}>
-      <section class={styles['settings-group']}>
-        <div class={styles['group-heading']}>
+    <div className={styles['settings-fields']}>
+      <section className={styles['settings-group']}>
+        <div className={styles['group-heading']}>
           <strong>{'联网搜索'}</strong>
           <span>{'开启后，Agent 可以调用 web_search 查询最新信息。'}</span>
         </div>
 
-        <label class={styles['toggle-setting']}>
-          <span class={styles['toggle-copy']}>
+        <label className={styles['toggle-setting']}>
+          <span className={styles['toggle-copy']}>
             <strong>{'启用联网搜索'}</strong>
             <small>{'仅在开启时向 Agent 注册联网搜索工具。'}</small>
           </span>
-          <span class={styles['toggle-control']}>
+          <span className={styles['toggle-control']}>
             <input
-              checked={webSearchEnabled()}
+              checked={webSearchEnabled}
               onChange={(event) => {
                 handleWebSearchEnabledChange(event.currentTarget.checked);
               }}
               type='checkbox'
             />
-            <span class={styles['toggle-track']} aria-hidden='true'>
-              <span class={styles['toggle-thumb']} />
+            <span className={styles['toggle-track']} aria-hidden='true'>
+              <span className={styles['toggle-thumb']} />
             </span>
           </span>
         </label>
 
-        <Show when={webSearchEnabled()}>
-          <label class={styles['field']}>
-            <span class={styles['field-label']}>{'搜索供应商'}</span>
-            <select
-              class={styles['select']}
-              name='web-search-provider'
-              onChange={(event) => {
-                handleWebSearchProviderChange(event.currentTarget.value);
-              }}
-              value={webSearchProvider()}
-            >
-              <For each={webSearchProviderOptions}>
-                {(option) => <option value={option.value}>{option.label}</option>}
-              </For>
-            </select>
-            <Show when={selectedWebSearchProvider()}>
-              {(provider) => (
-                <a class={styles['provider-link']} href={provider().websiteUrl} rel='noreferrer' target='_blank'>
-                  {`前往 ${provider().label} 官网获取 API Key ↗`}
-                </a>
-              )}
-            </Show>
-          </label>
-
-          <ControlledInput
-            autocomplete='off'
-            label='搜索 API Key'
-            name='web-search-api-key'
-            onValueChange={handleWebSearchApiKeyChange}
-            placeholder='输入所选搜索供应商的 API Key'
-            type='password'
-            value={webSearchApiKey()}
-          />
-
-          <div class={styles['validation-row']}>
-            <button
-              class={styles['secondary-button']}
-              disabled={validationStatus() === 'validating'}
-              onClick={handleWebSearchValidationClick}
-              type='button'
-            >
-              {validationStatus() === 'validating' ? '正在校验…' : '校验联网搜索'}
-            </button>
-            <Show when={validationMessage()}>
-              <p
-                class={validationStatus() === 'success' ? styles['validation-success'] : styles['validation-message']}
-                aria-live='polite'
+        {webSearchEnabled ? (
+          <>
+            <label className={styles['field']}>
+              <span className={styles['field-label']}>{'搜索供应商'}</span>
+              <select
+                className={styles['select']}
+                name='web-search-provider'
+                onChange={(event) => {
+                  handleWebSearchProviderChange(event.currentTarget.value);
+                }}
+                value={webSearchProvider}
               >
-                {validationMessage()}
-              </p>
-            </Show>
-          </div>
-        </Show>
+                {webSearchProviderOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {selectedWebSearchProvider ? (
+                <a
+                  className={styles['provider-link']}
+                  href={selectedWebSearchProvider.websiteUrl}
+                  rel='noreferrer'
+                  target='_blank'
+                >
+                  {`前往 ${selectedWebSearchProvider.label} 官网获取 API Key ↗`}
+                </a>
+              ) : null}
+            </label>
+
+            <ControlledInput
+              autoComplete='off'
+              label='搜索 API Key'
+              name='web-search-api-key'
+              onValueChange={handleWebSearchApiKeyChange}
+              placeholder='输入所选搜索供应商的 API Key'
+              type='password'
+              value={webSearchApiKey}
+            />
+
+            <div className={styles['validation-row']}>
+              <button
+                className={styles['secondary-button']}
+                disabled={validationStatus === 'validating'}
+                onClick={handleWebSearchValidationClick}
+                type='button'
+              >
+                {validationStatus === 'validating' ? '正在校验…' : '校验联网搜索'}
+              </button>
+              {validationMessage ? (
+                <p
+                  className={
+                    validationStatus === 'success' ? styles['validation-success'] : styles['validation-message']
+                  }
+                  aria-live='polite'
+                >
+                  {validationMessage}
+                </p>
+              ) : null}
+            </div>
+          </>
+        ) : null}
       </section>
 
-      <Show when={error()}>
-        <p class={styles['error']}>{error()}</p>
-      </Show>
-      <Show when={saved()}>
-        <p class={styles['success']}>{'联网搜索设置已保存。'}</p>
-      </Show>
+      {error ? <p className={styles['error']}>{error}</p> : null}
+      {saved ? <p className={styles['success']}>{'联网搜索设置已保存。'}</p> : null}
 
-      <div class={styles['actions']}>
-        <button class={styles['primary-button']} type='button' onClick={handleSave}>
+      <div className={styles['actions']}>
+        <button className={styles['primary-button']} type='button' onClick={handleSave}>
           {'保存联网搜索设置'}
         </button>
-        <button class={styles['danger-button']} type='button' onClick={handleClear}>
+        <button className={styles['danger-button']} type='button' onClick={handleClear}>
           {'删除全部本地设置'}
         </button>
       </div>
