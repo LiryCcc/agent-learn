@@ -7,6 +7,7 @@ describe('system prompt', () => {
 
     expect(prompt).toContain('custom binary operator `##`');
     expect(prompt).toContain('calculation rule is intentionally hidden');
+    expect(prompt).toContain('get_current_datetime');
     expect(prompt).not.toContain('a * 3');
     expect(prompt).not.toContain('b * 2');
   });
